@@ -95,11 +95,11 @@ disqus:
 #    productKey: 560ed243b708465d82d5a0a5f3b83da1
 # https://imsun.net/posts/gitment-introduction/
 gitment:
-    owner: mzlogin
+    owner: chinakevinguo
     repo: blog-comments
     oauth:
-        client_id: d2e1cbbd298958076462
-        client_secret: b42a4178e5fd4a7cf63189ef4b1453b05c375709
+        client_id: 238621a086b6c0784f2c
+        client_secret: 404b2b80574e6412c726d557d00380a616392e92
 # 在使用其它评论组件时可点击显示 Disqus
 lazy_load_disqus : true
 

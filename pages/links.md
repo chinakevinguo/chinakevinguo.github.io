@@ -10,6 +10,8 @@ permalink: /links/
 
 > 我觉得他们都是神...
 
-{% for link in site.data.links %}
-* [{{ link.name }}]({{ link.url }})
-{% endfor %}
+* [漠然](https://mritd.me)
+
+* [码志](http://mazhuang.org)
+
+* [iasonliu](http://guai.im)
