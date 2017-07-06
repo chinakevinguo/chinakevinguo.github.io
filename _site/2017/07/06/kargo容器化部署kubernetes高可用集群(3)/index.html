@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <title>Categories &mdash; KevinGuo</title>
+    <title>kargo容器化部署kubernetes高可用集群(3) &mdash; KevinGuo</title>
     <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
     <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
     <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
@@ -21,26 +21,28 @@
     
 
     
-    <link rel="canonical" href="http://0.0.0.0:80/categories/">
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/">
     <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
     <link rel="shortcut icon" href="/favicon.ico">
     
-    <meta property="og:title" content="Categories">
+    <meta property="og:title" content="kargo容器化部署kubernetes高可用集群(3)">
       
-    <meta name="keywords" content="分类">
-    <meta name="og:keywords" content="分类">
+    <meta name="keywords" content="kargo,kubernetes,docker">
+    <meta name="og:keywords" content="kargo,kubernetes,docker">
       
-    <meta name="description" content="这个作者很懒....">
-    <meta name="og:description" content="这个作者很懒....">
+    <meta name="description" content="  上一篇我们详细的剥析了通过kargo生成的各类服务的配置文件，学会了，如何生成证书，如何配置etcd,calico,kubelet，学会了如何配置一个kubernetes的高可用集群。既然集群已经配好了，那么这一章，我们就来学学如何配置一些常用的插件。">
+    <meta name="og:description" content="  上一篇我们详细的剥析了通过kargo生成的各类服务的配置文件，学会了，如何生成证书，如何配置etcd,calico,kubelet，学会了如何配置一个kubernetes的高可用集群。既然集群已经配好了，那么这一章，我们就来学学如何配置一些常用的插件。">
       
     
     
         
     
-    <meta property="og:url" content="http://0.0.0.0:80/categories/">
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/">
     <meta property="og:site_name" content="KevinGuo">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
     
     <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
     <script src="/assets/js/jquery-ui.js"></script>
@@ -68,7 +70,7 @@
                 
                 <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
                 
-                <a href="/categories/" class=" selected  site-header-nav-item" target="" title="分类">分类</a>
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
                 
                 <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
                 
@@ -81,79 +83,112 @@
     </header>
     <!-- / header -->
 
-    <section class="collection-head small geopattern" data-pattern-id="Categories">
-    <div class="container">
-        <div class="columns">
-            <div class="column three-fourths">
-                <div class="collection-title">
-                    <h1 class="collection-header">Categories</h1>
-                </div>
-            </div>
+    <section class="collection-head small geopattern" data-pattern-id="kargo容器化部署kuber">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">kargo容器化部署kubernetes高可用集群(3)</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
+          </span>
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
         </div>
+      </div>
     </div>
+  </div>
+</div>
 </section>
 <!-- / .banner -->
 <section class="container content">
-    <div class="columns">
-        <div class="column three-fourths" >
-            <article class="article-content markdown-body">
-                <section class="container posts-content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <blockquote>
+  <p>上一篇我们详细的剥析了通过kargo生成的各类服务的配置文件，学会了，如何生成证书，如何配置etcd,calico,kubelet，学会了如何配置一个kubernetes的高可用集群。既然集群已经配好了，那么这一章，我们就来学学如何配置一些常用的插件。</p>
+</blockquote>
+
+<p>其实这一章好像没什么好讲的，无非就是几个yaml文件，只要你集群搭建成功了，直接去<a href="https://github.com/chinakevinguo/kubernetes-custom/tree/master/kubernetes%20%E6%8F%92%E4%BB%B6">这里</a>下载yml文件运行即可</p>
+
+<p>目前，我所用到的插件如下：</p>
+
+<ul>
+  <li>ingress</li>
+  <li>kubedns</li>
+  <li>dashboard</li>
+  <li>efk</li>
+  <li>heapster
+<!--more--></li>
+</ul>
+
+<p>运行结果如下</p>
+
+<p>Dashboard and heapster
+<img src="/images/posts/dashboard-heapster.png" alt="" /></p>
+
+<p>EFK
+<img src="/images/posts/kibana.png" alt="" /></p>
+
+<p>后期再研究新的东西了再加吧，头疼，下班了</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/';
+              this.page.identifier = '/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/';
+              this.page.title = 'kargo容器化部署kubernetes高可用集群(3)';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
 
 
-<h3>docker</h3>
-<ol class="posts-list" id="docker">
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2017-07-06</span>
-<a class="posts-list-name" href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/">kargo容器化部署kubernetes高可用集群(3)</a>
-</li>
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2017-07-06</span>
-<a class="posts-list-name" href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/">kargo容器化部署kubernetes高可用集群(2)</a>
-</li>
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2017-07-06</span>
-<a class="posts-list-name" href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/">kargo容器化部署kubernetes高可用集群(1)</a>
-</li>
-
-</ol>
-
-<h3>kubernetes</h3>
-<ol class="posts-list" id="kubernetes">
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2017-07-06</span>
-<a class="posts-list-name" href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/">kargo容器化部署kubernetes高可用集群(3)</a>
-</li>
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2017-07-06</span>
-<a class="posts-list-name" href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/">kargo容器化部署kubernetes高可用集群(2)</a>
-</li>
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2017-07-06</span>
-<a class="posts-list-name" href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/">kargo容器化部署kubernetes高可用集群(1)</a>
-</li>
-
-</ol>
-
-</section>
-<!-- /section.content -->
-
-            </article>
-            <div class="share">
-                <div class="share-component"></div>
-            </div>
-            <div class="comment">
-                
-
-            </div>
-        </div>
-        <div class="column one-fourth">
-            
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
 <h3>Search</h3>
 <div id="site_search">
     <input type="text" id="search_box" placeholder="Search">
@@ -167,36 +202,22 @@
 <script src="/assets/js/search.js"></script>
 
 
-            
-<h3>Blog Categories</h3>
-<div id="blog-categories">
-  <ul class="list-group">
     
+
     
-    <li class="list-group-item">
-    <a href="#docker">docker</a>
-    <span class="badge">3</span>
-    </li>
-    
-    <li class="list-group-item">
-    <a href="#kubernetes">kubernetes</a>
-    <span class="badge">3</span>
-    </li>
-    
-  </ul>
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
 </div>
 
-<script type="text/javascript">
+<script src="/assets/js/jquery.toc.js"></script>
 
-  $(document).ready(function(){
-    $("#blog-categories li").css('text-transform','capitalize')
-  });
-
-</script>
-
-
-        </div>
-    </div>
+  </div>
+</div>
 </section>
 <!-- /section.content -->
 

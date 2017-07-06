@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>kargo容器化部署kubernetes高可用集群(2) &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="kargo容器化部署kubernetes高可用集群(2)">
+      
+    <meta name="keywords" content="kargo,kubernetes,docker">
+    <meta name="og:keywords" content="kargo,kubernetes,docker">
+      
+    <meta name="description" content="  上一篇已经使用kargo搭建了kubernetes高可用集群，这里重点通过剥析kargo生成的配置文件来更加细化的了解下kubernetes，方便后期对kubernetes的自定义。所有的配置文件，我会放到github上">
+    <meta name="og:description" content="  上一篇已经使用kargo搭建了kubernetes高可用集群，这里重点通过剥析kargo生成的配置文件来更加细化的了解下kubernetes，方便后期对kubernetes的自定义。所有的配置文件，我会放到github上">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="kargo容器化部署kuber">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">kargo容器化部署kubernetes高可用集群(2)</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
+          </span>
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <blockquote>
+  <p>上一篇已经使用kargo搭建了kubernetes高可用集群，这里重点通过剥析kargo生成的配置文件来更加细化的了解下kubernetes，方便后期对kubernetes的自定义。所有的配置文件，我会放到<a href="https://github.com/chinakevinguo/kubernetes-custom/tree/master/kubernetes%20%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4%E7%BB%84%E4%BB%B6">github</a>上</p>
+</blockquote>
+
+<h1 id="etcd-service">etcd service</h1>
+
+<p>kargo中也将etcd以容器的方式运行，不过不是放在manifest中，而是单独用systemd的方式管理起来，然后通过etcd cluster来实现高可用</p>
+
+<h2 id="主要文件">主要文件</h2>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>/usr/local/etcd <span class="c"># etcd server启动的shell脚本文件</span>
+/usr/local/etcdctl <span class="c"># etcd 命令,使用命令docker cp etcd1:/usr/local/bin/etcdctl /usr/local/bin/etcdctl将命令复制到本地</span>
+/etc/systemd/system/etcd.service <span class="c"># etcd 的service文件</span>
+/etc/etcd.env <span class="c"># etcd 的环境文件</span>
+/etc/ssl/etcd/ <span class="c"># etcd 证书文件存放目录</span>
+/etc/ssl/etcd/openssl.conf <span class="c"># 生成etcd证书所需要的openssl文件</span>
+/usr/local/bin/etcd-scripts/ <span class="c"># 生成etcd证书的脚本文件</span>
+</code></pre>
+</div>
+<!--more-->
+<h3 id="etcd-shell脚本">etcd shell脚本</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vim /usr/local/etcd
+<span class="c">#!/bin/bash</span>
+/usr/bin/docker run <span class="se">\</span>
+  --restart<span class="o">=</span>on-failure:5 <span class="se">\</span>
+  --env-file<span class="o">=</span>/etc/etcd.env <span class="se">\</span>
+  --net<span class="o">=</span>host <span class="se">\</span>
+  -v /etc/ssl/certs:/etc/ssl/certs:ro <span class="se">\</span>
+  -v /etc/ssl/etcd/ssl:/etc/ssl/etcd/ssl:ro <span class="se">\</span>
+  -v /var/lib/etcd:/var/lib/etcd:rw <span class="se">\</span>
+    --memory<span class="o">=</span>512M <span class="se">\</span>
+      --name<span class="o">=</span>etcd1 <span class="se">\</span>
+  quay.io/coreos/etcd:v3.1.5 <span class="se">\</span>
+    /usr/local/bin/etcd <span class="se">\</span>
+    <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span>
+</code></pre>
+</div>
+
+<h3 id="etcdservice">etcd.service</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vim /etc/systemd/system/etcd.service
+<span class="o">[</span>Unit]
+<span class="nv">Description</span><span class="o">=</span>etcd docker wrapper
+<span class="nv">Wants</span><span class="o">=</span>docker.socket
+<span class="nv">After</span><span class="o">=</span>docker.service
+
+<span class="o">[</span>Service]
+<span class="nv">User</span><span class="o">=</span>root
+<span class="nv">PermissionsStartOnly</span><span class="o">=</span><span class="nb">true
+</span><span class="nv">EnvironmentFile</span><span class="o">=</span>/etc/etcd.env
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/local/bin/etcd
+<span class="nv">ExecStartPre</span><span class="o">=</span>-/usr/bin/docker rm -f etcd1
+<span class="nv">ExecStop</span><span class="o">=</span>/usr/bin/docker stop etcd1
+<span class="nv">Restart</span><span class="o">=</span>always
+<span class="nv">RestartSec</span><span class="o">=</span>15s
+<span class="nv">TimeoutStartSec</span><span class="o">=</span>30s
+
+<span class="o">[</span>Install]
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</code></pre>
+</div>
+
+<h3 id="etcdenv">etcd.env</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vim /etc/etcd.env
+<span class="nv">ETCD_DATA_DIR</span><span class="o">=</span>/var/lib/etcd
+<span class="nv">ETCD_ADVERTISE_CLIENT_URLS</span><span class="o">=</span>https://172.30.33.90:2379
+<span class="nv">ETCD_INITIAL_ADVERTISE_PEER_URLS</span><span class="o">=</span>https://172.30.33.90:2380
+<span class="nv">ETCD_INITIAL_CLUSTER_STATE</span><span class="o">=</span>existing
+<span class="nv">ETCD_LISTEN_CLIENT_URLS</span><span class="o">=</span>https://172.30.33.90:2379,https://127.0.0.1:2379
+<span class="nv">ETCD_ELECTION_TIMEOUT</span><span class="o">=</span>5000
+<span class="nv">ETCD_HEARTBEAT_INTERVAL</span><span class="o">=</span>250
+<span class="nv">ETCD_INITIAL_CLUSTER_TOKEN</span><span class="o">=</span>k8s_etcd
+<span class="nv">ETCD_LISTEN_PEER_URLS</span><span class="o">=</span>https://172.30.33.90:2380
+<span class="nv">ETCD_NAME</span><span class="o">=</span>etcd1
+<span class="nv">ETCD_PROXY</span><span class="o">=</span>off
+<span class="nv">ETCD_INITIAL_CLUSTER</span><span class="o">=</span><span class="nv">etcd1</span><span class="o">=</span>https://172.30.33.90:2380,etcd2<span class="o">=</span>https://172.30.33.91:2380,etcd3<span class="o">=</span>https://172.30.33.92:2380
+
+<span class="c"># TLS settings</span>
+<span class="nv">ETCD_TRUSTED_CA_FILE</span><span class="o">=</span>/etc/ssl/etcd/ssl/ca.pem
+<span class="nv">ETCD_CERT_FILE</span><span class="o">=</span>/etc/ssl/etcd/ssl/member-node1.pem
+<span class="nv">ETCD_KEY_FILE</span><span class="o">=</span>/etc/ssl/etcd/ssl/member-node1-key.pem
+<span class="nv">ETCD_PEER_TRUSTED_CA_FILE</span><span class="o">=</span>/etc/ssl/etcd/ssl/ca.pem
+<span class="nv">ETCD_PEER_CERT_FILE</span><span class="o">=</span>/etc/ssl/etcd/ssl/member-node1.pem
+<span class="nv">ETCD_PEER_KEY_FILE</span><span class="o">=</span>/etc/ssl/etcd
+</code></pre>
+</div>
+
+<h2 id="安装步骤">安装步骤</h2>
+<p>安装步骤很简单</p>
+
+<p>1.按照最后的步骤生成证书
+2.在每个etcd server的节点上配置好上面的配置文件
+3.将etcd.service配置成系统服务(其实就是将运行docker的shell脚本写到systemd中)</p>
+<h1 id="calico-service">calico service</h1>
+
+<h2 id="主要文件-1">主要文件</h2>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>/usr/local/bin/calicoctl <span class="c">#calicoctl命令</span>
+/etc/systemd/system/calico-node.service <span class="c">#calico-node service文件</span>
+/etc/calico/calico.env <span class="c"># calico 环境文件</span>
+/etc/calico/certs/  <span class="c">#(将etcd/ssl目录下的ca.pem 复制成cert.crt, node-nodex.pem复制成cert.crt, node-nodex-key.pem复制成key.pem)</span>
+/etc/cni/net.d/10-calico.conf <span class="c"># calico cni config</span>
+/etc/kubernetes/node-kubeconfig.yaml <span class="c"># 为kubernetes 配置calico网络</span>
+/opt/cni/bin/ <span class="c">#(将hyperkube和calico/cni镜像中/opt/cni/bin/目录下的所有插件复制到宿主机的/opt/cni/bin/目录下，可通过-v挂载的方式)</span>
+</code></pre>
+</div>
+
+<h3 id="calicoctl-shell脚本">calicoctl shell脚本</h3>
+<p>运行这个脚本其实就是运行一个容器来进行查询</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+/usr/bin/docker run -i --privileged --rm <span class="se">\</span>
+--net<span class="o">=</span>host --pid<span class="o">=</span>host <span class="se">\</span>
+-e <span class="nv">ETCD_ENDPOINTS</span><span class="o">=</span>https://172.30.33.90:2379,https://172.30.33.91:2379,https://172.30.33.92:2379 <span class="se">\</span>
+-e <span class="nv">ETCD_CA_CERT_FILE</span><span class="o">=</span>/etc/calico/certs/ca_cert.crt <span class="se">\</span>
+-e <span class="nv">ETCD_CERT_FILE</span><span class="o">=</span>/etc/calico/certs/cert.crt <span class="se">\</span>
+-e <span class="nv">ETCD_KEY_FILE</span><span class="o">=</span>/etc/calico/certs/key.pem <span class="se">\</span>
+-v /usr/bin/docker:/usr/bin/docker <span class="se">\</span>
+-v /var/run/docker.sock:/var/run/docker.sock <span class="se">\</span>
+-v /var/run/calico:/var/run/calico <span class="se">\</span>
+-v /etc/calico/certs:/etc/calico/certs:ro <span class="se">\</span>
+--memory<span class="o">=</span>170M --cpu-shares<span class="o">=</span>100 <span class="se">\</span>
+calico/ctl:v1.1.0 <span class="se">\</span>
+<span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span>
+</code></pre>
+</div>
+
+<h3 id="calico-nodeservice">calico-node.service</h3>
+<p>这个系统服务，其实就是启动一个容器</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>Unit]
+<span class="nv">Description</span><span class="o">=</span>calico-node
+<span class="nv">After</span><span class="o">=</span>docker.service
+<span class="nv">Requires</span><span class="o">=</span>docker.service
+
+<span class="o">[</span>Service]
+<span class="nv">EnvironmentFile</span><span class="o">=</span>/etc/calico/calico.env
+<span class="nv">ExecStartPre</span><span class="o">=</span>-/usr/bin/docker rm -f calico-node
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/bin/docker run --net<span class="o">=</span>host --privileged <span class="se">\</span>
+ --name<span class="o">=</span>calico-node <span class="se">\</span>
+ -e <span class="nv">HOSTNAME</span><span class="o">=</span><span class="k">${</span><span class="nv">CALICO_HOSTNAME</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">IP</span><span class="o">=</span><span class="k">${</span><span class="nv">CALICO_IP</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">IP6</span><span class="o">=</span><span class="k">${</span><span class="nv">CALICO_IP6</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">CALICO_NETWORKING_BACKEND</span><span class="o">=</span><span class="k">${</span><span class="nv">CALICO_NETWORKING_BACKEND</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">FELIX_DEFAULTENDPOINTTOHOSTACTION</span><span class="o">=</span>RETURN <span class="se">\</span>
+ -e <span class="nv">AS</span><span class="o">=</span><span class="k">${</span><span class="nv">CALICO_AS</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">NO_DEFAULT_POOLS</span><span class="o">=</span><span class="k">${</span><span class="nv">CALICO_NO_DEFAULT_POOLS</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">CALICO_LIBNETWORK_ENABLED</span><span class="o">=</span><span class="k">${</span><span class="nv">CALICO_LIBNETWORK_ENABLED</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">ETCD_ENDPOINTS</span><span class="o">=</span><span class="k">${</span><span class="nv">ETCD_ENDPOINTS</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">ETCD_CA_CERT_FILE</span><span class="o">=</span><span class="k">${</span><span class="nv">ETCD_CA_CERT_FILE</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">ETCD_CERT_FILE</span><span class="o">=</span><span class="k">${</span><span class="nv">ETCD_CERT_FILE</span><span class="k">}</span> <span class="se">\</span>
+ -e <span class="nv">ETCD_KEY_FILE</span><span class="o">=</span><span class="k">${</span><span class="nv">ETCD_KEY_FILE</span><span class="k">}</span> <span class="se">\</span>
+ -v /var/log/calico:/var/log/calico <span class="se">\</span>
+ -v /run/docker/plugins:/run/docker/plugins <span class="se">\</span>
+ -v /lib/modules:/lib/modules <span class="se">\</span>
+ -v /var/run/calico:/var/run/calico <span class="se">\</span>
+ -v /etc/calico/certs:/etc/calico/certs:ro <span class="se">\</span>
+ --memory<span class="o">=</span>500M --cpu-shares<span class="o">=</span>300 <span class="se">\</span>
+ calico/node:v1.1.0
+
+<span class="nv">Restart</span><span class="o">=</span>always
+<span class="nv">RestartSec</span><span class="o">=</span>10s
+
+<span class="nv">ExecStop</span><span class="o">=</span>-/usr/bin/docker stop calico-node
+
+<span class="o">[</span>Install]
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</code></pre>
+</div>
+
+<h3 id="calicoenv-文件">calico.env 文件</h3>
+<p>系统服务所需的环境变量信息</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="nv">ETCD_ENDPOINTS</span><span class="o">=</span><span class="s2">"https://172.30.33.90:2379,https://172.30.33.91:2379,https://172.30.33.92:2379"</span>
+<span class="nv">ETCD_CA_CERT_FILE</span><span class="o">=</span><span class="s2">"/etc/calico/certs/ca_cert.crt"</span>
+<span class="nv">ETCD_CERT_FILE</span><span class="o">=</span><span class="s2">"/etc/calico/certs/cert.crt"</span>
+<span class="nv">ETCD_KEY_FILE</span><span class="o">=</span><span class="s2">"/etc/calico/certs/key.pem"</span>
+<span class="nv">CALICO_IP</span><span class="o">=</span><span class="s2">"172.30.33.90"</span>
+<span class="nv">CALICO_IP6</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">CALICO_NO_DEFAULT_POOLS</span><span class="o">=</span><span class="s2">"true"</span>
+<span class="nv">CALICO_LIBNETWORK_ENABLED</span><span class="o">=</span><span class="s2">"true"</span>
+<span class="nv">CALICO_HOSTNAME</span><span class="o">=</span><span class="s2">"k8s-master01"</span>
+</code></pre>
+</div>
+
+<h3 id="10-calicoconf">10-calico.conf</h3>
+<p>Calico CNI插件需要有一个标准的CNI配置文件</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">{</span>
+  <span class="s2">"name"</span>: <span class="s2">"calico-k8s-network"</span>,
+  <span class="s2">"hostname"</span>: <span class="s2">"k8s-master01"</span>,
+  <span class="s2">"type"</span>: <span class="s2">"calico"</span>,
+  <span class="s2">"etcd_endpoints"</span>: <span class="s2">"https://172.30.33.90:2379,https://172.30.33.91:2379,https://172.30.33.92:2379"</span>,
+  <span class="s2">"etcd_cert_file"</span>: <span class="s2">"/etc/ssl/etcd/ssl/node-node1.pem"</span>,
+  <span class="s2">"etcd_key_file"</span>: <span class="s2">"/etc/ssl/etcd/ssl/node-node1-key.pem"</span>,
+  <span class="s2">"etcd_ca_cert_file"</span>: <span class="s2">"/etc/ssl/etcd/ssl/ca.pem"</span>,
+  <span class="s2">"log_level"</span>: <span class="s2">"info"</span>,
+  <span class="s2">"ipam"</span>: <span class="o">{</span>
+    <span class="s2">"type"</span>: <span class="s2">"calico-ipam"</span>
+  <span class="o">}</span>,
+  <span class="s2">"kubernetes"</span>: <span class="o">{</span>
+    <span class="s2">"kubeconfig"</span>: <span class="s2">"/etc/kubernetes/node-kubeconfig.yaml"</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<h2 id="安装步骤-1">安装步骤</h2>
+
+<p>安装步骤也很简单</p>
+
+<p>1.首先将hyperkube和calico/cni镜像中的CNI插件拷贝到宿主机本地的/opt/cni/bin/目录下
+2.将和etcd通信的证书配置好
+3.将calicoctl,calico.env,10-calico.conf文件配置好放到指定的目录
+4.将calico-node配置成systemd管理的系统服务
+5.配置kubelet和kube-proxy</p>
+<h1 id="kubelet-service">kubelet service</h1>
+
+<h2 id="主要文件-2">主要文件</h2>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>/usr/local/bin/kubelet <span class="c"># 启动kubelet的shell脚本文件</span>
+/usr/local/bin/kubectl <span class="c"># kubectl二进制文件</span>
+/etc/systemd/system/kubelet.service <span class="c"># kubelet 的service文件</span>
+/etc/kubernetes/kubelet.env <span class="c"># kubelet service相关的环境文件</span>
+/etc/kubernetes/ssl <span class="c"># kubernetes证书文件存放目录</span>
+/etc/kubernetes/openssl.conf <span class="c"># 生成kubernetes证书所依赖的openssl文件</span>
+/usr/local/bin/kubernetes-scripts/ <span class="c"># 生成证书文件的shell脚本</span>
+/etc/kubernetes/node-kubeconfig.yaml <span class="c">#</span>
+</code></pre>
+</div>
+
+<h3 id="kubelet-shell-脚本">kubelet shell 脚本</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vim /usr/local/bin/kubelet
+<span class="c">#!/bin/bash</span>
+/usr/bin/docker run <span class="se">\</span>
+  --net<span class="o">=</span>host <span class="se">\</span>
+  --pid<span class="o">=</span>host <span class="se">\</span>
+  --privileged <span class="se">\</span>
+  --name<span class="o">=</span>kubelet <span class="se">\</span>
+  --restart<span class="o">=</span>on-failure:5 <span class="se">\</span>
+  --memory<span class="o">=</span>512M <span class="se">\</span>
+  --cpu-shares<span class="o">=</span>100 <span class="se">\</span>
+  -v /dev:/dev:rw <span class="se">\</span>
+  -v /etc/cni:/etc/cni:ro <span class="se">\</span>
+  -v /opt/cni:/opt/cni:ro <span class="se">\</span>
+  -v /etc/ssl:/etc/ssl:ro <span class="se">\</span>
+  -v /etc/resolv.conf:/etc/resolv.conf <span class="se">\</span>
+  -v /etc/pki/tls:/etc/pki/tls:ro <span class="se">\</span>
+  -v /etc/pki/ca-trust:/etc/pki/ca-trust:ro <span class="se">\</span>
+  -v /sys:/sys:ro <span class="se">\</span>
+  -v /var/lib/docker:/var/lib/docker:rw <span class="se">\</span>
+  -v /var/log:/var/log:rw <span class="se">\</span>
+  -v /var/lib/kubelet:/var/lib/kubelet:shared <span class="se">\</span>
+  -v /var/lib/cni:/var/lib/cni:shared <span class="se">\</span>
+  -v /var/run:/var/run:rw <span class="se">\</span>
+  -v /etc/kubernetes:/etc/kubernetes:ro <span class="se">\</span>
+  quay.io/coreos/hyperkube:v1.6.1_coreos.0 <span class="se">\</span>
+  ./hyperkube kubelet <span class="se">\</span>
+  <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span>
+</code></pre>
+</div>
+
+<h3 id="kubeletservice-文件">kubelet.service 文件</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vim /etc/systemd/system/kubelet.service
+<span class="o">[</span>Unit]
+<span class="nv">Description</span><span class="o">=</span>Kubernetes Kubelet Server
+<span class="nv">Documentation</span><span class="o">=</span>https://github.com/GoogleCloudPlatform/kubernetes
+<span class="nv">After</span><span class="o">=</span>docker.service docker.socket calico-node.service
+<span class="nv">Wants</span><span class="o">=</span>docker.socket calico-node.service
+
+<span class="o">[</span>Service]
+<span class="nv">EnvironmentFile</span><span class="o">=</span>/etc/kubernetes/kubelet.env
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/local/bin/kubelet <span class="se">\</span>
+                <span class="nv">$KUBE_LOGTOSTDERR</span> <span class="se">\</span>
+                <span class="nv">$KUBE_LOG_LEVEL</span> <span class="se">\</span>
+                <span class="nv">$KUBELET_API_SERVER</span> <span class="se">\</span>
+                <span class="nv">$KUBELET_ADDRESS</span> <span class="se">\</span>
+                <span class="nv">$KUBELET_PORT</span> <span class="se">\</span>
+                <span class="nv">$KUBELET_HOSTNAME</span> <span class="se">\</span>
+                <span class="nv">$KUBE_ALLOW_PRIV</span> <span class="se">\</span>
+                <span class="nv">$KUBELET_ARGS</span> <span class="se">\</span>
+                <span class="nv">$DOCKER_SOCKET</span> <span class="se">\</span>
+                <span class="nv">$KUBELET_NETWORK_PLUGIN</span> <span class="se">\</span>
+                <span class="nv">$KUBELET_CLOUDPROVIDER</span>
+<span class="nv">ExecStartPre</span><span class="o">=</span>-/usr/bin/docker rm -f kubelet
+<span class="nv">ExecReload</span><span class="o">=</span>/usr/bin/docker restart kubelet
+<span class="nv">Restart</span><span class="o">=</span>always
+<span class="nv">RestartSec</span><span class="o">=</span>10s
+
+<span class="o">[</span>Install]
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</code></pre>
+</div>
+
+<h3 id="kubeletenv">kubelet.env</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vim /etc/kubernetes/kubelet.env
+<span class="c"># logging to stderr means we get it in the systemd journal</span>
+<span class="nv">KUBE_LOGGING</span><span class="o">=</span><span class="s2">"--logtostderr=true"</span>
+<span class="nv">KUBE_LOG_LEVEL</span><span class="o">=</span><span class="s2">"--v=2"</span>
+<span class="c"># The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)</span>
+<span class="nv">KUBELET_ADDRESS</span><span class="o">=</span><span class="s2">"--address=172.30.33.90"</span>
+<span class="c"># The port for the info server to serve on</span>
+<span class="c"># KUBELET_PORT="--port=10250"</span>
+<span class="c"># You may leave this blank to use the actual hostname</span>
+<span class="nv">KUBELET_HOSTNAME</span><span class="o">=</span><span class="s2">"--hostname-override=k8s-master01"</span>
+
+<span class="nv">KUBELET_ARGS</span><span class="o">=</span><span class="s2">"--pod-manifest-path=/etc/kubernetes/manifests </span><span class="se">\</span><span class="s2">
+--pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 </span><span class="se">\</span><span class="s2">
+--kube-reserved cpu=100m,memory=512M </span><span class="se">\</span><span class="s2">
+--node-status-update-frequency=10s </span><span class="se">\</span><span class="s2">
+--enable-cri=False --cgroups-per-qos=False </span><span class="se">\</span><span class="s2">
+--enforce-node-allocatable=''  --cluster_dns=10.233.0.2 --cluster_domain=cluster.local --resolv-conf=/etc/resolv.conf --kubeconfig=/etc/kubernetes/node-kubeconfig.yaml --require-kubeconfig --node-labels=node-role.kubernetes.io/master=true,node-role.kubernetes.io/node=true"</span>
+<span class="nv">KUBELET_NETWORK_PLUGIN</span><span class="o">=</span><span class="s2">"--network-plugin=cni --network-plugin-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin"</span>
+<span class="c"># Should this cluster be allowed to run privileged docker containers</span>
+<span class="nv">KUBE_ALLOW_PRIV</span><span class="o">=</span><span class="s2">"--allow-privileged=true"</span>
+<span class="nv">KUBELET_CLOUDPROVIDER</span><span class="o">=</span><span class="s2">""</span>
+</code></pre>
+</div>
+
+<h3 id="node-kubeconfigyaml">node-kubeconfig.yaml</h3>
+
+<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="s">kind</span><span class="pi">:</span> <span class="s">Config</span>
+<span class="s">clusters</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">local</span>
+  <span class="s">cluster</span><span class="pi">:</span>
+    <span class="s">certificate-authority</span><span class="pi">:</span> <span class="s">/etc/kubernetes/ssl/ca.pem</span>
+    <span class="s">server</span><span class="pi">:</span> <span class="s">http://127.0.0.1:8080</span>
+<span class="s">users</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">kubelet</span>
+  <span class="s">user</span><span class="pi">:</span>
+    <span class="s">client-certificate</span><span class="pi">:</span> <span class="s">/etc/kubernetes/ssl/node-node1.pem</span>
+    <span class="s">client-key</span><span class="pi">:</span> <span class="s">/etc/kubernetes/ssl/node-node1-key.pem</span>
+<span class="s">contexts</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">context</span><span class="pi">:</span>
+    <span class="s">cluster</span><span class="pi">:</span> <span class="s">local</span>
+    <span class="s">user</span><span class="pi">:</span> <span class="s">kubelet</span>
+  <span class="s">name</span><span class="pi">:</span> <span class="s">kubelet-cluster.local</span>
+<span class="s">current-context</span><span class="pi">:</span> <span class="s">kubelet-cluster.local</span>
+</code></pre>
+</div>
+
+<h1 id="kubernetes-manifest文件">kubernetes manifest文件</h1>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>/etc/kubernetes/manifests
+<span class="gp">$ </span>ls -l
+-rw-r--r--. 1 root root 2234 Apr 12 15:26 kube-apiserver.manifest
+-rw-r--r--. 1 root root 1331 Apr 12 15:26 kube-controller-manager.manifest
+-rw-r--r--. 1 root root 1319 Apr 12 15:23 kube-proxy.manifest
+-rw-r--r--. 1 root root  708 Apr 12 15:26 kube-scheduler.manifest
+</code></pre>
+</div>
+
+<p>我们知道在kubernetes中，/etc/kubernetes/manifests 目录下的文件，会由kubelet来在文件所在的节点生成static pod，下面看看每个文件的详细信息。</p>
+
+<h2 id="kube-apiservermanifest">kube-apiserver.manifest</h2>
+<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="s">kind</span><span class="pi">:</span> <span class="s">Pod</span>
+<span class="s">metadata</span><span class="pi">:</span>
+  <span class="s">name</span><span class="pi">:</span> <span class="s">kube-apiserver</span>
+  <span class="s">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+  <span class="s">labels</span><span class="pi">:</span>
+    <span class="s">k8s-app</span><span class="pi">:</span> <span class="s">kube-apiserver</span>
+    <span class="s">kargo</span><span class="pi">:</span> <span class="s">v2</span>
+<span class="s">spec</span><span class="pi">:</span>
+  <span class="s">hostNetwork</span><span class="pi">:</span> <span class="s">true</span>
+  <span class="s">dnsPolicy</span><span class="pi">:</span> <span class="s">ClusterFirstWithHostNet</span>
+  <span class="s">containers</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">kube-apiserver</span>
+    <span class="s">image</span><span class="pi">:</span> <span class="s">quay.io/coreos/hyperkube:v1.6.1_coreos.0</span>
+    <span class="s">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+    <span class="s">resources</span><span class="pi">:</span>
+      <span class="s">limits</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">800m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">2000M</span>
+      <span class="s">requests</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">100m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">256M</span>
+    <span class="s">command</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/hyperkube</span>
+    <span class="pi">-</span> <span class="s">apiserver</span>
+    <span class="pi">-</span> <span class="s">--advertise-address=172.30.33.90</span>
+    <span class="pi">-</span> <span class="s">--etcd-servers=https://172.30.33.90:2379,https://172.30.33.91:2379,https://172.30.33.92:2379</span>
+    <span class="pi">-</span> <span class="s">--etcd-quorum-read=true</span>
+    <span class="c1"># etcd 证书认证</span>
+    <span class="pi">-</span> <span class="s">--etcd-cafile=/etc/ssl/etcd/ssl/ca.pem</span>
+    <span class="pi">-</span> <span class="s">--etcd-certfile=/etc/ssl/etcd/ssl/node-node1.pem</span>
+    <span class="pi">-</span> <span class="s">--etcd-keyfile=/etc/ssl/etcd/ssl/node-node1-key.pem</span>
+    <span class="pi">-</span> <span class="s">--insecure-bind-address=127.0.0.1</span>
+    <span class="pi">-</span> <span class="s">--apiserver-count=3</span>
+    <span class="pi">-</span> <span class="s">--admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota</span>
+    <span class="pi">-</span> <span class="s">--service-cluster-ip-range=10.233.0.0/18</span>
+    <span class="pi">-</span> <span class="s">--service-node-port-range=30000-32767</span>
+    <span class="c1"># kubernetes apiserver证书认证</span>
+    <span class="pi">-</span> <span class="s">--client-ca-file=/etc/kubernetes/ssl/ca.pem</span>
+    <span class="pi">-</span> <span class="s">--tls-cert-file=/etc/kubernetes/ssl/apiserver.pem</span>
+    <span class="pi">-</span> <span class="s">--tls-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem</span>
+    <span class="c1"># token auth认证</span>
+    <span class="pi">-</span> <span class="s">--token-auth-file=/etc/kubernetes/tokens/known_tokens.csv</span>
+    <span class="pi">-</span> <span class="s">--basic-auth-file=/etc/kubernetes/users/known_users.csv</span>
+    <span class="c1"># service account</span>
+    <span class="pi">-</span> <span class="s">--service-account-key-file=/etc/kubernetes/ssl/apiserver-key.pem</span>
+    <span class="pi">-</span> <span class="s">--secure-port=6443</span>
+    <span class="pi">-</span> <span class="s">--insecure-port=8080</span>
+    <span class="pi">-</span> <span class="s">--storage-backend=etcd3</span>
+    <span class="pi">-</span> <span class="s">--v=2</span>
+    <span class="pi">-</span> <span class="s">--allow-privileged=true</span>
+    <span class="pi">-</span> <span class="s">--anonymous-auth=False</span>
+    <span class="s">livenessProbe</span><span class="pi">:</span>
+      <span class="s">httpGet</span><span class="pi">:</span>
+        <span class="s">host</span><span class="pi">:</span> <span class="s">127.0.0.1</span>
+        <span class="s">path</span><span class="pi">:</span> <span class="s">/healthz</span>
+        <span class="s">port</span><span class="pi">:</span> <span class="s">8080</span>
+      <span class="s">initialDelaySeconds</span><span class="pi">:</span> <span class="s">30</span>
+      <span class="s">timeoutSeconds</span><span class="pi">:</span> <span class="s">10</span>
+    <span class="s">volumeMounts</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/kubernetes</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s">kubernetes-config</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/ssl/certs</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-host</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/ssl/etcd/ssl</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s">etcd-certs</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+  <span class="s">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s">/etc/kubernetes</span>
+    <span class="s">name</span><span class="pi">:</span> <span class="s">kubernetes-config</span>
+  <span class="pi">-</span> <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s">/etc/ssl/certs/</span>
+    <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-host</span>
+  <span class="pi">-</span> <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s">/etc/ssl/etcd/ssl</span>
+    <span class="s">name</span><span class="pi">:</span> <span class="s">etcd-certs</span>
+</code></pre>
+</div>
+
+<h2 id="kube-controller-managermanifest">kube-controller-manager.manifest</h2>
+<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="s">kind</span><span class="pi">:</span> <span class="s">Pod</span>
+<span class="s">metadata</span><span class="pi">:</span>
+  <span class="s">name</span><span class="pi">:</span> <span class="s">kube-controller-manager</span>
+  <span class="s">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+  <span class="s">labels</span><span class="pi">:</span>
+    <span class="s">k8s-app</span><span class="pi">:</span> <span class="s">kube-controller</span>
+<span class="s">spec</span><span class="pi">:</span>
+  <span class="s">hostNetwork</span><span class="pi">:</span> <span class="s">true</span>
+  <span class="s">dnsPolicy</span><span class="pi">:</span> <span class="s">ClusterFirstWithHostNet</span>
+  <span class="s">containers</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">kube-controller-manager</span>
+    <span class="s">image</span><span class="pi">:</span> <span class="s">quay.io/coreos/hyperkube:v1.6.1_coreos.0</span>
+    <span class="s">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+    <span class="s">resources</span><span class="pi">:</span>
+      <span class="s">limits</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">250m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">512M</span>
+      <span class="s">requests</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">100m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">100M</span>
+    <span class="s">command</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/hyperkube</span>
+    <span class="pi">-</span> <span class="s">controller-manager</span>
+    <span class="c1"># master ip</span>
+    <span class="pi">-</span> <span class="s">--master=http://127.0.0.1:8080</span>
+    <span class="pi">-</span> <span class="s">--leader-elect=true</span>
+    <span class="pi">-</span> <span class="s">--service-account-private-key-file=/etc/kubernetes/ssl/apiserver-key.pem</span>
+    <span class="c1"># 集群范围内的证书</span>
+    <span class="pi">-</span> <span class="s">--root-ca-file=/etc/kubernetes/ssl/ca.pem</span>
+    <span class="pi">-</span> <span class="s">--cluster-signing-cert-file=/etc/kubernetes/ssl/ca.pem</span>
+    <span class="pi">-</span> <span class="s">--cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem</span>
+    <span class="pi">-</span> <span class="s">--enable-hostpath-provisioner=false</span>
+    <span class="pi">-</span> <span class="s">--node-monitor-grace-period=40s</span>
+    <span class="pi">-</span> <span class="s">--node-monitor-period=5s</span>
+    <span class="pi">-</span> <span class="s">--pod-eviction-timeout=5m0s</span>
+    <span class="pi">-</span> <span class="s">--v=2</span>
+    <span class="s">livenessProbe</span><span class="pi">:</span>
+      <span class="s">httpGet</span><span class="pi">:</span>
+        <span class="s">host</span><span class="pi">:</span> <span class="s">127.0.0.1</span>
+        <span class="s">path</span><span class="pi">:</span> <span class="s">/healthz</span>
+        <span class="s">port</span><span class="pi">:</span> <span class="s">10252</span>
+      <span class="s">initialDelaySeconds</span><span class="pi">:</span> <span class="s">30</span>
+      <span class="s">timeoutSeconds</span><span class="pi">:</span> <span class="s">10</span>
+    <span class="s">volumeMounts</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/kubernetes/ssl</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-kubernetes</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/ssl/certs</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-host</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+  <span class="s">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s">/etc/kubernetes/ssl</span>
+    <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-kubernetes</span>
+  <span class="pi">-</span> <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s">/etc/ssl/certs</span>
+    <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-host</span>
+</code></pre>
+</div>
+
+<h2 id="kube-schedulermanifest">kube-scheduler.manifest</h2>
+<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="s">kind</span><span class="pi">:</span> <span class="s">Pod</span>
+<span class="s">metadata</span><span class="pi">:</span>
+  <span class="s">name</span><span class="pi">:</span> <span class="s">kube-scheduler</span>
+  <span class="s">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+  <span class="s">labels</span><span class="pi">:</span>
+    <span class="s">k8s-app</span><span class="pi">:</span> <span class="s">kube-scheduler</span>
+<span class="s">spec</span><span class="pi">:</span>
+  <span class="s">hostNetwork</span><span class="pi">:</span> <span class="s">true</span>
+  <span class="s">dnsPolicy</span><span class="pi">:</span> <span class="s">ClusterFirstWithHostNet</span>
+  <span class="s">containers</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">kube-scheduler</span>
+    <span class="s">image</span><span class="pi">:</span> <span class="s">quay.io/coreos/hyperkube:v1.6.1_coreos.0</span>
+    <span class="s">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+    <span class="s">resources</span><span class="pi">:</span>
+      <span class="s">limits</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">250m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">512M</span>
+      <span class="s">requests</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">80m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">170M</span>
+    <span class="s">command</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/hyperkube</span>
+    <span class="pi">-</span> <span class="s">scheduler</span>
+    <span class="pi">-</span> <span class="s">--leader-elect=true</span>
+    <span class="pi">-</span> <span class="s">--master=http://127.0.0.1:8080</span>
+    <span class="pi">-</span> <span class="s">--v=2</span>
+    <span class="s">livenessProbe</span><span class="pi">:</span>
+      <span class="s">httpGet</span><span class="pi">:</span>
+        <span class="s">host</span><span class="pi">:</span> <span class="s">127.0.0.1</span>
+        <span class="s">path</span><span class="pi">:</span> <span class="s">/healthz</span>
+        <span class="s">port</span><span class="pi">:</span> <span class="s">10251</span>
+      <span class="s">initialDelaySeconds</span><span class="pi">:</span> <span class="s">30</span>
+      <span class="s">timeoutSeconds</span><span class="pi">:</span> <span class="s">10</span>
+</code></pre>
+</div>
+
+<h2 id="kube-proxymanifest">kube-proxy.manifest</h2>
+<div class="language-yaml highlighter-rouge"><pre class="highlight"><code><span class="s">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="s">kind</span><span class="pi">:</span> <span class="s">Pod</span>
+<span class="s">metadata</span><span class="pi">:</span>
+  <span class="s">name</span><span class="pi">:</span> <span class="s">kube-proxy</span>
+  <span class="s">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+  <span class="s">labels</span><span class="pi">:</span>
+    <span class="s">k8s-app</span><span class="pi">:</span> <span class="s">kube-proxy</span>
+<span class="s">spec</span><span class="pi">:</span>
+  <span class="s">hostNetwork</span><span class="pi">:</span> <span class="s">true</span>
+  <span class="s">dnsPolicy</span><span class="pi">:</span> <span class="s">ClusterFirstWithHostNet</span>
+  <span class="s">containers</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">kube-proxy</span>
+    <span class="s">image</span><span class="pi">:</span> <span class="s">quay.io/coreos/hyperkube:v1.6.1_coreos.0</span>
+    <span class="s">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+    <span class="s">resources</span><span class="pi">:</span>
+      <span class="s">limits</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">500m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">2000M</span>
+      <span class="s">requests</span><span class="pi">:</span>
+        <span class="s">cpu</span><span class="pi">:</span> <span class="s">150m</span>
+        <span class="s">memory</span><span class="pi">:</span> <span class="s">64M</span>
+    <span class="s">command</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">/hyperkube</span>
+    <span class="pi">-</span> <span class="s">proxy</span>
+    <span class="pi">-</span> <span class="s">--v=2</span>
+    <span class="pi">-</span> <span class="s">--master=http://127.0.0.1:8080</span>
+    <span class="pi">-</span> <span class="s">--bind-address=172.30.33.90</span>
+    <span class="pi">-</span> <span class="s">--cluster-cidr=10.233.64.0/18</span>
+    <span class="pi">-</span> <span class="s">--proxy-mode=iptables</span>
+    <span class="s">securityContext</span><span class="pi">:</span>
+      <span class="s">privileged</span><span class="pi">:</span> <span class="s">true</span>
+    <span class="s">volumeMounts</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/ssl/certs</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-host</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/kubernetes/node-kubeconfig.yaml</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">kubeconfig"</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/etc/kubernetes/ssl</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">etc-kube-ssl"</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">true</span>
+    <span class="pi">-</span> <span class="s">mountPath</span><span class="pi">:</span> <span class="s">/var/run/dbus</span>
+      <span class="s">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">var-run-dbus"</span>
+      <span class="s">readOnly</span><span class="pi">:</span> <span class="s">false</span>
+  <span class="s">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">ssl-certs-host</span>
+    <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s">/etc/pki/tls</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">kubeconfig"</span>
+    <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/etc/kubernetes/node-kubeconfig.yaml"</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">etc-kube-ssl"</span>
+    <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/etc/kubernetes/ssl"</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">var-run-dbus"</span>
+    <span class="s">hostPath</span><span class="pi">:</span>
+      <span class="s">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/var/run/dbus"</span>
+</code></pre>
+</div>
+
+<h1 id="生成证书">生成证书</h1>
+<blockquote>
+  <p>上面的文件都配置好后，我们就需要生正认证所需的证书了，以前看过漠神的一篇<a href="https://mritd.me/2016/09/11/kubernetes-%E5%8F%8C%E5%90%91-TLS-%E9%85%8D%E7%BD%AE/">kubernetes双向TSL认证</a>，有兴趣的可以去看下，说实话证书这块，我也不是很懂。</p>
+</blockquote>
+
+<h2 id="生成etcd证书">生成etcd证书</h2>
+
+<h3 id="修改make-ssl-etcdsh脚本">修改<code class="highlighter-rouge">make-ssl-etcd.sh</code>脚本</h3>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># 在脚本开头加上</span>
+<span class="nv">MASTERS</span><span class="o">=(</span>node1 node2 node3<span class="o">)</span>
+<span class="nv">HOSTS</span><span class="o">=(</span>node1 node2 node3 node4 node5<span class="o">)</span>
+
+<span class="c"># 修改ETCD member的for循环语句，修改成下面这样</span>
+<span class="k">for </span>host <span class="k">in</span> <span class="k">${</span><span class="nv">MASTERS</span><span class="p">[*]</span><span class="k">}</span>
+
+<span class="c"># 修改Node keys的for循环语句，修改成下面这样</span>
+<span class="k">for </span>host <span class="k">in</span> <span class="k">${</span><span class="nv">HOSTS</span><span class="p">[*]</span><span class="k">}</span>
+</code></pre>
+</div>
+<h3 id="生成证书-1">生成证书</h3>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> /usr/local/bin/etcd-scripts/
+<span class="gp">$ </span>./make-ssl-etcd.sh -f /etc/ssl/etcd/openssl.conf -d ~/certs/etcd/
+<span class="gp">$ </span>chown kube.root ~/certs/etcd/<span class="k">*</span>
+<span class="gp">$ </span>chmod 700 ~/certs/etcd/<span class="k">*</span>
+</code></pre>
+</div>
+
+<h2 id="生成kubernetes证书">生成kubernetes证书</h2>
+
+<h3 id="修改make-sslsh脚本">修改<code class="highlighter-rouge">make-ssl.sh</code>脚本</h3>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># 在脚本开头加上</span>
+<span class="nv">MASTERS</span><span class="o">=(</span>node1 node2 node3<span class="o">)</span>
+<span class="nv">HOSTS</span><span class="o">=(</span>node1 node2 node3 node4 node5<span class="o">)</span>
+
+<span class="c"># 修改ETCD member的for循环语句，修改成下面这样</span>
+<span class="k">for </span>host <span class="k">in</span> <span class="k">${</span><span class="nv">MASTERS</span><span class="p">[*]</span><span class="k">}</span>
+
+<span class="c"># 修改Node keys的for循环语句，修改成下面这样</span>
+<span class="k">for </span>host <span class="k">in</span> <span class="k">${</span><span class="nv">HOSTS</span><span class="p">[*]</span><span class="k">}</span>
+</code></pre>
+</div>
+
+<h3 id="生成证书-2">生成证书</h3>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> /usr/local/bin/kubernetes-scripts/
+<span class="gp">$ </span>./make-ssl.sh -f /etc/kubernetes/openssl.conf -d ~/certs/kubernetes/
+<span class="gp">$ </span>chown kube.kube-cert ~/certs/kubernetes/<span class="k">*</span>
+<span class="gp">$ </span>chmod 600 ~/certs/kubernetes/<span class="k">*</span>
+</code></pre>
+</div>
+
+<h1 id="node节点上的主要文件">node节点上的主要文件</h1>
+
+<p>以后所有节点就按照这个来改就行了</p>
+
+<p>/etc/kubernetes/kubelet.env
+/etc/kubernetes/node-kubeconfig.yaml
+/etc/kubernetes/manifests/kube-proxy.manifest
+/etc/kubernetes/manifests/nginx-proxy.yml</p>
+
+<blockquote>
+  <p><strong>Note:</strong> 最后要重点注意一下，kargo会在node节点上配置单独的nginx反向代理，代理到apiserver集群，而node-kubeconfig.yaml和kube-proxy.manifest文件的内容需要修改一下</p>
+</blockquote>
+
+<h2 id="node-kubeconfigyaml-1">node-kubeconfig.yaml</h2>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>apiVersion: v1
+kind: Config
+clusters:
+- name: <span class="nb">local
+  </span>cluster:
+    certificate-authority: /etc/kubernetes/ssl/ca.pem
+    <span class="c"># server: https://172.30.33.90:6443 默认生成的</span>
+    server: https://127.0.0.1:6443 <span class="c">#修改成这样，因为本地节点上的nginx反向代理是监听的这个地址，这样就确保了高可用</span>
+    ...
+</code></pre>
+</div>
+
+<h2 id="kube-proxymanifest-1">kube-proxy.manifest</h2>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>apiVersion: v1
+...
+  <span class="c"># - --master=https://172.30.33.90:6443 默认生成</span>
+    - --master<span class="o">=</span>https://127.0.0.1:6443
+    - --kubeconfig<span class="o">=</span>/etc/kubernetes/node-kubeconfig.yaml
+</code></pre>
+</div>
+
+<p>至此， 基本上可以搭建一个基础的HA kubernetes 集群了，下一章将主要讲解如何配置一些常用插件</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/';
+              this.page.identifier = '/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/';
+              this.page.title = 'kargo容器化部署kubernetes高可用集群(2)';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

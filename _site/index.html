@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>KevinGuo</title>
     <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
     <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
@@ -36,7 +37,7 @@
     <meta property="og:url" content="http://0.0.0.0:80/">
     <meta property="og:site_name" content="KevinGuo">
     <meta property="og:type" content="article">
-    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:locale" content="zh_CN">
     
     <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
     <script src="/assets/js/jquery-ui.js"></script>
@@ -103,8 +104,83 @@
 <!-- /.banner -->
 <section class="container content">
     <div class="columns">
-        <div class="column two-thirds" >
+        <div class="column two-thirds">
             <ol class="repo-list">
+                
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/">kargo容器化部署kubernetes高可用集群(3)</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        上一篇我们详细的剥析了通过kargo生成的各类服务的配置文件，学会了，如何生成证书，如何配置etcd,calico,kubelet，学会了如何配置一个kubernetes的高可用集群。既然集群已经配好了，那么这一章，我们就来学学如何配置一些常用的插件。
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> 2017/07/06
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#docker" title="docker">docker</a>
+                        </span>
+                        
+                    </p>
+                </li>
+                
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/">kargo容器化部署kubernetes高可用集群(2)</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        上一篇已经使用kargo搭建了kubernetes高可用集群，这里重点通过剥析kargo生成的配置文件来更加细化的了解下kubernetes，方便后期对kubernetes的自定义。所有的配置文件，我会放到github上
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> 2017/07/06
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#docker" title="docker">docker</a>
+                        </span>
+                        
+                    </p>
+                </li>
+                
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/">kargo容器化部署kubernetes高可用集群(1)</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        捣鼓kubernetes有一段时间了，先后用过yum,kubeadm,custom等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到漠然大神的快速部署kubernetes高可用集群，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> 2017/07/06
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#docker" title="docker">docker</a>
+                        </span>
+                        
+                    </p>
+                </li>
                 
             </ol>
         </div>
@@ -150,6 +226,64 @@
                 <span class="meta-info" title="Last updated：2017-07-06 04:10:12 UTC">
                     <span class="octicon octicon-clock"></span>
                     <time datetime="2017-07-06 04:10:12 UTC">2017-07-06</time>
+                </span>
+            </div>
+        </div>
+    </div>
+</a>
+
+<a href="https://github.com/chinakevinguo/mzlogin.github.io" target="_blank" class="card text-center">
+    <div class="thumbnail">
+        <div class="card-image geopattern" data-pattern-id="mzlogin.github.io">
+            <div class="card-image-cell">
+                <h3 class="card-title">
+                    mzlogin.github.io
+                </h3>
+            </div>
+        </div>
+        <div class="caption">
+            <div class="card-description">
+                <p class="card-text"><img class="emoji" title=":speak_no_evil:" alt=":speak_no_evil:" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f64a.png" height="20" width="20" align="absmiddle"> My Blog / Jekyll Themes</p>
+            </div>
+            <div class="card-text">
+                <span class="meta-info" title="0 stars">
+                    <span class="octicon octicon-star"></span> 0
+                </span>
+                <span class="meta-info" title="0 forks">
+                    <span class="octicon octicon-git-branch"></span> 0
+                </span>
+                <span class="meta-info" title="Last updated：2017-07-06 08:57:43 UTC">
+                    <span class="octicon octicon-clock"></span>
+                    <time datetime="2017-07-06 08:57:43 UTC">2017-07-06</time>
+                </span>
+            </div>
+        </div>
+    </div>
+</a>
+
+<a href="https://github.com/chinakevinguo/mritd.github.io" target="_blank" class="card text-center">
+    <div class="thumbnail">
+        <div class="card-image geopattern" data-pattern-id="mritd.github.io">
+            <div class="card-image-cell">
+                <h3 class="card-title">
+                    mritd.github.io
+                </h3>
+            </div>
+        </div>
+        <div class="caption">
+            <div class="card-description">
+                <p class="card-text">十字路口,繁华街头......</p>
+            </div>
+            <div class="card-text">
+                <span class="meta-info" title="0 stars">
+                    <span class="octicon octicon-star"></span> 0
+                </span>
+                <span class="meta-info" title="0 forks">
+                    <span class="octicon octicon-git-branch"></span> 0
+                </span>
+                <span class="meta-info" title="Last updated：2017-07-06 09:04:14 UTC">
+                    <span class="octicon octicon-clock"></span>
+                    <time datetime="2017-07-06 09:04:14 UTC">2017-07-06</time>
                 </span>
             </div>
         </div>
@@ -214,64 +348,6 @@
     </div>
 </a>
 
-<a href="https://github.com/chinakevinguo/integration" target="_blank" class="card text-center">
-    <div class="thumbnail">
-        <div class="card-image geopattern" data-pattern-id="integration">
-            <div class="card-image-cell">
-                <h3 class="card-title">
-                    integration
-                </h3>
-            </div>
-        </div>
-        <div class="caption">
-            <div class="card-description">
-                <p class="card-text">This Repository for httpd</p>
-            </div>
-            <div class="card-text">
-                <span class="meta-info" title="0 stars">
-                    <span class="octicon octicon-star"></span> 0
-                </span>
-                <span class="meta-info" title="0 forks">
-                    <span class="octicon octicon-git-branch"></span> 0
-                </span>
-                <span class="meta-info" title="Last updated：2016-04-18 02:41:26 UTC">
-                    <span class="octicon octicon-clock"></span>
-                    <time datetime="2016-04-18 02:41:26 UTC">2016-04-18</time>
-                </span>
-            </div>
-        </div>
-    </div>
-</a>
-
-<a href="https://github.com/chinakevinguo/hexo" target="_blank" class="card text-center">
-    <div class="thumbnail">
-        <div class="card-image geopattern" data-pattern-id="hexo">
-            <div class="card-image-cell">
-                <h3 class="card-title">
-                    hexo
-                </h3>
-            </div>
-        </div>
-        <div class="caption">
-            <div class="card-description">
-                <p class="card-text"></p>
-            </div>
-            <div class="card-text">
-                <span class="meta-info" title="0 stars">
-                    <span class="octicon octicon-star"></span> 0
-                </span>
-                <span class="meta-info" title="0 forks">
-                    <span class="octicon octicon-git-branch"></span> 0
-                </span>
-                <span class="meta-info" title="Last updated：2016-11-18 10:02:42 UTC">
-                    <span class="octicon octicon-clock"></span>
-                    <time datetime="2016-11-18 10:02:42 UTC">2016-11-18</time>
-                </span>
-            </div>
-        </div>
-    </div>
-</a>
-
 
 
         </div>
@@ -279,14 +355,14 @@
     <div class="pagination text-align">
       <div class="btn-group">
         
-            <button disabled="disabled" href="javascript:;" class="btn btn-outline">&laquo;</button>
+            <button disabled href="javascript:;" class="btn btn-outline">«</button>
         
         
-            <a href="/"  class="btn btn-outline">1</a>
+            <a href="javascript:;" class="active btn btn-outline">1</a>
         
         
         
-            <button disabled="disabled" href="javascript:;" class="btn btn-outline">&raquo;</button>
+            <button disabled href="javascript:;" class="btn btn-outline">»</button>
         
         </div>
     </div>
@@ -304,7 +380,7 @@
 
             <ul class="site-footer-links right mobile-hidden">
                 <li>
-                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                    <a href="javascript:window.scrollTo(0,0)">TOP</a>
                 </li>
             </ul>
             <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">

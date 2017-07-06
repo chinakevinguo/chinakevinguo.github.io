@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>kargo容器化部署kubernetes高可用集群(1) &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="kargo容器化部署kubernetes高可用集群(1)">
+      
+    <meta name="keywords" content="kargo,kubernetes,docker">
+    <meta name="og:keywords" content="kargo,kubernetes,docker">
+      
+    <meta name="description" content="  捣鼓kubernetes有一段时间了，先后用过yum,kubeadm,custom等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到漠然大神的快速部署kubernetes高可用集群，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。">
+    <meta name="og:description" content="  捣鼓kubernetes有一段时间了，先后用过yum,kubeadm,custom等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到漠然大神的快速部署kubernetes高可用集群，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="kargo容器化部署kuber">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">kargo容器化部署kubernetes高可用集群(1)</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
+          </span>
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <blockquote>
+  <p>捣鼓kubernetes有一段时间了，先后用过<code class="highlighter-rouge">yum</code>,<code class="highlighter-rouge">kubeadm</code>,<code class="highlighter-rouge">custom</code>等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到<a href="https://mritd.me/">漠然</a>大神的<a href="https://mritd.me/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/">快速部署kubernetes高可用集群</a>，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。</p>
+</blockquote>
+
+<h1 id="一基础环境">一、基础环境</h1>
+
+<h2 id="1准备好要部署的机器">1.准备好要部署的机器</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">IP</th>
+      <th style="text-align: left">ROLE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">172.30.33.89</td>
+      <td style="text-align: left">k8s-registry-lb</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">172.30.33.90</td>
+      <td style="text-align: left">k8s-master01-etcd01</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">172.30.33.91</td>
+      <td style="text-align: left">k8s-master02-etcd02</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">172.30.33.92</td>
+      <td style="text-align: left">k8s-master03-etcd03</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">172.30.33.93</td>
+      <td style="text-align: left">k8s-node01-ingress01</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">172.30.33.94</td>
+      <td style="text-align: left">k8s-node02-ingress02</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">192.168.1.1</td>
+      <td style="text-align: left">ansible-client</td>
+    </tr>
+  </tbody>
+</table>
+
+<!--more-->
+<h2 id="2准备部署机器-ansible-client">2.准备部署机器 <a href="http://www.oo3p.com/2017/04/17/ansible-client/">ansible-client</a></h2>
+
+<h2 id="3准备所需要镜像由于被墙所需镜像可以在百度云去下载点击这里">3.准备所需要镜像,由于被墙，所需镜像可以在百度云去下载，<a href="http://pan.baidu.com/s/1i5sUzmH">点击这里</a></h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">IMAGE</th>
+      <th style="text-align: left">VERSION</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">quay.io/coreos/hyperkube</td>
+      <td style="text-align: left">v1.6.1_coreos.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">quay.io/coreos/etcd</td>
+      <td style="text-align: left">v3.1.5</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">calico/ctl</td>
+      <td style="text-align: left">v1.1.0-rc8</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">calico/node</td>
+      <td style="text-align: left">v1.1.0-rc8</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">calico/cni</td>
+      <td style="text-align: left">v1.5.6</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/kubernetes-dashboard-amd64</td>
+      <td style="text-align: left">v1.6.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/nginx-ingress-controller</td>
+      <td style="text-align: left">0.9.0-beta.3</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/defaultbackend</td>
+      <td style="text-align: left">1.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/cluster-proportional-autoscaler-amd64</td>
+      <td style="text-align: left">1.1.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/fluentd-elasticsearch</td>
+      <td style="text-align: left">1.22</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/kibana</td>
+      <td style="text-align: left">v4.6.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/elasticsearch</td>
+      <td style="text-align: left">v2.4.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/kubedns-amd64</td>
+      <td style="text-align: left">1.9</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/kube-dnsmasq-amd64</td>
+      <td style="text-align: left">1.3</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/exechealthz-amd64</td>
+      <td style="text-align: left">1.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">andyshinn/dnsmasq</td>
+      <td style="text-align: left">2.72</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">nginx</td>
+      <td style="text-align: left">1.11.4-alpine</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/heapster-grafana-amd64</td>
+      <td style="text-align: left">v4.0.2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/heapster-amd64</td>
+      <td style="text-align: left">v1.3.0-beta.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/heapster-influxdb-amd64</td>
+      <td style="text-align: left">v1.1.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">gcr.io/google_containers/pause-amd64</td>
+      <td style="text-align: left">3.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="4load所有下载的镜像">4.load所有下载的镜像</h2>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># 在ansible-client上操作</span>
+<span class="gp">$ </span><span class="nv">ip</span><span class="o">=(</span>172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94<span class="o">)</span>
+<span class="gp">$ </span><span class="k">for </span>i <span class="k">in</span> <span class="k">${</span><span class="nv">ip</span><span class="p">[*]</span><span class="k">}</span>; <span class="k">do </span>scp -r kargo_images_v1.6.1 <span class="nv">$i</span>:~/; <span class="k">done</span>
+<span class="c"># 对所有要部署的节点操作</span>
+<span class="gp">$ </span><span class="nv">images</span><span class="o">=</span><span class="k">$(</span>ls -l ~/kargo_images_v1.6.1|awk -F<span class="s1">' '</span> <span class="s1">'{ print $9 }'</span><span class="k">)</span>
+<span class="gp">$ </span><span class="k">for </span>x <span class="k">in</span> <span class="k">${</span><span class="nv">images</span><span class="p">[*]</span><span class="k">}</span>; <span class="k">do </span>docker load -i <span class="nv">$x</span>; <span class="k">done</span>
+</code></pre>
+</div>
+<h1 id="二搭建集群">二、搭建集群</h1>
+
+<h2 id="1获取kargo源码">1.获取kargo源码</h2>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git clone https://github.com/kubernetes-incubator/kargo.git
+</code></pre>
+</div>
+
+<h2 id="2编辑配置文件">2.编辑配置文件</h2>
+
+<div class="language-sh highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vim ~/kargo/inventory/group_vars/k8s-cluster.yml
+
+---
+<span class="c"># 启动集群的基础系统,支持ubuntu, coreos, centos, none</span>
+bootstrap_os: centos
+
+<span class="c"># etcd数据存放位置</span>
+etcd_data_dir: /var/lib/etcd
+
+<span class="c"># kubernetes所需二进制文件将要安装的位置</span>
+bin_dir: /usr/local/bin
+
+<span class="c"># kubrnetes配置文件存放目录</span>
+kube_config_dir: /etc/kubernetes
+<span class="c"># 生成证书和token的脚本的存放位置</span>
+kube_script_dir: <span class="s2">"{ { bin_dir } }/kubernetes-scripts"</span>
+<span class="c"># kubernetes manifest文件存放目录</span>
+kube_manifest_dir: <span class="s2">"{ { kube_config_dir } }/manifests"</span>
+<span class="c"># kubernetes 命名空间</span>
+system_namespace: kube-system
+
+<span class="c"># 日志存放位置</span>
+kube_log_dir: <span class="s2">"/var/log/kubernetes"</span>
+
+<span class="c"># kubernetes证书存放位置</span>
+kube_cert_dir: <span class="s2">"{ { kube_config_dir } }/ssl"</span>
+
+<span class="c"># kubernetes token存放位置</span>
+kube_token_dir: <span class="s2">"{ { kube_config_dir } }/tokens"</span>
+
+<span class="c"># basic auth 认证文件存放位置</span>
+kube_users_dir: <span class="s2">"{ { kube_config_dir } }/users"</span>
+
+<span class="c"># 关闭匿名授权</span>
+kube_api_anonymous_auth: <span class="nb">false</span>
+
+<span class="c">## kubernetes使用版本</span>
+kube_version: v1.6.1
+
+<span class="c"># 安装过程中缓存文件下载位置(最少1G)</span>
+local_release_dir: <span class="s2">"/tmp/releases"</span>
+<span class="c"># 重试次数，比如下载失败等情况</span>
+retry_stagger: 5
+
+<span class="c"># 证书组</span>
+kube_cert_group: kube-cert
+
+<span class="c"># 集群日志等级</span>
+kube_log_level: 2
+
+<span class="c"># HTTP下api server的basic auth认证用户名密码</span>
+kube_api_pwd: <span class="s2">"test123"</span>
+kube_users:
+  kube:
+    pass: <span class="s2">"{ {kube_api_pwd} }"</span>
+    role: admin
+  root:
+    pass: <span class="s2">"{ {kube_api_pwd} }"</span>
+    role: admin
+
+
+
+<span class="c">## 开关认证 (basic auth, static token auth)</span>
+<span class="c">#kube_oidc_auth: false</span>
+<span class="c">#kube_basic_auth: false</span>
+<span class="c">#kube_token_auth: false</span>
+
+
+<span class="c">## Variables for OpenID Connect Configuration https://kubernetes.io/docs/admin/authentication/</span>
+<span class="c">## To use OpenID you have to deploy additional an OpenID Provider (e.g Dex, Keycloak, ...)</span>
+
+<span class="c"># kube_oidc_url: https:// ...</span>
+<span class="c"># kube_oidc_client_id: kubernetes</span>
+<span class="c">## Optional settings for OIDC</span>
+<span class="c"># kube_oidc_ca_file: { { kube_cert_dir } }/ca.pem</span>
+<span class="c"># kube_oidc_username_claim: sub</span>
+<span class="c"># kube_oidc_groups_claim: groups</span>
+
+
+<span class="c"># 网络插件 (calico, weave or flannel)</span>
+kube_network_plugin: calico
+
+<span class="c"># 开启 kubernetes network policies</span>
+enable_network_policy: <span class="nb">false</span>
+
+<span class="c"># Kubernetes 服务的地址范围.</span>
+kube_service_addresses: 10.233.0.0/18
+
+<span class="c"># pod 地址范围</span>
+kube_pods_subnet: 10.233.64.0/18
+
+<span class="c"># 网络节点大小分配</span>
+kube_network_node_prefix: 24
+
+<span class="c"># api server 监听地址及端口</span>
+kube_apiserver_ip: <span class="s2">"{ { kube_service_addresses|ipaddr('net')|ipaddr(1)|ipaddr('address') } }"</span>
+kube_apiserver_port: 6443 <span class="c"># (https)</span>
+kube_apiserver_insecure_port: 8080 <span class="c"># (http)</span>
+
+<span class="c"># 默认dns后缀</span>
+cluster_name: cluster.local
+<span class="c"># 为使用主机网络的pods使用/etc/resolv.conf解析DNS的子域</span>
+ndots: 2
+<span class="c"># DNS 组件dnsmasq_kubedns/kubedns</span>
+dns_mode: dnsmasq_kubedns
+<span class="c"># dns模式，可以是 docker_dns, host_resolvconf or none</span>
+resolvconf_mode: docker_dns
+<span class="c"># 部署netchecker来检测DNS和HTTP状态</span>
+deploy_netchecker: <span class="nb">false</span>
+<span class="c"># skydns service IP配置</span>
+skydns_server: <span class="s2">"{ { kube_service_addresses|ipaddr('net')|ipaddr(3)|ipaddr('address') } }"</span>
+dns_server: <span class="s2">"{ { kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address') } }"</span>
+dns_domain: <span class="s2">"{ { cluster_name } }"</span>
+
+<span class="c"># docker 存储目录</span>
+docker_daemon_graph: <span class="s2">"/var/lib/docker"</span>
+
+<span class="c">## A string of extra options to pass to the docker daemon.</span>
+<span class="c">## This string should be exactly as you wish it to appear.</span>
+<span class="c">## An obvious use case is allowing insecure-registry access</span>
+<span class="c">## to self hosted registries like so:</span>
+docker_options: <span class="s2">"--insecure-registry={ { kube_service_addresses } } --graph={ { docker_daemon_graph } } --iptables=false --storage-driver=devicemapper"</span>
+docker_bin_dir: <span class="s2">"/usr/bin"</span>
+
+<span class="c"># 组件部署方式</span>
+<span class="c"># Settings for containerized control plane (etcd/kubelet/secrets)</span>
+etcd_deployment_type: docker
+kubelet_deployment_type: docker
+cert_management: script
+vault_deployment_type: docker
+
+<span class="c"># K8s image pull policy (imagePullPolicy)</span>
+k8s_image_pull_policy: IfNotPresent
+
+<span class="c"># Monitoring apps for k8s</span>
+efk_enabled: <span class="nb">true</span>
+
+<span class="c"># Helm deployment</span>
+helm_enabled: <span class="nb">false</span>
+</code></pre>
+</div>
+
+<h2 id="3生成集群配置">3.生成集群配置</h2>
+<p>配置完基本集群参数后，还需要生成一个集群配置文件，用于指定需要在哪几台服务器安装，和指定 master、node 节点分布，以及 etcd 集群等安装在那几台机器上。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># 定义集群IP</span>
+<span class="gp">$ </span><span class="nv">IP</span><span class="o">=(</span>172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94<span class="o">)</span>
+<span class="c"># 利用kargo自带的python脚本生成配置</span>
+<span class="gp">$ </span><span class="nv">CONFIG_FILE</span><span class="o">=</span>~/kargo/inventory/inventory.cfg python3 ~/kargo/contrib/inventory_builder/inventory.py <span class="k">${</span><span class="p"> IP[*] </span><span class="k">}</span>
+
+</code></pre>
+</div>
+
+<p>生成的配置如下，最好是在配置上加上<code class="highlighter-rouge">ansible_user=root</code>,我最开始在搭建的时候没有指定，报错了</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>node1    <span class="nv">ansible_user</span><span class="o">=</span>root <span class="nv">ansible_host</span><span class="o">=</span>172.30.33.90 <span class="nv">ip</span><span class="o">=</span>172.30.33.90
+node2    <span class="nv">ansible_user</span><span class="o">=</span>root <span class="nv">ansible_host</span><span class="o">=</span>172.30.33.91 <span class="nv">ip</span><span class="o">=</span>172.30.33.91
+node3    <span class="nv">ansible_user</span><span class="o">=</span>root <span class="nv">ansible_host</span><span class="o">=</span>172.30.33.92 <span class="nv">ip</span><span class="o">=</span>172.30.33.92
+node4    <span class="nv">ansible_user</span><span class="o">=</span>root <span class="nv">ansible_host</span><span class="o">=</span>172.30.33.93 <span class="nv">ip</span><span class="o">=</span>172.30.33.93
+node5    <span class="nv">ansible_user</span><span class="o">=</span>root <span class="nv">ansible_host</span><span class="o">=</span>172.30.33.94 <span class="nv">ip</span><span class="o">=</span>172.30.33.94
+
+<span class="o">[</span>kube-master]
+node1
+node2
+node3
+
+<span class="o">[</span>kube-node]
+node1
+node2
+node3
+node4
+node5
+
+<span class="o">[</span>etcd]
+node1
+node2
+node3
+
+<span class="o">[</span>k8s-cluster:children]
+kube-node
+kube-master
+
+<span class="o">[</span>calico-rr]
+</code></pre>
+</div>
+
+<h2 id="5dockerefketcd配置修改">5.docker,efk,etcd配置修改</h2>
+
+<p>提前修改ansbile中有关docker,efk,etcd的配置，因为后面在部署的过程中，ansible会检测docker的版本并下载最新的版本，但是由于墙的原因，导致无法下载，会一直卡在下载的地方，所以这里，我们要提前修改，同时需要升级etcd的版本，默认的3.0.6的版本，存在不稳定因素。</p>
+
+<p>修改docker配置,将下面关于docker安装的部分全部注释掉</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>vim ~/kargo/roles/docker/tasks/main.yml
+
+<span class="c"># - name: ensure docker repository public key is installed</span>
+<span class="c">#  action: "{ { docker_repo_key_info.pkg_key } }"</span>
+<span class="c">#  args:</span>
+<span class="c">#    id: "{ {item} }"</span>
+<span class="c">#    keyserver: "{ {docker_repo_key_info.keyserver} }"</span>
+<span class="c">#    state: present</span>
+<span class="c">#  register: keyserver_task_result</span>
+<span class="c">#  until: keyserver_task_result|succeeded</span>
+<span class="c">#  retries: 4</span>
+<span class="c">#  delay: "{ { retry_stagger | random + 3 } }"</span>
+<span class="c">#  with_items: "{ { docker_repo_key_info.repo_keys } }"</span>
+<span class="c">#  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"] or is_atomic)</span>
+
+<span class="c"># - name: ensure docker repository is enabled</span>
+<span class="c">#  action: "{ { docker_repo_info.pkg_repo } }"</span>
+<span class="c">#  args:</span>
+<span class="c">#    repo: "{ {item} }"</span>
+<span class="c">#    state: present</span>
+<span class="c">#  with_items: "{ { docker_repo_info.repos } }"</span>
+<span class="c">#  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"] or is_atomic) and (docker_repo_info.repos|length &gt; 0)</span>
+
+<span class="c"># - name: Configure docker repository on RedHat/CentOS</span>
+<span class="c">#  template:</span>
+<span class="c">#    src: "rh_docker.repo.j2"</span>
+<span class="c">#    dest: "/etc/yum.repos.d/docker.repo"</span>
+<span class="c">#  when: ansible_distribution in ["CentOS","RedHat"] and not is_atomic</span>
+
+<span class="c"># - name: ensure docker packages are installed</span>
+<span class="c">#  action: "{ { docker_package_info.pkg_mgr } }"</span>
+<span class="c">#  args:</span>
+<span class="c">#    pkg: "{ {item.name} }"</span>
+<span class="c">#    force: "{ {item.force|default(omit)} }"</span>
+<span class="c">#    state: present</span>
+<span class="c">#  register: docker_task_result</span>
+<span class="c">#  until: docker_task_result|succeeded</span>
+<span class="c">#  retries: 4</span>
+<span class="c">#  delay: "{ { retry_stagger | random + 3 } }"</span>
+<span class="c">#  with_items: "{ { docker_package_info.pkgs } }"</span>
+<span class="c">#  notify: restart docker</span>
+<span class="c">#  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"] or is_atomic) and (docker_package_info.pkgs|length &gt; 0)</span>
+
+</code></pre>
+</div>
+
+<p>修改efk配置，注释掉<code class="highlighter-rouge">KIBANA_BASE_URL</code>这段，否则后面你搭建efk之后，无法访问kibana</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>vim ~/kargo/roles/kubernetes-apps/efk/kibana/templates/kibana-deployment.yml.j2
+
+<span class="c">#          - name: "KIBANA_BASE_URL"</span>
+<span class="c">#            value: "{ { kibana_base_url } }"</span>
+
+</code></pre>
+</div>
+
+<p>修改download配置，更改etcd和kubedns版本</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>vim ~/kargo/roles/download/defaults/main.yml
+etcd_version: v3.1.5
+kubedns_version: 1.9
+</code></pre>
+</div>
+
+<h2 id="6在ansible-client上一键部署">6.在ansible-client上一键部署</h2>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>ansible-playbook -i ~/kargo/inventory/inventory.cfg cluster.yml -b -v --private-key<span class="o">=</span>~/.ssh/id_rsa
+</code></pre>
+</div>
+
+<p>部署成功后如下
+<img src="/images/posts/ansible-run.png" alt="" />
+相关node信息
+<img src="/images/posts/nodes.png" alt="" />
+相关pod信息
+<img src="/images/posts/pods.png" alt="" /></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/';
+              this.page.identifier = '/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/';
+              this.page.title = 'kargo容器化部署kubernetes高可用集群(1)';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>
