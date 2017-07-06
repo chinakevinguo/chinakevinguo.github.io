@@ -8,13 +8,7 @@ menu: 关于
 permalink: /about/
 ---
 
-## 联系
-
-{% for website in site.data.social %}
-* {{ website.sitename }}：[@{{ website.name }}]({{ website.url }})
-{% endfor %}
-
-## Skill Keywords
+## 我只是个菜鸡
 
 {% for category in site.data.skills %}
 ### {{ category.name }}
