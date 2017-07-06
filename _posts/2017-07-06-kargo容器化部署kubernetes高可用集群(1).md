@@ -23,7 +23,7 @@ keywords: kargo,kubernetes,docker
 | 192.168.1.1 | ansible-client |
 
 <!--more-->
-## 2.准备部署机器[**ansible-client**](http://www.oo3p.com/2017/04/17/ansible-client/)
+## 2.准备部署机器 [ansible-client](http://www.oo3p.com/2017/04/17/ansible-client/)
 
 ## 3.准备所需要镜像,由于被墙，所需镜像可以在百度云去下载，[点击这里](http://pan.baidu.com/s/1i5sUzmH)
 
