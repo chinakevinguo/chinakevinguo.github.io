@@ -144,7 +144,7 @@ kube_users:
 # kube_oidc_url: https:// ...
 # kube_oidc_client_id: kubernetes
 ## Optional settings for OIDC
-# kube_oidc_ca_file: {{ kube_cert_dir }}/ca.pem
+# kube_oidc_ca_file: { { kube_cert_dir } }/ca.pem
 # kube_oidc_username_claim: sub
 # kube_oidc_groups_claim: groups
 
@@ -218,7 +218,7 @@ helm_enabled: false
 # 定义集群IP
 $ IP=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
 # 利用kargo自带的python脚本生成配置
-$ CONFIG_FILE=~/kargo/inventory/inventory.cfg python3 ~/kargo/contrib/inventory_builder/inventory.py ${IP[*]}
+$ CONFIG_FILE=~/kargo/inventory/inventory.cfg python3 ~/kargo/contrib/inventory_builder/inventory.py ${ IP[*] }
 
 ```
 
@@ -263,24 +263,24 @@ kube-master
 vim ~/kargo/roles/docker/tasks/main.yml
 
 # - name: ensure docker repository public key is installed
-#  action: "{{ docker_repo_key_info.pkg_key }}"
+#  action: "{ { docker_repo_key_info.pkg_key } }"
 #  args:
-#    id: "{{item}}"
-#    keyserver: "{{docker_repo_key_info.keyserver}}"
+#    id: "{ {item} }"
+#    keyserver: "{ {docker_repo_key_info.keyserver} }"
 #    state: present
 #  register: keyserver_task_result
 #  until: keyserver_task_result|succeeded
 #  retries: 4
-#  delay: "{{ retry_stagger | random + 3 }}"
-#  with_items: "{{ docker_repo_key_info.repo_keys }}"
+#  delay: "{ { retry_stagger | random + 3 } }"
+#  with_items: "{ { docker_repo_key_info.repo_keys } }"
 #  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"] or is_atomic)
 
 # - name: ensure docker repository is enabled
-#  action: "{{ docker_repo_info.pkg_repo }}"
+#  action: "{ { docker_repo_info.pkg_repo } }"
 #  args:
-#    repo: "{{item}}"
+#    repo: "{ {item} }"
 #    state: present
-#  with_items: "{{ docker_repo_info.repos }}"
+#  with_items: "{ { docker_repo_info.repos } }"
 #  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"] or is_atomic) and (docker_repo_info.repos|length > 0)
 
 # - name: Configure docker repository on RedHat/CentOS
@@ -290,16 +290,16 @@ vim ~/kargo/roles/docker/tasks/main.yml
 #  when: ansible_distribution in ["CentOS","RedHat"] and not is_atomic
 
 # - name: ensure docker packages are installed
-#  action: "{{ docker_package_info.pkg_mgr }}"
+#  action: "{ { docker_package_info.pkg_mgr } }"
 #  args:
-#    pkg: "{{item.name}}"
-#    force: "{{item.force|default(omit)}}"
+#    pkg: "{ {item.name} }"
+#    force: "{ {item.force|default(omit)} }"
 #    state: present
 #  register: docker_task_result
 #  until: docker_task_result|succeeded
 #  retries: 4
-#  delay: "{{ retry_stagger | random + 3 }}"
-#  with_items: "{{ docker_package_info.pkgs }}"
+#  delay: "{ { retry_stagger | random + 3 } }"
+#  with_items: "{ { docker_package_info.pkgs } }"
 #  notify: restart docker
 #  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"] or is_atomic) and (docker_package_info.pkgs|length > 0)
 
@@ -310,7 +310,7 @@ vim ~/kargo/roles/docker/tasks/main.yml
 vim ~/kargo/roles/kubernetes-apps/efk/kibana/templates/kibana-deployment.yml.j2
 
 #          - name: "KIBANA_BASE_URL"
-#            value: "{{ kibana_base_url }}"
+#            value: "{ { kibana_base_url } }"
 
 ```
 
