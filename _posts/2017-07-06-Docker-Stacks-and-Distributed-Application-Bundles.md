@@ -79,7 +79,7 @@ $ systemctl daemon-reload
 $ systemctl restart docker
 
 # 确认是否开启成功
-$ docker version -f '{{.Server.Experimental}}'
+$ docker version -f '{ { .Server.Experimental } }'
 true
 ```
 

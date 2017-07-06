@@ -24,7 +24,7 @@ Logging Driver: json-file
 
 看看当前容器的日志驱动是啥
 ```bash
-$ docker inspect -f {{.HostConfig.LogConfig.Type}} webtest1
+$ docker inspect -f { { .HostConfig.LogConfig.Type } } webtest1
 json-file
 ```
 

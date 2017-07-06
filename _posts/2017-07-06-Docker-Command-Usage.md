@@ -98,7 +98,7 @@ docker top CONTAINER
 docker inspect [OPTIONS] CONTAINER|IMAGE|TASK [CONTAINER|IMAGE|TASK...]
   -f 按照给定的模板来输出结果
 
-$ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' romantic_mahavira
+$ docker inspect -f '{ { range .NetworkSettings.Networks } }{ { .IPAddress } }{ { end } }' romantic_mahavira
 ```
 
 ```bash

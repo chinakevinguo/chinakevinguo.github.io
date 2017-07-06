@@ -21,35 +21,35 @@ Docker提供了一组基本函数来操作模板元素，下面简单举例几�
 ## Json
 将结果格式化为json格式
 ```bash
-$ docker inspect --format '{{json .NetworkSettings.IPAddress}}'
+$ docker inspect --format '{ { json .NetworkSettings.IPAddress } }'
 ```
 
 ## upper
 将字符串转换成大写
 ```bash
-docker inspect --format '{{upper .NetworkSettings.MacAddress}}' webtest1
+docker inspect --format '{ { upper .NetworkSettings.MacAddress } }' webtest1
 ```
 
 # lower
 将字符转换成小写
 ```bash
-$ docker inspect --format "{{lower .Name}}" container
+$ docker inspect --format "{ { lower .Name } }" container
 ```
 
 #Title
 第一个字母大写
 ```bash
-$ docker inspect --format "{{title .Name}}" container
+$ docker inspect --format "{ { title .Name } }" container
 ```
 
 # split
 通过指定分隔符，将一个字符串拆分为多个字符串
 ```bash
-$ docker inspect --format '{{split (join .Names "/") "/"}}' container
+$ docker inspect --format '{ { split (join .Names "/") "/" } }' container
 ```
 
 # Join
 join 将所有字符串组成一个新的字符串。原始字符串之间使用知道你该的分隔符进行分割。分隔符可以是多个字符组成的字符串
 ```bash
-$ docker ps --format '{{join .Names " or "}}'
+$ docker ps --format '{ { join .Names " or " } }'
 ```
