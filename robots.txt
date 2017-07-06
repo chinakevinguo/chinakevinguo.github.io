@@ -1,4 +1,0 @@
-# robots.txt
-User-agent: *
-Disallow: 
-Sitemap: https://mritd.me/sitemap.xml
