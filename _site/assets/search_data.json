@@ -1,5 +1,23 @@
 {
   
+  "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-3": {
+    "title": "kargo容器化部署kubernetes高可用集群(3)",
+    "url": " /2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/",
+    "category": "kubernetes"
+  },
+  
+  "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-2": {
+    "title": "kargo容器化部署kubernetes高可用集群(2)",
+    "url": " /2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/",
+    "category": "kubernetes"
+  },
+  
+  "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-1": {
+    "title": "kargo容器化部署kubernetes高可用集群(1)",
+    "url": " /2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/",
+    "category": "kubernetes"
+  },
+  
 
   
   
@@ -55,5 +73,23 @@
   
   
 
+  
+  "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-1": {
+    "title": "kargo容器化部署kubernetes高可用集群(1)",
+    "url": "/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/",
+    "category": "[&quot;kubernetes&quot;, &quot;docker&quot;]"
+  },
+  
+  "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-2": {
+    "title": "kargo容器化部署kubernetes高可用集群(2)",
+    "url": "/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/",
+    "category": "[&quot;kubernetes&quot;, &quot;docker&quot;]"
+  },
+  
+  "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-3": {
+    "title": "kargo容器化部署kubernetes高可用集群(3)",
+    "url": "/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/",
+    "category": "[&quot;kubernetes&quot;, &quot;docker&quot;]"
+  }
   
 }
