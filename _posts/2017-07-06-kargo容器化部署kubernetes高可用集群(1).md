@@ -69,9 +69,10 @@ $ git clone https://github.com/kubernetes-incubator/kargo.git
 
 ## 2.编辑配置文件
 
-```bash
+```sh
 $ vim ~/kargo/inventory/group_vars/k8s-cluster.yml
 
+---
 # 启动集群的基础系统,支持ubuntu, coreos, centos, none
 bootstrap_os: centos
 
