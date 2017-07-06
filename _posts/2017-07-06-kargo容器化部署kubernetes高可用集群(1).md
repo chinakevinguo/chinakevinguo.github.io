@@ -21,6 +21,7 @@ keywords: kargo,kubernetes,docker
 | 172.30.33.93 | k8s-node01-ingress01 |
 | 172.30.33.94 | k8s-node02-ingress02 |
 | 192.168.1.1 | ansible-client |
+
 <!--more-->
 ## 2.准备部署机器[**ansible-client**](http://www.oo3p.com/2017/04/17/ansible-client/)
 
