@@ -190,7 +190,7 @@ $ docker rmi -f web1
 * container模式：容器和另外一个容器共享network namespace。kubernetes中的pod就是多容器共享一个network namespace
 * none模式：容器有独立的network namespace，但没有对其进行任何的网络配置
 * bridge模式：docker默认模式，容器通过一个网桥获取ip，以NAT的方式和外界通信
-![](/images/docker-bridge-module.png)
+![](/images/posts/docker-bridge-module.png)
 **总结一下bridge网络就是：docker会在机器上自己维护一个网络，并通过docker0这个虚拟交换机和主机本身的网络连接在一起**
 
 ```bash

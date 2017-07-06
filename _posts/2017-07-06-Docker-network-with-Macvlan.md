@@ -36,7 +36,7 @@ Docker官网的解释是，`macvlan`驱动使Docker用户的使用实例和审�
 在下面的例子中，都是在virtualbox中操作的
 Route host： enp0s8:192.168.1.100(Hostonly模式) enp0s3:10.0.2.15(NAT模式，连接外网)
 Docker host：enp0s8:192.168.1.1(Hostonly模式) gateway:192.168.1.100
-![macvlan-bridge](/images/macvlan-docker.png)
+![macvlan-bridge](/images/posts/macvlan-docker.png)
 **Note:** Macvlan bridge模式下的子网必须和其所关联的网卡的网段相同，在这个例子中，使用`-o parent=enp0s8`来指定
 1.配置router host的ip，以及路由转发等功能，使其成为一台路由
 ```bash
@@ -181,7 +181,7 @@ Router host:
 enp0s8:192.168.1.100
 enp0s8.200:192.168.200.100
 enp0s8.201:192.168.201.100
-![multi-tenant-8021q-vlans](/images/multi_tenant_8021q_vlans.png)
+![multi-tenant-8021q-vlans](/images/posts/multi_tenant_8021q_vlans.png)
 
 1.因为是使用的turnk模式，所以，我们首先在route host上新建几个vlan，并配上IP
 ```bash

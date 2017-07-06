@@ -259,7 +259,7 @@ $ docker inspect --format=''  container2 | python -m json.tool
 }
 ```
 我们可以看到`container2`同时属于两个网络，当你启动它的时候默认加入了`bridge`网络，然后在第三步的时候，你将它加入了`isolated_nw`网络，所以如下图所示：
-![working](/images/working.png)
+![working](/images/posts/working.png)
 ```bash
 $ docker exec -ti container2 ifconfig
 eth0      Link encap:Ethernet  HWaddr 02:42:AC:11:00:04  

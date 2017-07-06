@@ -22,9 +22,9 @@ keywords: kargo,kubernetes,docker
 运行结果如下
 
 Dashboard and heapster
-![](/images/posts/dashboard-heapster.png)
+![](/images/posts/posts/dashboard-heapster.png)
 
 EFK
-![](/images/posts/kibana.png)
+![](/images/posts/posts/kibana.png)
 
 后期再研究新的东西了再加吧，头疼，下班了

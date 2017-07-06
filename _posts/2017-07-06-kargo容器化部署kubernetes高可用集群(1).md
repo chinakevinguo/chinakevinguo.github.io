@@ -328,8 +328,8 @@ $ ansible-playbook -i ~/kargo/inventory/inventory.cfg cluster.yml -b -v --privat
 ```
 
 部署成功后如下
-![](/images/posts/ansible-run.png)
+![](/images/posts/posts/ansible-run.png)
 相关node信息
-![](/images/posts/nodes.png)
+![](/images/posts/posts/nodes.png)
 相关pod信息
-![](/images/posts/pods.png)
+![](/images/posts/posts/pods.png)

@@ -210,7 +210,7 @@ e3ed743a143c        bridge              bridge              local
 ```
 可以看到`my-net`网络在两个节点上都生效了
 6.这时候也可以直接去consul上查看
-![consul-key-value](/images/consul-key-value.png)
+![consul-key-value](/images/posts/consul-key-value.png)
 可以看到我们已经在consul上存储了两个网络(其中有一个网络是我以前创建的)
 
 ## 测试.在`my-net`网络上运行应用试试

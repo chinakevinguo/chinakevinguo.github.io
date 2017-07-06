@@ -14,9 +14,9 @@ keywords: docker
 docker stacks 和分布式应用程序bundles是在docker 1.12和docker compose 1.8中引入的一个新特性，目前还在实验阶段，同Engine API中的swarm、nodes和service同时进行
 
 截至目前，大家已经可以选定一个Dockerfile，并利用docker build命令由此创建镜像。使用docker run命令则可启动容器。这条命令亦能够轻松同时启动多套容器。另外，大家也可以使用Docker Compose文件并利用docker-compose scale命令对容器进行规模扩展。
-![](/images/Dockerfile.jpg)
+![](/images/posts/Dockerfile.jpg)
 那么同样，一个docker-compose.yml可以创建一个分布式的应用程序bundle。使用docker-compose bundle可以启动docker stack。其专门面向多套容器的迁移需求，每个捆绑包都可以作为stack在运行时进行部署。
-![](/images/Docker-compose.jpg)
+![](/images/posts/Docker-compose.jpg)
 
 简单来说，我们可以使用一个类比来进行说明：
 Dockerfile --> 镜像 --> 容器

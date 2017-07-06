@@ -188,9 +188,9 @@ lo        Link encap:Local Loopback
 
 ```
 你在此网络启动的容器，必须是和该网络在同一台Docker主机上，虽然网络本身将容器与外部网络隔离开，但是在此网络中的容器，还是能立即与该网络中的其他容器进行通信，如下图：
-![bridge_network](/images/bridge_network.png)
+![bridge_network](/images/posts/bridge_network.png)
 在用户自定义的网络中，不支持link。如果你想要使bridge的一部分网络可以访问外网，你可以在此网络中的容器上公开和发布容器端口。
-![network_access](/images/network_access.png)
+![network_access](/images/posts/network_access.png)
 
 **bridge**网络在单个主机上运行比较有用，但是，在大规模网络中，一般使用**overlay**网络模式
 
@@ -234,9 +234,9 @@ $ docker service create --replicas 2 --network my-multi-host-network --name my-w
 如果你没有使用swarm，那么`overlay`网络可能会需要一个`key-value`的存储服务。支持以`key-value`方式存储的服务包括`Cousul`,`Etcd`,`ZooKeeper`...所以在此之前，你先要创建和配置你选择的`key-value`store，保证docker host和key-value store能够互相通信。
 
 > * **注意：** 集群模式下的Docker Engine和使用外部存储的网络不兼容
-![](/images/key_value.png)
+![](/images/posts/key_value.png)
 在网络中的每个主机都必须运行一个Docker Engine实例，提供主机最简单的方法是使用Docker Machine
-![](/images/engine_on_net.png)
+![](/images/posts/engine_on_net.png)
 
 你还应该在每个主机上都打开如下的端口：
 
@@ -262,14 +262,14 @@ $ docker network create --driver overlay my-multi-host-network
 ```
 
 创建之后，`overlay`网络会覆盖多个主机，网络范围下的容器会与其他网络的主机完全隔离
-![overlay_network](/images/overlay_network.png)
+![overlay_network](/images/posts/overlay_network.png)
 然后，在每个host上启动容器的时候记住都要制定network name
 ```bash
 $ docker run -tid --network=my-multi-host-network busybox
 ```
 
 一旦连接，`overlay`网络范围内的所有容器都可以互相访问，而不管该容器是在哪个主机上
-![overlay-network-final](/images/overlay-network-final.png)
+![overlay-network-final](/images/posts/overlay-network-final.png)
 
 如果你想自己试试，可以参考[Getting started for overlay](https://docs.docker.com/engine/userguide/networking/get-started-overlay/)
 

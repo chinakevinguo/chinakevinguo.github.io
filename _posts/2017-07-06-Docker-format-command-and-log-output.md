@@ -7,7 +7,7 @@ keywords: docker
 ---
 
 docker 使用[Go template](https://golang.org/pkg/text/template/)来允许用户操作某些命令和日志的输出格式。详细如下：
-* [Docker Images formatting](https://docs.docker.com/engine/reference/commandline/images/#formatting)
+* [Docker Images formatting](https://docs.docker.com/engine/reference/commandline/images/posts/#formatting)
 * [Docker Inspect formatting](https://docs.docker.com/engine/reference/commandline/inspect/#examples)
 * [Docker Log Tag formatting](https://docs.docker.com/engine/admin/logging/log_tags/)
 * [Docker Network Inspect formatting](https://docs.docker.com/engine/reference/commandline/network_inspect/)
