@@ -6,10 +6,9 @@ description: saltstack之pillar
 keywords: saltstack
 ---
 # **Pillar**
+主要作用是存储和定义配置管理中需要的一些变量，比如数据，比如软件版本，用户名密码等信息
 
-### 主要作用是存储和定义配置管理中需要的一些变量，比如数据，比如软件版本，用户名密码等信息
 <!--more-->
-
 ###### 1.在master上开启pillar_roots
 
 ```yaml
