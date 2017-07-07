@@ -2,8 +2,7 @@ language: ruby
 rvm:
 - 2.3.3
 before_install:
-  - openssl aes-256-cbc -K $encrypted_3870315c7a22_key -iv $encrypted_3870315c7a22_iv
-  -in id_rsa.enc -out ~/.ssh/id_rsa -d
+  - openssl aes-256-cbc -K $encrypted_3870315c7a22_key -iv $encrypted_3870315c7a22_iv -in id_rsa.enc -out ~/.ssh/id_rsa -d
   - chmod 600 ~/.ssh/id_rsa
   - echo -e "Host oo3p.com\n\tStrictHostKeyChecking no\n" >>~/.ssh/config
 script:
