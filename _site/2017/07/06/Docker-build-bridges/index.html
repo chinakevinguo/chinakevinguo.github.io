@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-自定义docker bridge &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-build-bridges/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-自定义docker bridge">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="这篇主要解释了怎么绑定你自己的bridge来替换docker默认的bridge，这个默认的bridge网络是在安装docker的时候自动安装的。">
+    <meta name="og:description" content="这篇主要解释了怎么绑定你自己的bridge来替换docker默认的bridge，这个默认的bridge网络是在安装docker的时候自动安装的。">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-build-bridges/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-自定义doc">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-自定义docker bridge</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>这篇主要解释了怎么绑定你自己的bridge来替换docker默认的bridge，这个默认的bridge网络是在安装docker的时候自动安装的。</p>
+
+<blockquote>
+  <p><strong>Note:</strong> docker允许你创建默认bridge网络之外的自定义bridge网络。
+<!--more-->
+你可以在启动docker之前设定你自己的bridge网络，并使用<code class="highlighter-rouge">-b BRIDGE</code> or <code class="highlighter-rouge">--bridge=BRIDGE</code> 来告诉docker使用它。如果已经有偶docker启动并运行，并且使用的是docker0的默认配置，你可以直接创建自定义的bridge网络，并重启docker，或者停止服务之后删除接口</p>
+  <div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># 停止docker服务，并删除docker0接口</span>
+<span class="gp">$ </span>sudo service docker stop
+<span class="gp">$ </span>sudo ip link <span class="nb">set </span>dev docker0 down
+<span class="gp">$ </span>sudo brctl delbr docker0
+<span class="gp">$ </span>sudo iptables -t nat -F POSTROUTING
+</code></pre>
+  </div>
+</blockquote>
+
+<p>然后,在创建docker服务之前,创建自己的网桥,并给她任何你想要的配置.这里,我们创建了一个足够简单的bridge,我们可以使用上一节中的选项来自定义docker0,这就足够了.</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># create our own bridge</span>
+<span class="gp">$ </span>brctl addbr bridge0
+<span class="gp">$ </span>ip addr add 192.168.5.1/24 dev bridge0
+<span class="gp">$ </span>ip link <span class="nb">set </span>dev bridge0 up
+
+<span class="c"># 配置bridge up并且running</span>
+
+<span class="gp">$ </span>ip addr show bridge0
+
+4: bridge0: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state UP group default
+    link/ether 66:38:d0:0d:76:18 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.5.1/24 scope global bridge0
+       valid_lft forever preferred_lft forever
+
+<span class="c"># 配置docker启动的配置文件,修改成如下类容</span>
+<span class="gp">$ </span>vi /usr/lib/systemd/system/docker.service
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/bin/dockerd -b<span class="o">=</span>bridge0
+
+<span class="c"># 重启docker</span>
+systemctl start docker
+
+<span class="c"># 看看新的NAT是否启用</span>
+<span class="gp">$ </span>iptables -t nat -L -n
+Chain POSTROUTING <span class="o">(</span>policy ACCEPT<span class="o">)</span>
+target     prot opt <span class="nb">source               </span>destination         
+MASQUERADE  all  --  192.168.5.0/24       0.0.0.0/0  
+</code></pre>
+</div>
+<p>我们看到docker服务已经成功重启，现在可以将新的容器绑定到新的bridge，然后我们新建一个容器看看</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker run -tid <span class="nb">test</span>
+<span class="gp">$ </span>docker inspect clever_spence
+...
+<span class="s2">"Gateway"</span>: <span class="s2">"192.168.5.1"</span>,
+<span class="s2">"IPAddress"</span>: <span class="s2">"192.168.5.2"</span>,
+...
+</code></pre>
+</div>
+<p>我们发现，我们刚创建的bridge已经生效。
+我们可以使用<code class="highlighter-rouge">brctl</code>来对bridge进行查看，删除，添加等操作。</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>brctl show
+bridge name	bridge id		STP enabled	interfaces
+bridge0		8000.f600adbf94d5	no		veth79dcc4b
+</code></pre>
+</div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-build-bridges/';
+              this.page.identifier = '/2017/07/06/Docker-build-bridges/';
+              this.page.title = 'Docker基础-自定义docker bridge';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

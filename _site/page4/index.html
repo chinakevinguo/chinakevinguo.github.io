@@ -23,7 +23,7 @@
     
 
     
-    <link rel="canonical" href="http://0.0.0.0:80/">
+    <link rel="canonical" href="http://0.0.0.0:80/page4/">
     <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
     <link rel="shortcut icon" href="/favicon.ico">
     
@@ -33,7 +33,7 @@
     
         
     
-    <meta property="og:url" content="http://0.0.0.0:80/">
+    <meta property="og:url" content="http://0.0.0.0:80/page4/">
     <meta property="og:site_name" content="KevinGuo">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="zh_CN" />
@@ -108,60 +108,15 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/video-test/">video</a>
+                      <a href="/2017/07/06/Docker-configuring-logging-drivers/">Docker基础-docker日志驱动配置</a>
                     </h3>
                     <p class="repo-list-description">
-                        就是加个视频链接，测试一下看看行不行，代码如下
+                        Docker 包含多个日志记录机制，来帮助你从运行的容器或服务获取日志信息。这些机制成为日志驱动。
+每一个docker daemon都有一个默认的日志驱动，每个容器都默认都是使用这个日志驱动，除非你自定义了其他的日志驱动。
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
                           <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#生活" title="生活">生活</a>
-                        </span>
-                        
-                    </p>
-                </li>
-                
-                <li class="repo-list-item">
-                    <h3 class="repo-list-name">
-                      <a href="/2017/07/06/saltstack%E4%B9%8Bpillar/">saltstack之pillar</a>
-                    </h3>
-                    <p class="repo-list-description">
-                        Pillar
-主要作用是存储和定义配置管理中需要的一些变量，比如数据，比如软件版本，用户名密码等信息
-                    </p>
-                    <p class="repo-list-meta">
-                        <span class="meta-info">
-                          <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#saltstack" title="saltstack">saltstack</a>
-                        </span>
-                        
-                    </p>
-                </li>
-                
-                <li class="repo-list-item">
-                    <h3 class="repo-list-name">
-                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/">kargo容器化部署kubernetes高可用集群(3)</a>
-                    </h3>
-                    <p class="repo-list-description">
-                        上一篇我们详细的剥析了通过kargo生成的各类服务的配置文件，学会了，如何生成证书，如何配置etcd,calico,kubelet，学会了如何配置一个kubernetes的高可用集群。既然集群已经配好了，那么这一章，我们就来学学如何配置一些常用的插件。
-                    </p>
-                    <p class="repo-list-meta">
-                        <span class="meta-info">
-                          <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
                         </span>
                         
                         <span class="meta-info">
@@ -174,19 +129,17 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/">kargo容器化部署kubernetes高可用集群(2)</a>
+                      <a href="/2017/07/06/Docker-config-dns/">Docker基础-docker在自定义的网络上定义DNS</a>
                     </h3>
                     <p class="repo-list-description">
-                        上一篇已经使用kargo搭建了kubernetes高可用集群，这里重点通过剥析kargo生成的配置文件来更加细化的了解下kubernetes，方便后期对kubernetes的自定义。所有的配置文件，我会放到github上
+                        在自定义网络上的内嵌dns
+这一章主要讲了在用户自定义网络中，容器内嵌dns的操作。连接到用户自定义网络的容器的DNS查询和连接到默认网桥网络的容器的查询方式不同。
+
+  Note: 为了保持向后的兼容性，默认网桥中的DNS配置保留，没有进行更改。有关默认网桥中DNS配置的详细信息，可以参考DNS in default bridge network
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
                           <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
                         </span>
                         
                         <span class="meta-info">
@@ -199,19 +152,14 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/">kargo容器化部署kubernetes高可用集群(1)</a>
+                      <a href="/2017/07/06/Docker-build-bridges/">Docker基础-自定义docker bridge</a>
                     </h3>
                     <p class="repo-list-description">
-                        捣鼓kubernetes有一段时间了，先后用过yum,kubeadm,custom等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到漠然大神的快速部署kubernetes高可用集群，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。
+                        这篇主要解释了怎么绑定你自己的bridge来替换docker默认的bridge，这个默认的bridge网络是在安装docker的时候自动安装的。
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
                           <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
                         </span>
                         
                         <span class="meta-info">
@@ -224,16 +172,12 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/ansible-client/">ansible客户端配置</a>
+                      <a href="/2017/07/06/Docker-bind/">Docker基础-bridge绑定容器端口</a>
                     </h3>
                     <p class="repo-list-description">
-                        1.ansible-client 免密钥登录所有要部署的节点
-$ ssh-keygen -t rsa -P ''
+                        本章节主要讲解了在Docker默认的bridge网络上绑定容器端口，这个bridge网络是在docker安装的时候，系统默认创建的。
 
-
-2.将ansible-client上的id_rsa.pub复制到其他所有节点
-```bash
-$ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
+  Note: docker允许创建除了默认bridge网络之外的bridge网络
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
@@ -242,12 +186,7 @@ $ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33
                         
                         <span class="meta-info">
                           <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#ansible" title="ansible">ansible</a>
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kargo" title="kargo">kargo</a>
+                          <a href="/categories/#docker" title="docker">docker</a>
                         </span>
                         
                     </p>
@@ -255,19 +194,10 @@ $ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/Maven-setting.xml/">Maven之setting.xml</a>
+                      <a href="/2017/07/06/Docker-automatically-start-containers/">Docker基础-自动启动容器</a>
                     </h3>
                     <p class="repo-list-description">
-                        什么是Maven
-Maven是一个项目管理和综合工具，用java编写，能简化和标准化项目建设过程。处理编译，部署，文档，团队协作和其他任务的无缝连接。 Maven增加可重用性并负责建立相关的任务。
-
-Maven资源库
-
-  
-    Maven本地资源库
-    Maven私服库
-    Maven中央仓库
-一般在打包编译的时候，会先从本地仓库中查找，如果本地仓库没有，就会去设定好的私服仓库去查找，私服仓库上如果有就下载下来，没有私服仓库就会去中央仓库查找
+                        自动启动容器
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
@@ -276,7 +206,7 @@ Maven资源库
                         
                         <span class="meta-info">
                           <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#maven" title="maven">maven</a>
+                          <a href="/categories/#docker" title="docker">docker</a>
                         </span>
                         
                     </p>
@@ -284,10 +214,50 @@ Maven资源库
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/Dockerfile-reference/">Docker基础-Dockerfile常用指令</a>
+                      <a href="/2017/07/06/Docker-View-a-containers-logs/">Docker基础-docker容器日志处理方式</a>
                     </h3>
                     <p class="repo-list-description">
-                        Dockerfile reference
+                        docker logs显示了正在运行的容器的日志信息。默认情况下，docker logs显示命令的输出，就好象在终端中交互运行命令时一样。UNIX和Linux命令通常在运行时打开3个I/O流，成为STDIN,STDOUT和STDERR。STDIN为标准输入，其可以包括来自键盘的输入或来自另一个命令的输入。STDOUT为标准输出，STDERR为错误输出。默认情况下，docker日志显示STDOUT和STDERR。更多关于Linux上的I/O信息，可参考 Linux Documentation Project article on I/O redirection
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> 2017/07/06
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#docker" title="docker">docker</a>
+                        </span>
+                        
+                    </p>
+                </li>
+                
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="/2017/07/06/Docker-Using-compose-in-production/">Docker基础-docker compose应用在生产环境</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        当你使用compose定义你的app用于开发环境时，同样也可以使用这个配置来在不同的环境，如CI，临时和生产环境运行应用程序。
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> 2017/07/06
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#docker" title="docker">docker</a>
+                        </span>
+                        
+                    </p>
+                </li>
+                
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="/2017/07/06/Docker-Use-compose-with-swarm/">Docker基础-在swarm上使用docker compose</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        现在看到的是旧版本的独立版的swarm。如果你使用的是docker 1.12或更高的版本，swarm mode已经继承到了docker engine中。大多数用户都使用集成的swarm mode。可参考Getting started with swarm mode和Swarm mode CLI commands，独立的swarm没有集成到docker engine API和CLI commands中。
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
@@ -475,10 +445,12 @@ Maven资源库
     <div class="pagination text-align">
       <div class="btn-group">
         
-            <button disabled="disabled" href="javascript:;" class="btn btn-outline">&laquo;</button>
+          
+              <a href="/page3"  class="btn btn-outline">&laquo;</a>
+          
         
         
-            <a href="javascript:;" class="active btn btn-outline">1</a>
+            <a href="/"  class="btn btn-outline">1</a>
         
         
           
@@ -490,7 +462,7 @@ Maven资源库
           
         
           
-              <a href="/page4"  class="btn btn-outline">4</a>
+              <a href="javascript:;"  class="active btn btn-outline">4</a>
           
         
           
@@ -502,7 +474,7 @@ Maven资源库
           
         
         
-            <a href="/page2"  class="btn btn-outline">&raquo;</a>
+            <a href="/page5"  class="btn btn-outline">&raquo;</a>
         
         </div>
     </div>

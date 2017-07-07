@@ -23,7 +23,7 @@
     
 
     
-    <link rel="canonical" href="http://0.0.0.0:80/">
+    <link rel="canonical" href="http://0.0.0.0:80/page5/">
     <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
     <link rel="shortcut icon" href="/favicon.ico">
     
@@ -33,7 +33,7 @@
     
         
     
-    <meta property="og:url" content="http://0.0.0.0:80/">
+    <meta property="og:url" content="http://0.0.0.0:80/page5/">
     <meta property="og:site_name" content="KevinGuo">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="zh_CN" />
@@ -108,60 +108,14 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/video-test/">video</a>
+                      <a href="/2017/07/06/Docker-Stacks-and-Distributed-Application-Bundles/">Docker基础-docker stacks</a>
                     </h3>
                     <p class="repo-list-description">
-                        就是加个视频链接，测试一下看看行不行，代码如下
+                        该章节介绍的功能都是实验性的，在变成正式版本之前，可能发生变动
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
                           <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#生活" title="生活">生活</a>
-                        </span>
-                        
-                    </p>
-                </li>
-                
-                <li class="repo-list-item">
-                    <h3 class="repo-list-name">
-                      <a href="/2017/07/06/saltstack%E4%B9%8Bpillar/">saltstack之pillar</a>
-                    </h3>
-                    <p class="repo-list-description">
-                        Pillar
-主要作用是存储和定义配置管理中需要的一些变量，比如数据，比如软件版本，用户名密码等信息
-                    </p>
-                    <p class="repo-list-meta">
-                        <span class="meta-info">
-                          <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#saltstack" title="saltstack">saltstack</a>
-                        </span>
-                        
-                    </p>
-                </li>
-                
-                <li class="repo-list-item">
-                    <h3 class="repo-list-name">
-                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/">kargo容器化部署kubernetes高可用集群(3)</a>
-                    </h3>
-                    <p class="repo-list-description">
-                        上一篇我们详细的剥析了通过kargo生成的各类服务的配置文件，学会了，如何生成证书，如何配置etcd,calico,kubelet，学会了如何配置一个kubernetes的高可用集群。既然集群已经配好了，那么这一章，我们就来学学如何配置一些常用的插件。
-                    </p>
-                    <p class="repo-list-meta">
-                        <span class="meta-info">
-                          <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
                         </span>
                         
                         <span class="meta-info">
@@ -174,19 +128,18 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(2)/">kargo容器化部署kubernetes高可用集群(2)</a>
+                      <a href="/2017/07/06/Docker-Registry/">Docker基础-docker registry的几种方式</a>
                     </h3>
                     <p class="repo-list-description">
-                        上一篇已经使用kargo搭建了kubernetes高可用集群，这里重点通过剥析kargo生成的配置文件来更加细化的了解下kubernetes，方便后期对kubernetes的自定义。所有的配置文件，我会放到github上
+                        Registry
+Registry用来管理您的IMAGE镜像，常见的有:
+Private Registry:私有仓库，自己搭建
+DockerHub：由Docker维护
+Docker Trusted Registry：采购
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
                           <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
                         </span>
                         
                         <span class="meta-info">
@@ -199,19 +152,27 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/">kargo容器化部署kubernetes高可用集群(1)</a>
+                      <a href="/2017/07/06/Docker-Overview/">Docker基础-docker 简介</a>
                     </h3>
                     <p class="repo-list-description">
-                        捣鼓kubernetes有一段时间了，先后用过yum,kubeadm,custom等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到漠然大神的快速部署kubernetes高可用集群，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。
+                        什么是Docker
+Docker是一个提供开发、传输及运行应用程序的开放平台，Docker能将应用程序和基础架构平台进行分离，以便快速交付，使用Docker，你能用像管理基础架构一样的的方式来管理你的应用程序，通过利用Docker来开发，测试，部署，传输代码，可以显著的提高开发部署的效率。
+Docker使用Google公司推出的Go语言进行开发实现，基于Linux内核的Control groups,Union file systems，Namespace等技术，对进程进行封装隔离，属于操作系统层面的虚拟化技术。由于隔离的进程独立于宿主机和其他被隔离的进程，因此也称其为容器。最初实现是基于LXC，从0.7之后开始去除LXC，转而使用自行开发的libcontainer，从1.11开始，则进一步演进为使用RUNC和containerd
+
+Docker Engine
+Docker engine 是一个C/S架构应用程序，包含如下组件，如下图：
+
+  Docker server daemon
+一个长时间运行的守护进程
+  REST API
+程序和damon通信的接口
+  Docker client CLI
+命令行界面
+这里的Docker client CLI就是通过REST API 和Docker server daemon进行通信，而其它的底层程序则是通过底层的API来和REST API接口进行通信，最终和Docker server daemon进行通信
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
                           <span class="octicon octicon-calendar"></span> 2017/07/06
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kubernetes" title="kubernetes">kubernetes</a>
                         </span>
                         
                         <span class="meta-info">
@@ -224,16 +185,10 @@
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/ansible-client/">ansible客户端配置</a>
+                      <a href="/2017/07/06/Docker-Overview-of-Docker-Compose/">Docker基础-docker compose简介</a>
                     </h3>
                     <p class="repo-list-description">
-                        1.ansible-client 免密钥登录所有要部署的节点
-$ ssh-keygen -t rsa -P ''
-
-
-2.将ansible-client上的id_rsa.pub复制到其他所有节点
-```bash
-$ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
+                        Compose 是一个定义和运行多个docker容器的应用程序的工具。你可以使用compose file来配置你的应用服务。然后，使用单个命令，docker就会根据你的compose配置文件来创建和启动所有的服务。想要了解更多关于compose的特性，可以参考后面的the list of features
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
@@ -242,12 +197,7 @@ $ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33
                         
                         <span class="meta-info">
                           <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#ansible" title="ansible">ansible</a>
-                        </span>
-                        
-                        <span class="meta-info">
-                          <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#kargo" title="kargo">kargo</a>
+                          <a href="/categories/#docker" title="docker">docker</a>
                         </span>
                         
                     </p>
@@ -255,19 +205,10 @@ $ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/Maven-setting.xml/">Maven之setting.xml</a>
+                      <a href="/2017/07/06/Docker-Networking-in-compose/">Docker基础-docker compose网络</a>
                     </h3>
                     <p class="repo-list-description">
-                        什么是Maven
-Maven是一个项目管理和综合工具，用java编写，能简化和标准化项目建设过程。处理编译，部署，文档，团队协作和其他任务的无缝连接。 Maven增加可重用性并负责建立相关的任务。
-
-Maven资源库
-
-  
-    Maven本地资源库
-    Maven私服库
-    Maven中央仓库
-一般在打包编译的时候，会先从本地仓库中查找，如果本地仓库没有，就会去设定好的私服仓库去查找，私服仓库上如果有就下载下来，没有私服仓库就会去中央仓库查找
+                        注意： 本文涉及的compose只适用于compose文件格式为version 2的版本，v1(旧的)不支持网络功能
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
@@ -276,7 +217,7 @@ Maven资源库
                         
                         <span class="meta-info">
                           <span class="octicon octicon-file-directory"></span>
-                          <a href="/categories/#maven" title="maven">maven</a>
+                          <a href="/categories/#docker" title="docker">docker</a>
                         </span>
                         
                     </p>
@@ -284,10 +225,50 @@ Maven资源库
                 
                 <li class="repo-list-item">
                     <h3 class="repo-list-name">
-                      <a href="/2017/07/06/Dockerfile-reference/">Docker基础-Dockerfile常用指令</a>
+                      <a href="/2017/07/06/Docker-Log-tag-for-logging-driver/">Docker基础-docker 容器日志命名</a>
                     </h3>
                     <p class="repo-list-description">
-                        Dockerfile reference
+                        tag 选项指定你该为容器的日志如何命名。默认是容器ID的前12个字符。要覆盖默认值，可指定一个tag选项:
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> 2017/07/06
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#docker" title="docker">docker</a>
+                        </span>
+                        
+                    </p>
+                </li>
+                
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="/2017/07/06/Docker-Limit-container-resources/">Docker基础-docker limit资源限制</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        默认情况下，容器没有资源约束，可以使用与主机的内核调度程序允许的的资源一样多的资源。docker提供了在运行docker run指定选项来控制容器内存，cpu或IO的方法。这部分提供了有关何时应该设置这类限制以及设置这些限制可能有什么影响的详细信息。
+                    </p>
+                    <p class="repo-list-meta">
+                        <span class="meta-info">
+                          <span class="octicon octicon-calendar"></span> 2017/07/06
+                        </span>
+                        
+                        <span class="meta-info">
+                          <span class="octicon octicon-file-directory"></span>
+                          <a href="/categories/#docker" title="docker">docker</a>
+                        </span>
+                        
+                    </p>
+                </li>
+                
+                <li class="repo-list-item">
+                    <h3 class="repo-list-name">
+                      <a href="/2017/07/06/Docker-Keep-containers-alive-during-daemon-downtime/">Docker基础-当docker daemon停止时依然保持容器运行</a>
+                    </h3>
+                    <p class="repo-list-description">
+                        默认情况下，当docker daemon停止，它会关闭所有正在运行的容器。从docker1.12起，你可以配置当docker daemon不可用时依然保持容器继续运行。live restore选项有助于减少由于docker daemon崩溃，中断或升级而导致的容器停机时间。
                     </p>
                     <p class="repo-list-meta">
                         <span class="meta-info">
@@ -475,10 +456,12 @@ Maven资源库
     <div class="pagination text-align">
       <div class="btn-group">
         
-            <button disabled="disabled" href="javascript:;" class="btn btn-outline">&laquo;</button>
+          
+              <a href="/page4"  class="btn btn-outline">&laquo;</a>
+          
         
         
-            <a href="javascript:;" class="active btn btn-outline">1</a>
+            <a href="/"  class="btn btn-outline">1</a>
         
         
           
@@ -494,7 +477,7 @@ Maven资源库
           
         
           
-              <a href="/page5"  class="btn btn-outline">5</a>
+              <a href="javascript:;"  class="active btn btn-outline">5</a>
           
         
           
@@ -502,7 +485,7 @@ Maven资源库
           
         
         
-            <a href="/page2"  class="btn btn-outline">&raquo;</a>
+            <a href="/page6"  class="btn btn-outline">&raquo;</a>
         
         </div>
     </div>

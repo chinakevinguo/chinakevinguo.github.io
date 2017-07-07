@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker 简介 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-Overview/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker 简介">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="什么是DockerDocker是一个提供开发、传输及运行应用程序的开放平台，Docker能将应用程序和基础架构平台进行分离，以便快速交付，使用Docker，你能用像管理基础架构一样的的方式来管理你的应用程序，通过利用Docker来开发，测试，部署，传输代码，可以显著的提高开发部署的效率。Docker使用Google公司推出的Go语言进行开发实现，基于Linux内核的Control groups,Union file systems，Namespace等技术，对进程进行封装隔离，属于操作系统层面的虚拟化技术。由于隔离的进程独立于宿主机和其他被隔离的进程，因此也称其为容器。最初实现是基于LXC，从0.7之后开始去除LXC，转而使用自行开发的libcontainer，从1.11开始，则进一步演进为使用RUNC和containerdDocker EngineDocker engine 是一个C/S架构应用程序，包含如下组件，如下图：  Docker server daemon一个长时间运行的守护进程  REST API程序和damon通信的接口  Docker client CLI命令行界面这里的Docker client CLI就是通过REST API 和Docker server daemon进行通信，而其它的底层程序则是通过底层的API来和REST API接口进行通信，最终和Docker server daemon进行通信">
+    <meta name="og:description" content="什么是DockerDocker是一个提供开发、传输及运行应用程序的开放平台，Docker能将应用程序和基础架构平台进行分离，以便快速交付，使用Docker，你能用像管理基础架构一样的的方式来管理你的应用程序，通过利用Docker来开发，测试，部署，传输代码，可以显著的提高开发部署的效率。Docker使用Google公司推出的Go语言进行开发实现，基于Linux内核的Control groups,Union file systems，Namespace等技术，对进程进行封装隔离，属于操作系统层面的虚拟化技术。由于隔离的进程独立于宿主机和其他被隔离的进程，因此也称其为容器。最初实现是基于LXC，从0.7之后开始去除LXC，转而使用自行开发的libcontainer，从1.11开始，则进一步演进为使用RUNC和containerdDocker EngineDocker engine 是一个C/S架构应用程序，包含如下组件，如下图：  Docker server daemon一个长时间运行的守护进程  REST API程序和damon通信的接口  Docker client CLI命令行界面这里的Docker client CLI就是通过REST API 和Docker server daemon进行通信，而其它的底层程序则是通过底层的API来和REST API接口进行通信，最终和Docker server daemon进行通信">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-Overview/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker 简介</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="什么是docker">什么是Docker</h1>
+<p>Docker是一个提供开发、传输及运行应用程序的开放平台，Docker能将应用程序和基础架构平台进行分离，以便快速交付，使用Docker，你能用像管理基础架构一样的的方式来管理你的应用程序，通过利用Docker来开发，测试，部署，传输代码，可以显著的提高开发部署的效率。
+Docker使用Google公司推出的Go语言进行开发实现，基于Linux内核的<a href="https://zh.wikipedia.org/wiki/Cgroups">Control groups</a>,<a href="https://en.wikipedia.org/wiki/Union_mount">Union file systems</a>，<a href="https://en.wikipedia.org/wiki/Linux_namespaces">Namespace</a>等技术，对进程进行封装隔离，属于操作系统层面的虚拟化技术。由于隔离的进程独立于宿主机和其他被隔离的进程，因此也称其为容器。最初实现是基于LXC，从0.7之后开始去除LXC，转而使用自行开发的libcontainer，从1.11开始，则进一步演进为使用RUNC和containerd
+<!--more--></p>
+<h1 id="docker-engine">Docker Engine</h1>
+<p>Docker engine 是一个C/S架构应用程序，包含如下组件，如下图：</p>
+<ul>
+  <li>Docker server daemon
+一个长时间运行的守护进程</li>
+  <li>REST API
+程序和damon通信的接口</li>
+  <li>Docker client CLI
+命令行界面
+这里的Docker client CLI就是通过REST API 和Docker server daemon进行通信，而其它的底层程序则是通过底层的API来和REST API接口进行通信，最终和Docker server daemon进行通信
+<img src="/images/posts/engine-components-flow.png" alt="" /></li>
+</ul>
+
+<h1 id="docker-vs-virtual-machines">Docker VS Virtual Machines</h1>
+<p>下面的图片比较了Docker和传统虚拟化方式的不同之处。传统虚拟机技术是虚拟出一套硬件后，在其上运行一套完整的操作系统，再在系统上运行应用程序；而Docker的应用程序则是直接运行于主机的内核之上，容器没有自己的内核，也没有进行硬件虚拟化。因此容器比传统虚拟机更为轻量。
+<img src="/images/posts/virtualization.png" alt="Virtual Machines" />
+<img src="/images/posts/docker.png" alt="Docker" /></p>
+
+<p><em>The underlying technology</em></p>
+<ul>
+  <li>Namespaces
+Docker 使用namespaces来对容器进行隔离，当你运行一个容器时，Docker为该容器创建一组namespaces，这个namespaces提供一个隔离层，容器的所有操作都被限制在这个单独的namespaces中
+Docker在Linux上使用如下的namespaces：
+    <blockquote>
+      <ul>
+        <li>PID 进程隔离</li>
+        <li>NET 网络隔离</li>
+        <li>IPC 消息队列隔离</li>
+        <li>MNT 文件系统挂载隔离</li>
+        <li>UTS 主机名和域名隔离</li>
+        <li>USER 用户和用户组隔离</li>
+      </ul>
+    </blockquote>
+  </li>
+  <li>Control groups
+Cgroup技术将应用程序限制为特定的一进程集，Cgroup允许Docker Engine将可用的硬件资源共享到容器，并且可以对其进行限制和约束，例如，你可以限制容器的内存大小</li>
+  <li>Union file systems
+UFS，其实就是一个层级概念，将多个目录挂载到同一个目录下，然后进行修改，修改的内容会被重新保存到另外的层里面，而不会影响到原有挂载层数据</li>
+  <li>Container format
+Docker将namespaces，cgroup和UnionFS组合在一起，形成了一个libcontainer</li>
+</ul>
+
+<h1 id="docker的存储方式-storage-driver">Docker的存储方式-Storage Driver</h1>
+<p>为了能有效的理解Docker的存储方式，首先，你必须要了解如何构建和存储镜像，然后，了解如何通过镜像使用容器，最后，了解如何使用镜像和容器。
+在这之前，你必须先了解layers和image，container的概念.
+Docker模型的核心部分是有效利用分层镜像机制，镜像可以通过分层来进行继承，基于基础镜像，可以制作各种具体的应用镜像，不同的Docker容器就可以共享一些基础的文件系统层，同时加上自己独有的改动层，大大提高了存储的效率，其中主要的机制就是分层模型和ufs。针对镜像存储，docker采用了集中不同的存储drivers，包括：aufs，devicemapper，btrfs和overlay</p>
+<h1 id="内容寻址存储">内容寻址存储</h1>
+<p>在Docker 1.10版中引入了一个新的内容寻址存储模型，这是一种在磁盘上定位镜像层和数据层的新方式。原来的版本中，镜像层和数据层使用随机生成的UUID来进行存储，这样可能会出现ID冲突，而新版本的存储模型，使用哈希来进行存储，提高了安全性，同时也保证了数据的完整性。
+另：
+镜像是由多个只读层组成，并且多个只读层是可以被多个镜像共享的，如果其中一个数据层，在某个镜像中已经存在，那么根据内容寻址存储的原理，该数据层，就不需要被再此下载，可以节省空间。
+容器是建立在镜像层之上的一个可读可写的层，多个容器层可以共享一个镜像层，容器层内数据的修改是遵循cow原则，更高效。
+<img src="/images/posts/container-layers-cas.jpg" alt="container-layers-cas" />
+可以看到所有的镜像层ID都是加密的哈希值，但是容器层依旧是使用的随机生成的UUID</p>
+<h1 id="copy-on-write">copy-on-write</h1>
+<p>写时复制，多个进程共享资源，只有当某个进程需要进行修改的时候，才会复制一份给该进程，而其他进程依然使用原始的数据。</p>
+<h1 id="images-and-layers">Images and layers</h1>
+<p>Images其实是由多个表示不同文件系统的只读层组成，层级从底层开始，逐层堆叠，形成一个完整的Image,Docker storage driver就负责来堆叠这些层
+<img src="/images/posts/image-layers.jpg" alt="image-layers" /></p>
+<h1 id="container-and-layers">Container and layers</h1>
+<p>当你创建了一个新的容器，你就是在Images layers的最上层添加了一个新的可读，可写的层，这个层就称之为容器，所有的变动都在这个容器层里面发生。
+<img src="/images/posts/container-layers.jpg" alt="container-layers" /></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-Overview/';
+              this.page.identifier = '/2017/07/06/Docker-Overview/';
+              this.page.title = 'Docker基础-docker 简介';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker 存储驱动 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-storage-driver/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker 存储驱动">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="Select a storage driver">
+    <meta name="og:description" content="Select a storage driver">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-storage-driver/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker 存储驱动</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="select-a-storage-driver">Select a storage driver</h1>
+
+<p>该篇主要介绍Docker的存储驱动，列出了Docker支持的存储驱动以及介绍了用来管理这些存储驱动的命令，同时也提供了在为Docker选择存储驱动的一些建议。
+<!--more--></p>
+<h1 id="热插拔存储驱动架构">热插拔存储驱动架构</h1>
+
+<p>Docker提供了一个可热插拔的存储驱动架构，这意味着，你可以灵活的插入最合适你当前环境的存储驱动程序。每一个Docker存储驱动都是基于Linux文件系统或卷组管理器。
+每个存储驱动有自己独特的方式来管理数据层和镜像层，这意味着特定的驱动程序在特定的环境下，运行的会比其他的存储驱动好。</p>
+
+<p>一旦你决定使用那个存储驱动，那么在启动docker的时候，你就指定该驱动程序，因此，Docker每次只能运行一个存储驱动，并且所有的容器实例都是用该存储驱动。下表列出了所有支持的存储驱动：</p>
+
+<p>| Technology    | Storage driver name  |
+| ———-    | :——————-:|
+| <a href="https://docs.docker.com/engine/userguide/storagedriver/overlayfs-driver/">OverlayFS</a>     | overlay or overlay2  |
+| <a href="https://docs.docker.com/engine/userguide/storagedriver/aufs-driver/">AUFS</a>          | aufs                 |
+| <a href="https://docs.docker.com/engine/userguide/storagedriver/btrfs-driver/">Btrfs</a>         | btrfs                |
+| <a href="https://docs.docker.com/engine/userguide/storagedriver/device-mapper-driver/">Device Mapper</a> | devicemapper         |
+| VFS           | vfs                  |
+| <a href="https://docs.docker.com/engine/userguide/storagedriver/zfs-driver/">ZFS</a>           | zfs                  |
+到底使用哪个存储驱动，部分取决于你本地后台的文件系统，比如说，你当前主机的文件系统是btrfs，那么你的存储驱动最好也选择btrfs，下表列出了每个存储驱动和它对应所匹配的后台文件系统：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Storage driver</th>
+      <th style="text-align: left">Commonly used on</th>
+      <th style="text-align: left">Disabled on</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>overlay</td>
+      <td style="text-align: left">ext4 xfs</td>
+      <td style="text-align: left">btrfs aufs overlay overlay2 zfs eCryptfs</td>
+    </tr>
+    <tr>
+      <td>overlay2</td>
+      <td style="text-align: left">ext4 xfs</td>
+      <td style="text-align: left">btrfs aufs overlay overlay2 zfs eCryptfs</td>
+    </tr>
+    <tr>
+      <td>aufs</td>
+      <td style="text-align: left">ext4 xfs</td>
+      <td style="text-align: left">btrfs aufs eCryptfs</td>
+    </tr>
+    <tr>
+      <td>devicemapper</td>
+      <td style="text-align: left">direct-lvm</td>
+      <td style="text-align: left">N/A</td>
+    </tr>
+    <tr>
+      <td>btrfs</td>
+      <td style="text-align: left">btrfs <em>only</em></td>
+      <td style="text-align: left">N/A</td>
+    </tr>
+    <tr>
+      <td>vfs</td>
+      <td style="text-align: left">debugging <em>only</em></td>
+      <td style="text-align: left">N/A</td>
+    </tr>
+    <tr>
+      <td>zfs</td>
+      <td style="text-align: left">zfs <em>only</em></td>
+      <td style="text-align: left">N/A</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>查看当前Docker使用的存储驱动命令</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker info
+Containers: 10
+ Running: 1
+ Paused: 0
+ Stopped: 9
+Images: 5
+Server Version: 1.12.3
+Storage Driver: devicemapper
+Backing Filesystem: xfs
+</code></pre>
+</div>
+<p>在启动时Docker时指定存储驱动</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>dockerd --storage-driver<span class="o">=</span>overlay
+</code></pre>
+</div>
+
+<h1 id="共享存储系统和存储驱动">共享存储系统和存储驱动</h1>
+<p>许多企业使用共享存储（如SAN和NAS等），而Docker存储驱动程序是可以在这些共享存储上操作的，这是Docker在存储上有了更高的性能和可用性，但是目前，Docker还没有与这些共享存储进行集成，虽然没有和共享存储集成，但是，Docker的存储驱动程序是基于Linux文件系统和卷管理器的，所以Docker也能很好的在共享存储上进行使用。</p>
+
+<h1 id="选择存储驱动建议">选择存储驱动建议</h1>
+<p>在选择存储驱动之前，你必须了解到以下两点：
+1.没有那个存储驱动最适合于那个用例
+2.存储驱动正序正在不停的发展和改进
+所以，我们在选择存储驱动的时候要注意：
+1.稳定性</p>
+<blockquote>
+  <ul>
+    <li>使用默认的存储驱动</li>
+    <li>使用Docker指定的稳定版的存储驱动</li>
+  </ul>
+</blockquote>
+
+<p>2.是否有使用该存储驱动的经验
+你的开发团队是否有使用该存储驱动的经验，这也是你在选择存储驱动的时候需要考虑的</p>
+
+<p>3.该存储驱动是否发展成熟
+许多人认为<code class="highlighter-rouge">OverlayFS</code>是Docker 存储驱动未来发展的趋势，但是，相对于<code class="highlighter-rouge">aufs</code>和<code class="highlighter-rouge">devicemapper</code>来说，它还不太成熟，所以在选择存储驱动的时候，要尽可能的选择已经发展成熟的存储驱动</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-storage-driver/';
+              this.page.identifier = '/2017/07/06/Docker-storage-driver/';
+              this.page.title = 'Docker基础-docker 存储驱动';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

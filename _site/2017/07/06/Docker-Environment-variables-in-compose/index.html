@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker 环境变量在compose文件中的使用 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-Environment-variables-in-compose/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker 环境变量在compose文件中的使用">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="在compose文件中引用环境变量">
+    <meta name="og:description" content="在compose文件中引用环境变量">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-Environment-variables-in-compose/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker 环境变量在compose文件中的使用</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="在compose文件中引用环境变量">在compose文件中引用环境变量</h1>
+
+<p>可以在compose文件中引用运行<code class="highlighter-rouge">docker-compose</code>所在的shell中的环境变量，如：</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>web:
+  image: <span class="s2">"webapp:</span><span class="k">${</span><span class="nv">TAG</span><span class="k">}</span><span class="s2">"</span>
+</code></pre>
+</div>
+<!--more-->
+<h1 id="在容器中设置环境变量">在容器中设置环境变量</h1>
+
+<p>可以在compose文件中的<code class="highlighter-rouge">environment</code>关键字下设置容器的环境变量，就像使用<code class="highlighter-rouge">docker run -e VARIABLE=VALUE</code>一样</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>web:
+  environment:
+    - <span class="nv">DEBUG</span><span class="o">=</span>1
+</code></pre>
+</div>
+
+<h1 id="将环境变量传递到容器">将环境变量传递到容器</h1>
+
+<p>可以在compose文件中的<code class="highlighter-rouge">environment</code>关键字下定义一个环境变量而不是直接赋值，就像是<code class="highlighter-rouge">docker run -e VARIABLE</code></p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>web:
+  environment:
+    - DEBUG
+</code></pre>
+</div>
+
+<h1 id="env_file配置选项">env_file配置选项</h1>
+
+<p>可以使用compose文件中的<code class="highlighter-rouge">env_file</code>选项从一个外部文件传递多个环境变量到容器中，就像<code class="highlighter-rouge">docker run --env-file=FILE</code></p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>web:
+  env_file:
+    - web-variables.env
+</code></pre>
+</div>
+
+<h1 id="使用docker-compose-run设置环境变量">使用docker-compose run设置环境变量</h1>
+
+<p>就像<code class="highlighter-rouge">docker run -e</code>,可以使用<code class="highlighter-rouge">docker-compose run -e</code>为一次性容器设置环境变量</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>docker-compose run -e <span class="nv">DEBUG</span><span class="o">=</span>1 web python console.py
+</code></pre>
+</div>
+<p>也可以不赋值，直接从shell变量中取值</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>docker-compose run -e DEBUG web python console.py
+</code></pre>
+</div>
+<p>DEBUG的值是从执行compose文件所在的shell的同一个环境变量取得。</p>
+
+<h1 id="env文件">.env文件</h1>
+
+<p>可以在环境文件<code class="highlighter-rouge">.env</code>设置默认的环境变量，这些环境变量可以在compose文件中调用</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>cat .env
+<span class="nv">TAG</span><span class="o">=</span>v1.5
+
+<span class="gp">$ </span>cat docker-compose.yml
+version: <span class="s1">'2.0'</span>
+services:
+  web:
+    image: <span class="s2">"webapp:</span><span class="k">${</span><span class="nv">TAG</span><span class="k">}</span><span class="s2">"</span>
+</code></pre>
+</div>
+
+<p>当执行<code class="highlighter-rouge">docker-compose up</code>命令时，上面定义的web服务将使用webapp:v1.5镜像，可以使用config命令来打印出来：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker-compose config
+version: <span class="s1">'2.0'</span>
+services:
+  web:
+    image: <span class="s1">'webapp:v1.5'</span>
+</code></pre>
+</div>
+
+<p>在shell中的环境变量将比定义在<code class="highlighter-rouge">.env</code>文件中的环境变量优先。如果在shell中设置一个不同的TAG，镜像将优先使用shell中的定义，而不是.evn文件中的：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">export </span><span class="nv">TAG</span><span class="o">=</span>v2.0
+<span class="gp">$ </span>docker-compose config
+version: <span class="s1">'2.0'</span>
+services:
+  web:
+    image: <span class="s1">'webapp:v2.0'</span>
+</code></pre>
+</div>
+
+<h1 id="使用环境变量来配置compose">使用环境变量来配置compose</h1>
+
+<p>某些环境变量可用来配置以改变<code class="highlighter-rouge">docker compose</code>的命令行特性，以<code class="highlighter-rouge">COMPOSE_</code>或<code class="highlighter-rouge">DOCKER_</code>开头，详细信息参考<a href="https://docs.docker.com/compose/reference/envvars/">CLI Environment Variables</a></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-Environment-variables-in-compose/';
+              this.page.identifier = '/2017/07/06/Docker-Environment-variables-in-compose/';
+              this.page.title = 'Docker基础-docker 环境变量在compose文件中的使用';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

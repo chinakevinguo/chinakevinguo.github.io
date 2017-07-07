@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker stacks &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-Stacks-and-Distributed-Application-Bundles/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker stacks">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="  该章节介绍的功能都是实验性的，在变成正式版本之前，可能发生变动">
+    <meta name="og:description" content="  该章节介绍的功能都是实验性的，在变成正式版本之前，可能发生变动">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-Stacks-and-Distributed-Application-Bundles/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker stacks</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <blockquote>
+  <p>该章节介绍的功能都是实验性的，在变成正式版本之前，可能发生变动</p>
+</blockquote>
+
+<blockquote>
+  <p>这些内容来自<a href="https://github.com/docker/docker">docker/docker repo</a>的<a href="https://github.com/docker/docker/blob/v1.12.0-rc4/experimental/docker-stacks-and-bundles.md">Docker Stacks and Distributed Application Bundles</a></p>
+</blockquote>
+
+<h1 id="概述">概述</h1>
+<p>docker stacks 和分布式应用程序bundles是在docker 1.12和docker compose 1.8中引入的一个新特性，目前还在实验阶段，同Engine API中的swarm、nodes和service同时进行</p>
+
+<p>截至目前，大家已经可以选定一个Dockerfile，并利用docker build命令由此创建镜像。使用docker run命令则可启动容器。这条命令亦能够轻松同时启动多套容器。另外，大家也可以使用Docker Compose文件并利用docker-compose scale命令对容器进行规模扩展。
+<img src="/images/posts/Dockerfile.jpg" alt="" />
+那么同样，一个docker-compose.yml可以创建一个分布式的应用程序bundle。使用docker-compose bundle可以启动docker stack。其专门面向多套容器的迁移需求，每个捆绑包都可以作为stack在运行时进行部署。
+<img src="/images/posts/Docker-compose.jpg" alt="" /></p>
+
+<p>简单来说，我们可以使用一个类比来进行说明：
+Dockerfile –&gt; 镜像 –&gt; 容器
+Docker Compose –&gt; 分布式应用程序包 –&gt; Docker Stack</p>
+
+<p>从Docker 1.12和compose 1.8开始，这些功能是实验性的。Docker Engine和Docker Registry 都不支持捆绑包的分发。</p>
+
+<!--more-->
+<h1 id="生成一个捆绑包">生成一个捆绑包</h1>
+<p>生成捆绑包最简单的方法就是使用docker-compose从docker-compose.yml中生成。当然，这仅仅是一种可能的方式，用同样的方式， docker build不是唯一能生成docker image的方式。</p>
+
+<p>1.新建docker-compose.yml文件</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>cat docker-compose.yml
+version: <span class="s2">"2"</span>
+services:
+ db:
+   container_name: <span class="s2">"db"</span>
+   image: arungupta/oreilly-couchbase:latest
+   ports:
+     - 8091:8091
+     - 8092:8092
+     - 8093:8093
+     - 11210:11210
+ web:
+   image: arungupta/oreilly-wildfly:latest
+   depends_on:
+     - db
+   environment:
+     - <span class="nv">COUCHBASE_URI</span><span class="o">=</span>db
+   ports:
+     - 8080:8080
+</code></pre>
+</div>
+
+<p>2.拉取服务镜像</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker-compose pull db
+<span class="gp">$ </span>docker-compose pull web
+</code></pre>
+</div>
+
+<p>3.生成捆绑包</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker-compose bundle
+WARNING: Unsupported key <span class="s1">'depends_on'</span> <span class="k">in </span>services.web - ignoring
+WARNING: Unsupported key <span class="s1">'container_name'</span> <span class="k">in </span>services.db - ignoring
+Wrote bundle to composetest.dab
+</code></pre>
+</div>
+
+<h1 id="从bundle创建一个stack">从bundle创建一个stack</h1>
+
+<blockquote>
+  <p><strong>Note:</strong> 因为目前stack和应用程序捆绑包还在试验阶段，所以最好使用最新版的docker-engine才会有这些新特性，想要使用这些新特性，可参考<a href="https://github.com/docker/docker/blob/master/experimental/README.md">experimental build README</a></p>
+</blockquote>
+
+<p>在这之前，我们先开启这些实验版的特性</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>vi /lib/systemd/system/docker.service
+  <span class="nv">ExecStart</span><span class="o">=</span>/usr/bin/dockerd --experimental
+
+<span class="c"># 重启服务</span>
+<span class="gp">$ </span>systemctl daemon-reload
+<span class="gp">$ </span>systemctl restart docker
+
+<span class="c"># 确认是否开启成功</span>
+<span class="gp">$ </span>docker version -f <span class="s1">'{ { .Server.Experimental } }'</span>
+<span class="nb">true</span>
+</code></pre>
+</div>
+
+<p>使用<code class="highlighter-rouge">docker deploy</code>命令来创建stack</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker deploy --help
+
+Usage:	docker deploy <span class="o">[</span>OPTIONS] STACK
+
+Deploy a new stack or update an existing stack
+
+Options:
+      --bundle-file string    Path to a Distributed Application Bundle file
+  -c, --compose-file string   Path to a Compose file
+      --help                  Print usage
+      --with-registry-auth    Send registry authentication details to Swarm agents
+</code></pre>
+</div>
+
+<p>依据前面生成的捆绑包来部署stack</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker deploy --bundle-file composetest.dab composetest
+Loading bundle from composetest.dab
+Creating network composetest_default
+Creating service composetest_db
+Creating service composetest_web
+</code></pre>
+</div>
+
+<p>检查我们刚部署的服务</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker service ls
+ID            NAME             MODE        REPLICAS  IMAGE
+1658d7kh5gs9  composetest_web  replicated  1/1       arungupta/oreilly-wildfly@sha256:d567ade7bb82ba8f15a85df0c6d692d85c15ec5a78d8826dfba92756babcb914
+pr6ympnpgv9g  composetest_db   replicated  1/1       arungupta/oreilly-couchbase@sha256:f150fcb9fca5392075c96f1baffc7f893858ba763f3c05cf0908ef2613cbf34c
+</code></pre>
+</div>
+
+<h1 id="管理stacks">管理stacks</h1>
+<p>使用<code class="highlighter-rouge">docker stack</code>命令来进行管理</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker stack --help
+
+Usage:	docker stack COMMAND
+
+Manage Docker stacks
+
+Options:
+      --help   Print usage
+
+Commands:
+  deploy      Deploy a new stack or update an existing stack
+  ls          List stacks
+  ps          List the tasks <span class="k">in </span>the stack
+  rm          Remove the stack
+  services    List the services <span class="k">in </span>the stack
+
+Run <span class="s1">'docker stack COMMAND --help'</span> <span class="k">for </span>more information on a command.
+</code></pre>
+</div>
+
+<h1 id="bundle-文件格式">Bundle 文件格式</h1>
+<p>分布式应用程序包用<code class="highlighter-rouge">JSON</code>格式来描述。当bundles以文件方式保存时，文件的后缀是<code class="highlighter-rouge">.dab</code>。
+一个bundle有两个顶级字段：<code class="highlighter-rouge">version</code>和<code class="highlighter-rouge">services</code>。docker1.12工具使用的是0.1版</p>
+
+<p><code class="highlighter-rouge">services</code>是指构成应用程序的服务。他们对应1.12 Docker Engine API中引述的新services对象</p>
+
+<p>一个<code class="highlighter-rouge">services</code>包含如下字段：
+<strong>Image[必须]</strong>
+服务将运行的image。docker images应该使用hash码来引用，如：<code class="highlighter-rouge">arungupta/oreilly-couchbase@sha256:f150fcb9fca5392075c96f1baffc7f893858ba763f3c05cf0908ef2613cbf34c</code>
+<strong>Command</strong>[]
+在服务容器中运行的命令
+<strong>Args</strong>[]
+传递给服务容器的参数
+<strong>Env</strong>[]
+环境变量
+<strong>Labels</strong>map[string]
+设置标签
+<strong>Ports</strong>[]
+服务端口(由端口和协议组成)，服务描述只能指定要暴露的容器端口，具体要隐射到主机的那些端口，就有管理员自己决定了
+<strong>WorkingDir</strong>
+服务容器内部的工作目录
+<strong>User</strong>
+用户名或UID
+<strong>Networks[]</strong>
+应该要连接到服务容器的网络</p>
+
+<blockquote>
+  <p><strong>Note:</strong> 目前尚有很多选项不支持DAB格式，包括volume mount</p>
+</blockquote>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-Stacks-and-Distributed-Application-Bundles/';
+              this.page.identifier = '/2017/07/06/Docker-Stacks-and-Distributed-Application-Bundles/';
+              this.page.title = 'Docker基础-docker stacks';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

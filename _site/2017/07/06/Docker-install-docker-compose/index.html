@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker compose安装 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-install-docker-compose/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker compose安装">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="你可以在macOS，windows 和64位的linux系统上运行compose。在安装它之前，你需要先安装docker。步骤如下：1.安装docker engine2.docker toolbox安装包括了docker engine和compose，因此Mac和windows已经安装好了。其他系统需要进入下一步3.进入compose repository release page on Github4.按照发行页中的说明，在你的终端下运行指定的curl命令  如果你收到”Permission denied”的报错，你的/usr/local/bin目录可能是不可写的，你需要用超级用户来进行安装。运行sudo -i，然后执行下面的两个命令，然后exit.">
+    <meta name="og:description" content="你可以在macOS，windows 和64位的linux系统上运行compose。在安装它之前，你需要先安装docker。步骤如下：1.安装docker engine2.docker toolbox安装包括了docker engine和compose，因此Mac和windows已经安装好了。其他系统需要进入下一步3.进入compose repository release page on Github4.按照发行页中的说明，在你的终端下运行指定的curl命令  如果你收到”Permission denied”的报错，你的/usr/local/bin目录可能是不可写的，你需要用超级用户来进行安装。运行sudo -i，然后执行下面的两个命令，然后exit.">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-install-docker-compose/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker compose安装</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>你可以在macOS，windows 和64位的linux系统上运行compose。在安装它之前，你需要先安装docker。
+步骤如下：
+<!--more-->
+1.安装docker engine
+2.docker toolbox安装包括了docker engine和compose，因此Mac和windows已经安装好了。其他系统需要进入下一步
+3.进入<a href="https://github.com/docker/compose/releases">compose repository release page on Github</a>
+4.按照发行页中的说明，在你的终端下运行指定的<code class="highlighter-rouge">curl</code>命令</p>
+<blockquote>
+  <p>如果你收到”Permission denied”的报错，你的<code class="highlighter-rouge">/usr/local/bin</code>目录可能是不可写的，你需要用超级用户来进行安装。运行<code class="highlighter-rouge">sudo -i</code>，然后执行下面的两个命令，然后<code class="highlighter-rouge">exit</code>.</p>
+</blockquote>
+
+<p>下面这个例子：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code> <span class="nv">$ </span>curl -L <span class="s2">"https://github.com/docker/compose/releases/download/1.9.0/docker-compose-</span><span class="k">$(</span>uname -s<span class="k">)</span><span class="s2">-</span><span class="k">$(</span>uname -m<span class="k">)</span><span class="s2">"</span> -o /usr/local/bin/docker-compose
+</code></pre>
+</div>
+<p>如果你对使用<code class="highlighter-rouge">curl</code>安装有疑问，你可以看看<a href="https://docs.docker.com/compose/install/#alternative-install-options">备用的安装选项</a>
+5.赋权</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>chmod +x /usr/local/bin/docker-compose
+</code></pre>
+</div>
+<p>6.(可选)，为<code class="highlighter-rouge">bash</code>和<code class="highlighter-rouge">zsh</code>安装<a href="https://docs.docker.com/compose/completion/">命令补全</a>
+7.测试</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker-compose --version
+ docker-compose version: 1.9.0
+</code></pre>
+</div>
+
+<h1 id="备用安装选项">备用安装选项</h1>
+
+<h2 id="pip安装">pip安装</h2>
+
+<p>这种方式是将compose当作一个python应用来从pip源中安装,建议使用<a href="https://virtualenv.pypa.io/en/latest/">virtualenv</a>避免python冲突</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>pip install docker-compose
+</code></pre>
+</div>
+
+<h2 id="直接作为容器运行">直接作为容器运行</h2>
+
+<p>既然docker-compose是一个python应用，那么当然可以作为一个容器来执行它</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>curl -L https://github.com/docker/compose/releases/download/1.9.0/run.sh &gt; /usr/local/bin/docker-compose
+<span class="gp">$ </span>chmod +x /usr/local/bin/docker-compose
+</code></pre>
+</div>
+
+<h1 id="主构建">主构建</h1>
+
+<p>如果你对预发布版本有兴趣，你可以从https://dl.bintray.com/docker-compose/master/ 下载二进制包。预发布版本有很多新的功能，但是不稳定。</p>
+
+<h1 id="升级">升级</h1>
+
+<p>如果要把compose从1.2或更早的版本升级，你需要在升级compose后删除或迁移现有的容器，因为从1.3开始，compose使用docker labels来跟踪容器，因此需要使用添加的标签来重新创建它们。</p>
+
+<p>如果compose检测到没有label的容器，那么它将拒绝运行，因此最终你不会有两套的容器。如果你要继续使用现有的容器(例如，因为他们有要保留的数据volume)，可以使用compose 1.5.x来迁移它们：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>docker-compose migrate-to-labels
+</code></pre>
+</div>
+
+<p>或者，如果你不想保留它们，你可以删除，compose只会创建新的</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>docker rm -f -v myapp_web_1 myapp_db_1 ..
+</code></pre>
+</div>
+
+<h1 id="卸载">卸载</h1>
+
+<p>卸载使用<code class="highlighter-rouge">curl</code>安装的compose</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>rm /usr/local/bin/docker-compose
+</code></pre>
+</div>
+
+<p>卸载使用<code class="highlighter-rouge">pip</code>安装的compose</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>pip uninstall docker-compose
+</code></pre>
+</div>
+<blockquote>
+  <p>如果你收到”Permission denied”的报错，说明你没有权限删除<code class="highlighter-rouge">docker-compose</code>，你可以使用sudo来强制删除，或者使用超级管理员用户来删除。</p>
+</blockquote>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-install-docker-compose/';
+              this.page.identifier = '/2017/07/06/Docker-install-docker-compose/';
+              this.page.title = 'Docker基础-docker compose安装';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

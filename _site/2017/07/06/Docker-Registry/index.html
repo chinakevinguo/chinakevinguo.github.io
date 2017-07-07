@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker registry的几种方式 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-Registry/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker registry的几种方式">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="RegistryRegistry用来管理您的IMAGE镜像，常见的有:Private Registry:私有仓库，自己搭建DockerHub：由Docker维护Docker Trusted Registry：采购">
+    <meta name="og:description" content="RegistryRegistry用来管理您的IMAGE镜像，常见的有:Private Registry:私有仓库，自己搭建DockerHub：由Docker维护Docker Trusted Registry：采购">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-Registry/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker registry的几种方式</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="registry">Registry</h1>
+<p><code class="highlighter-rouge">Registry</code>用来管理您的<code class="highlighter-rouge">IMAGE</code>镜像，常见的有:
+<code class="highlighter-rouge">Private Registry</code>:私有仓库，自己搭建
+<code class="highlighter-rouge">DockerHub</code>：由<code class="highlighter-rouge">Docker</code>维护
+<code class="highlighter-rouge">Docker Trusted Registry</code>：采购</p>
+
+<h2 id="今天我们主要介绍如何搭建自己的private-registry">今天我们主要介绍，如何搭建自己的<code class="highlighter-rouge">Private Registry</code></h2>
+<h3 id="why-use-it">Why use it</h3>
+<p>官网列了三条，其实就一句话，能够自己管理自己的IMAGE
+<!--more--></p>
+<h3 id="storage">Storage</h3>
+<p>默认是存储在本地，所有的数据都作为<code class="highlighter-rouge">Docker volume</code>持久保存在本地主机上，适用于开发和小型部署，还支持其他云存储方式，如S3,Microsoft Azure,OpenStack Swift和Aliyun OSS，如果使用其他的存储方式，用户需要自己编写<a href="https://docs.docker.com/registry/storage-drivers/">Storage API</a>。</p>
+<h3 id="running-a-domain-registry">Running a domain registry</h3>
+<p>搭建<code class="highlighter-rouge">Private Registry</code>不仅仅是为了自己用，还可能给公司其他的人用，那这个时候就需要使用<code class="highlighter-rouge">TLS</code>来确保Registry的安全，有点类似于Web服务器的<code class="highlighter-rouge">SSL</code></p>
+<h4 id="纯http的registry">纯HTTP的Registry</h4>
+<h6 id="从官方拉取一个registry">从官方拉取一个Registry</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker run -d -p 5000:5000 --restart<span class="o">=</span>always --name registry <span class="se">\</span>
+    -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>/data:/var/lib/registry <span class="se">\</span>
+    registry:2
+</code></pre>
+</div>
+<h6 id="修改registry-server以及所有要访问registry-server的client端让其支持http传输默认是https传输">修改<code class="highlighter-rouge">Registry server</code>以及所有要访问<code class="highlighter-rouge">Registry server</code>的<code class="highlighter-rouge">client端</code>，让其支持HTTP传输(默认是HTTPS传输)</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">##1.12版</span>
+<span class="c">#Create or modify /etc/docker/daemon.json</span>
+<span class="gp">$ </span><span class="o">{</span> <span class="s2">"insecure-registries"</span>:[<span class="s2">"youripordomain:5000"</span><span class="o">]</span> <span class="o">}</span>
+<span class="c">#Restart docker daemon</span>
+<span class="gp">$ </span>systemctl restart docker
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">##1.10版</span>
+<span class="c">#Modify /etc/default/docker or /etc/sysconfig/docker,add or edit</span>
+<span class="gp">$ </span><span class="nv">INSECURE_REGISTRY</span><span class="o">=</span><span class="s1">'--insecure-registry youripordomain:5000'</span>
+<span class="c">#Restart docker daemon</span>
+<span class="gp">$ </span>systemctl restart docker
+</code></pre>
+</div>
+<h6 id="pull-or-push-image-from-your-private-registry">pull or push IMAGE from your Private Registry</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker pull ubuntu
+<span class="gp">$ </span>docker tag ubuntu oo3p.com:5000/ubuntu
+<span class="gp">$ </span>docker push oo3p.com:5000/ubuntu
+<span class="gp">$ </span>docker pull oo3p.com:5000/ubuntu
+</code></pre>
+</div>
+
+<h4 id="自签名证书的registry">自签名证书的Registry</h4>
+<h6 id="generate-a-certificate">Generate a certificate</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir -p certs
+<span class="gp">$ </span>openssl req <span class="se">\</span>
+    -newkey rsa:2048 -nodes -keyout certs/domain.key
+    -x509 -days 365 -out certs/domain.crt
+</code></pre>
+</div>
+<h6 id="将生成的domaincrt文件的内容放入docker客户端系统的ca-bundle文件中使操作系统信任我们的自签名证书或者将domaincrt复制成docker客户端的etcdockercertsdwwwoo3pcom5000cacrt两种方式皆可">将生成的domain.crt文件的内容，放入docker客户端系统的<code class="highlighter-rouge">ca-bundle</code>文件中，使操作系统信任我们的自签名证书，或者将domain.crt复制成docker客户端的/etc/docker/certs.d/www.oo3p.com:5000/ca.crt，两种方式皆可</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>cat ~/certs/domain.crt &gt;&gt;/etc/pki/tls/certs/ca-bundle.crt
+<span class="gp">$ </span>systemctl restart docker
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>cp ~/certs/domain.crt /etc/docker/certs.d/www.oo3p.com:5000/ca.crt
+<span class="gp">$ </span>systemctl restart docker
+</code></pre>
+</div>
+
+<h6 id="start-your-registry-with-tls-enabled">Start your Registry with TLS enabled</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker run -d -p 5000:5000 --restart<span class="o">=</span>always --name registry <span class="se">\</span>
+    -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span> /certs:/certs <span class="se">\</span>
+    -e <span class="nv">REGISTRY_HTTP_TLS_CERTIFICATE</span><span class="o">=</span>/certs/domain.crt <span class="se">\</span>
+    -e <span class="nv">REGISTRY_HTTP_TLS_KEY</span><span class="o">=</span>/certs/domain.key <span class="se">\</span>
+    registry:2
+</code></pre>
+</div>
+<h6 id="pull-or-push-image-from-your-private-registry-on-another-docker-client">Pull or Push IMAGE from your Private Registry on another docker client</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker pull ubuntu
+<span class="gp">$ </span>docker tag ubuntu oo3p.com:5000/ubuntu
+<span class="gp">$ </span>docker push oo3p.com:5000/ubuntu
+<span class="gp">$ </span>docker pull oo3p.com:5000/ubuntu
+</code></pre>
+</div>
+
+<h4 id="从lets-encrypt获取证书的registry">从Lets Encrypt获取证书的Registry</h4>
+<p>从认证<code class="highlighter-rouge">CA</code>处获取签名证书，大多数需要付出一定的费用，这里可以使用<code class="highlighter-rouge">Lets Encrypt</code>(被大多数浏览器信任)提供的免费证书，和自签名证书不一样的是，我们不需要将domain.crt文件再复制到我们的docker客户端中了
+<strong>获取证书所需条件</strong></p>
+<ul>
+  <li>Registry server需要有公网IP地址</li>
+  <li>Registry server的80，443端口未被占用</li>
+</ul>
+
+<h6 id="get-letsencrypt">Get letsencrypt</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git clone https://github.com/certbot/certbot.git
+<span class="gp">$ </span><span class="nb">cd </span>certbot
+<span class="gp">$ </span>./certbot-auto certonly --standalone --email chinakevinguo@live.com -d oo3p.com -d www.oo3p.com
+
+<span class="c">#看到这就表示已经获取证书成功，时间是90天，我们需要在到期之前手动续约，然后我们在`/etc/letsencrypt/live/域名`目录中可以看到4个文件(cert.pem chain.pem fullchain.pem privkey.pem)</span>
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at
+   /etc/letsencrypt/live/oo3p.com/fullchain.pem. Your cert will expire
+   on 2017-02-23. To obtain a new or tweaked version of this
+   certificate <span class="k">in </span>the future, simply run certbot-auto again. To
+   non-interactively renew <span class="k">*</span>all<span class="k">*</span> of your certificates, run
+   <span class="s2">"certbot-auto renew"</span>
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let<span class="s1">'s Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+</span></code></pre>
+</div>
+
+<h6 id="查看证书以及更新证书">查看证书，以及更新证书</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#查看证书</span>
+<span class="gp">$ </span>ls /etc/letsencrypt/live/oo3p.com/
+    cert.pem  chain.pem  fullchain.pem  privkey.pem
+
+<span class="c">#更新证书</span>
+<span class="gp">$ </span>./certbot-auto renew --dry-run
+</code></pre>
+</div>
+
+<h6 id="将从letsencrypt获取到的证书复制到registry-server上的certs目录下方便挂载到registry-容器里">将从letsencrypt获取到的证书，复制到Registry server上的/certs目录下，方便挂载到Registry 容器里</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>cp /etc/letsencrypt/live/oo3p.com/fullchain.pem ~/certs/domain.crt
+cp /etc/letsencrypt/live/oo3p.com/privkey.pem   ~/certs/domain.key
+</code></pre>
+</div>
+
+<h6 id="start-your-registry-with-tls-enabled-1">Start your Registry with TLS enabled</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker run -d -p 5000:5000 --restart<span class="o">=</span>always --name registry <span class="se">\</span>
+    -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span> /certs:/certs <span class="se">\</span>
+    -e <span class="nv">REGISTRY_HTTP_TLS_CERTIFICATE</span><span class="o">=</span>/certs/domain.crt <span class="se">\</span>
+    -e <span class="nv">REGISTRY_HTTP_TLS_KEY</span><span class="o">=</span>/certs/domain.key <span class="se">\</span>
+    registry:2
+</code></pre>
+</div>
+<h6 id="pull-or-push-image-from-your-private-registry-on-another-docker-client-1">Pull or Push IMAGE from your Private Registry on another docker client</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker pull ubuntu
+<span class="gp">$ </span>docker tag ubuntu oo3p.com:5000/ubuntu
+<span class="gp">$ </span>docker push oo3p.com:5000/ubuntu
+<span class="gp">$ </span>docker pull oo3p.com:5000/ubuntu
+</code></pre>
+</div>
+
+<h4 id="load-balancing-注意事项以及访问控制">Load Balancing 注意事项以及访问控制</h4>
+
+<h6 id="在做registry集群的时候下面这几个必须保持相同">在做Registry集群的时候，下面这几个必须保持相同：</h6>
+<ul>
+  <li>Storage Driver</li>
+  <li>HTTP Secret</li>
+  <li>Redis Cache(if configured)</li>
+</ul>
+
+<h6 id="本机基本访问认证">本机基本访问认证</h6>
+<p><strong>在这之前，你需要先配置了TLS认证</strong></p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir auth -p
+<span class="c"># 创建密码文件，替换用户名：testuser，密码：testpassword</span>
+<span class="gp">$ </span>docker run --entrypoint htpasswd registry:2 -Bbn testuser testpassword &gt; auth/htpasswd
+<span class="c"># 停止registry，然后用下面的代码再次启动</span>
+<span class="gp">$ </span>docker run -d -p 5000:5000 --restart<span class="o">=</span>always --name registry <span class="se">\</span>
+  -v /data/registry:/var/lib/registry <span class="se">\</span>
+  -v ~/auth:/auth <span class="se">\</span>
+  -e <span class="s2">"REGISTRY_AUTH=htpasswd"</span> <span class="se">\</span>
+  -e <span class="s2">"REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm"</span> <span class="se">\</span>
+  -e <span class="nv">REGISTRY_AUTH_HTPASSWD_PATH</span><span class="o">=</span>/auth/htpasswd <span class="se">\</span>
+  -v ~/certs:/certs <span class="se">\</span>
+  -e <span class="nv">REGISTRY_HTTP_TLS_CERTIFICATE</span><span class="o">=</span>/certs/domain.crt <span class="se">\</span>
+  -e <span class="nv">REGISTRY_HTTP_TLS_KEY</span><span class="o">=</span>/certs/domain.key <span class="se">\</span>
+  registry:2
+<span class="c"># 然后登录</span>
+<span class="gp">$ </span>docker login www.oo3p.com:5000
+</code></pre>
+</div>
+<h6 id="通过代理进行认证">通过代理进行认证</h6>
+<ul>
+  <li><a href="https://docs.docker.com/registry/recipes/apache/">using Apache as an authenticating proxy</a></li>
+  <li><a href="https://docs.docker.com/registry/recipes/nginx/">using Nginx as an authenticating proxy</a></li>
+  <li><a href="https://docs.docker.com/registry/recipes/mirror/">mirror the Docker Hub</a></li>
+</ul>
+
+<h6 id="通过委派第三方认证">通过委派第三方认证</h6>
+<p>将用户重定向到指定的可信任的服务器上进行认证，这比较耗费成本</p>
+<ul>
+  <li><a href="https://docs.docker.com/registry/spec/auth/token/">background information here</a></li>
+  <li><a href="https://docs.docker.com/registry/configuration/#auth">configuration information here</a></li>
+</ul>
+
+<h4 id="使用dockerfile构建自己的registry">使用Dockerfile构建自己的Registry</h4>
+
+<h6 id="从docker的github上拉取有关docker-registry的代码">从docker的Github上拉取有关docker-registry的代码</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git clone https://github.com/docker/distribution-library-image.git
+</code></pre>
+</div>
+
+<h6 id="修改distribution-library-image下的dockerfile文件">修改distribution-library-image下的Dockerfile文件</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>FROM alpine:3.4
+
+RUN <span class="nb">set</span> -ex <span class="se">\</span>
+    <span class="o">&amp;&amp;</span> apk add --no-cache ca-certificates apache2-utils
+
+COPY ./registry/registry /bin/registry
+COPY ./registry/config-example.yml /etc/docker/registry/config.yml
+<span class="c"># 这里我们自己添加，后面将在certs目录下生成证书</span>
+COPY ./registry/certs /etc/ssl/docker
+
+VOLUME <span class="o">[</span><span class="s2">"/var/lib/registry"</span><span class="o">]</span>
+EXPOSE 5000
+
+COPY docker-entrypoint.sh /entrypoint.sh
+ENTRYPOINT <span class="o">[</span><span class="s2">"/entrypoint.sh"</span><span class="o">]</span>
+
+CMD <span class="o">[</span><span class="s2">"/etc/docker/registry/config.yml"</span><span class="o">]</span>
+</code></pre>
+</div>
+
+<h6 id="生成自签名证书">生成自签名证书</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir -p ~/distribution-library-image/registry/certs
+<span class="gp">$ </span>openssl req -newkey rsa:2048 -nodes -keyout ~/distribution-library-image/registry/certs/docker_registry.key -x509 -days 365 -out ~/distribution-library-image/registry/certs/docker_registry.crt
+</code></pre>
+</div>
+
+<h6 id="修改distribution-library-imageregistry-下的config-exampleyml">修改distribution-library-image/registry 下的config-example.yml</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>cp -a config-example.yml config-example.yml.bak
+<span class="gp">$ </span>vi config-example.yml
+version: 0.1
+log:
+  accesslog:
+    disabled: <span class="nb">true
+  </span>level: debug
+  formatter: text
+  fields:
+    service: registry
+<span class="c"># 该处设置hook，触发邮件发送</span>
+  <span class="c"># hooks:</span>
+  <span class="c">#   - type: mail</span>
+  <span class="c">#     disabled: true</span>
+  <span class="c">#     levels:</span>
+  <span class="c">#       - panic</span>
+  <span class="c">#     options:</span>
+  <span class="c">#       smtp:</span>
+  <span class="c">#         addr: mail.example.com:25</span>
+  <span class="c">#         username: mailuser</span>
+  <span class="c">#         password: password</span>
+  <span class="c">#         insecure: true</span>
+  <span class="c">#       from: sender@example.com</span>
+  <span class="c">#       to:</span>
+  <span class="c">#         - errors@example.com</span>
+<span class="c"># 该处指定存储方式和位置，我是直接使用的filesystem</span>
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry
+    maxthreads: 100
+  delete:
+    enabled: <span class="nb">false
+  </span>redirect:
+    disable: <span class="nb">false
+  </span>cache:
+    blobdescriptor: inmemory
+<span class="c"># 该处指定你的清楚策略</span>
+  maintenance:
+  <span class="c"># 表示上传168h后删除，没隔1天清除一次</span>
+    uploadpurging:
+      enabled: <span class="nb">true
+      </span>age: 168h
+      interval: 24h
+      dryrun: <span class="nb">false
+    readonly</span>:
+      enabled: <span class="nb">false
+</span>http:
+  addr: :5000
+<span class="c">#  host: https://registry.quarkfinance.com:5000</span>
+<span class="c"># 该处指定你的证书所在的位置</span>
+tls:
+  certificate: /etc/ssl/docker/docker_registry.crt
+  key: /etc/ssl/docker/docker_registry.key
+headers:
+  X-Content-Type-Options: <span class="o">[</span>nosniff]
+health:
+storagedriver:
+  enabled: <span class="nb">true
+  </span>interval: 10s
+  threshold: 3
+<span class="c"># 该处指定你的代理，如果你有的话</span>
+<span class="c">#proxy:</span>
+<span class="c">#  remoteurl: https://registry-1.docker.io</span>
+<span class="c">#  username: [username]</span>
+<span class="c">#  password: [password]</span>
+</code></pre>
+</div>
+<p>更多内容参考<a href="https://docs.docker.com/registry/configuration/">configuring a registry</a></p>
+
+<h6 id="开始构建该命令在dockerfile文件所在的目录执行">开始构建(该命令在Dockerfile文件所在的目录执行)</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$  </span>docker build -t registry.quarkfinance.com:5000/docker_registry:latest .
+</code></pre>
+</div>
+
+<h6 id="启动docker-registry我这里挂载了hosts目录是因为我的registry是通过域名访问的而我的域名实际上是不存在的所以我只能在etchosts文件中添加了隐射后期如果有实际存在的域名解析就不需要挂载了">启动docker registry(我这里挂载了hosts目录，是因为我的registry是通过域名访问的，而我的域名实际上是不存在的，所以，我只能在/etc/hosts文件中添加了隐射，后期如果有实际存在的域名解析，就不需要挂载了)</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker run -d -p 5000:5000 --name docker_registry --privileged -v /etc/hosts:/etc/hosts --restart always registry.quarkfinance.com:5000/docker_registry
+</code></pre>
+</div>
+
+<h6 id="如何使用">如何使用</h6>
+
+<p>在所有要访问docker registry的主机上执行如下操作</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir -p /etc/docker/certs.d/registry.quarkfinance.com:5000
+</code></pre>
+</div>
+
+<p>将registry主机上生成的证书<code class="highlighter-rouge">docker_registry.crt</code>复制到所有要访问docker registry的主机上</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nv">ip</span><span class="o">=(</span>192.168.1.1 192.168.1.2 192.168.1.3<span class="o">)</span>
+<span class="gp">$ </span><span class="k">for </span>i <span class="k">in</span> <span class="k">${</span><span class="nv">ip</span><span class="p">[*]</span><span class="k">}</span>;
+    <span class="se">\ </span><span class="k">do</span>
+    <span class="se">\ </span>scp ~/distribution-library-image/registry/certs/docker_registry.crt
+    <span class="se">\ </span><span class="nv">$i</span>:/etc/docker/certs.d/registry.quarkfinance.com:5000/
+    <span class="se">\ </span><span class="k">done</span>
+</code></pre>
+</div>
+
+<p>试着push</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@k8s-master01 ~]# docker push registry.quarkfinance.com:5000/nginx:1.11.4-alpine
+The push refers to a repository <span class="o">[</span>registry.quarkfinance.com:5000/nginx]
+e83e87cb73c3: Pushed
+740e5e49ea89: Pushed
+092e6cb28bdb: Pushed
+9007f5987db3: Pushed
+1.11.4-alpine: digest: sha256:36b95728c0d9b6668bb8e4aa31476de27aeedbeba07dcddb6821b76fb72830b2 size: 1154
+</code></pre>
+</div>
+
+<p>发现push成功了,至此你的私有registry就算是成功了，下面我们来使用nginx来做认证</p>
+
+<h4 id="nginxregistry认证登录">nginx+registry认证登录</h4>
+
+<h6 id="从docker的github上拉取有关docker-registry的代码-1">从docker的Github上拉取有关docker-registry的代码</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git clone https://github.com/docker/distribution-library-image.git
+</code></pre>
+</div>
+
+<h6 id="生成自签名证书-1">生成自签名证书</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir -p ~/distribution-library-image/registry/certs
+<span class="gp">$ </span>openssl req -newkey rsa:2048 -nodes -keyout ~/distribution-library-image/registry/certs/docker_registry.key -x509 -days 365 -out ~/distribution-library-image/registry/certs/docker_registry.crt
+</code></pre>
+</div>
+
+<h6 id="修改distribution-library-imageregistry-下的config-exampleyml-1">修改distribution-library-image/registry 下的config-example.yml</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>cp -a config-example.yml config-example.yml.bak
+<span class="gp">$ </span>vi config-example.yml
+version: 0.1
+log:
+  accesslog:
+    disabled: <span class="nb">true
+  </span>level: info
+  formatter: text
+  fields:
+    service: registry
+<span class="c"># 该处设置hook，触发邮件发送</span>
+  <span class="c"># hooks:</span>
+  <span class="c">#   - type: mail</span>
+  <span class="c">#     disabled: true</span>
+  <span class="c">#     levels:</span>
+  <span class="c">#       - panic</span>
+  <span class="c">#     options:</span>
+  <span class="c">#       smtp:</span>
+  <span class="c">#         addr: mail.example.com:25</span>
+  <span class="c">#         username: mailuser</span>
+  <span class="c">#         password: password</span>
+  <span class="c">#         insecure: true</span>
+  <span class="c">#       from: sender@example.com</span>
+  <span class="c">#       to:</span>
+  <span class="c">#         - errors@example.com</span>
+<span class="c"># 该处指定存储方式和位置，我是直接使用的filesystem</span>
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry
+    maxthreads: 100
+  delete:
+    enabled: <span class="nb">false
+  </span>redirect:
+    disable: <span class="nb">false
+  </span>cache:
+    blobdescriptor: inmemory
+<span class="c"># 该处指定你的清楚策略</span>
+  maintenance:
+  <span class="c"># 表示上传168h后删除，没隔1天清除一次</span>
+    uploadpurging:
+      enabled: <span class="nb">true
+      </span>age: 168h
+      interval: 24h
+      dryrun: <span class="nb">false
+    readonly</span>:
+      enabled: <span class="nb">false
+</span>http:
+  addr: :5000
+<span class="c">#  host: https://registry.quarkfinance.com:5000</span>
+<span class="c"># 该处指定你的证书所在的位置，注释掉，因为我们这里使用nginx的认证，如果指定两处，会出问题</span>
+<span class="c">#tls:</span>
+<span class="c">#  certificate: /etc/ssl/docker/docker_registry.crt</span>
+<span class="c">#  key: /etc/ssl/docker/docker_registry.key</span>
+headers:
+  X-Content-Type-Options: <span class="o">[</span>nosniff]
+health:
+storagedriver:
+  enabled: <span class="nb">true
+  </span>interval: 10s
+  threshold: 3
+<span class="c"># 该处指定你的代理，如果你有的话</span>
+<span class="c">#proxy:</span>
+<span class="c">#  remoteurl: https://registry-1.docker.io</span>
+<span class="c">#  username: [username]</span>
+<span class="c">#  password: [password]</span>
+</code></pre>
+</div>
+<p>更多内容参考<a href="https://docs.docker.com/registry/configuration/">configuring a registry</a></p>
+
+<h6 id="开始构建该命令在dockerfile文件所在的目录执行-1">开始构建(该命令在Dockerfile文件所在的目录执行)</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$  </span>docker build -t registry.quarkfinance.com/docker_registry:latest .
+</code></pre>
+</div>
+
+<h6 id="启动docker-registry我这里挂载了hosts目录是因为我的registry是通过域名访问的而我的域名实际上是不存在的所以我只能在etchosts文件中添加了隐射后期如果有实际存在的域名解析就不需要挂载了同时需要指定监听的ip不让其它主机访问registry的5000端口其它主机通过nginx代理访问">启动docker registry(我这里挂载了hosts目录，是因为我的registry是通过域名访问的，而我的域名实际上是不存在的，所以，我只能在/etc/hosts文件中添加了隐射，后期如果有实际存在的域名解析，就不需要挂载了),同时需要指定监听的ip，不让其它主机访问registry的5000端口，其它主机通过nginx代理访问</h6>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>docker run -d -p 127.0.0.1:5000:5000 --name docker_registry --privileged -v /etc/hosts:/etc/hosts --restart always registry.quarkfinance.com:5000/docker_registry
+</code></pre>
+</div>
+<h6 id="配置nginx">配置nginx</h6>
+
+<p>安装nginx</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># 配置nginx的yum repo</span>
+vi /etc/yum.repos.d/nginx.repo
+<span class="o">[</span>nginx]
+<span class="nv">name</span><span class="o">=</span>nginx repo
+<span class="nv">baseurl</span><span class="o">=</span>http://nginx.org/packages/centos/<span class="nv">$releasever</span>/<span class="nv">$basearch</span>/
+<span class="nv">gpgcheck</span><span class="o">=</span>0
+<span class="nv">enabled</span><span class="o">=</span>1
+
+<span class="c"># 安装nginx</span>
+<span class="gp">$ </span>yum install nginx -y         
+</code></pre>
+</div>
+
+<p>配置nginx的配置文件/etc/nginx/conf.d/(不同版本的nginx配置文件有所不同)</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@k8s-registry conf.d]# ll
+total 12
+-rw-r--r-- 1 root root 1097 Apr 12 23:21 default.conf
+-rw-r--r-- 1 root root  933 Apr 13 18:24 registry.conf
+-rw-r--r-- 1 root root   46 Apr 13 15:11 registry-upstream.conf
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># registry.conf</span>
+
+server <span class="o">{</span>
+    listen       443;
+    server_name  registry.quarkfinance.com;
+    <span class="c"># 指定证书的位置，这里我们使用的就是上面生成的证书</span>
+    ssl          on;
+    ssl_certificate /etc/nginx/ssl/docker_registry.crt;
+    ssl_certificate_key /etc/nginx/ssl/docker_registry.key;
+    client_max_body_size 0;
+
+   <span class="c"># charset koi8-r;</span>
+   <span class="c"># access_log  /var/log/nginx/log/host.access.log  main;</span>
+
+    location / <span class="o">{</span>
+        auth_basic <span class="s2">"Registry realm"</span>;
+        <span class="c"># 指定认证文件</span>
+        auth_basic_user_file /etc/nginx/conf.d/.htpasswd;
+        add_header <span class="s1">'Docker-Distribution-Api-Version'</span> <span class="s1">'registry/2.0'</span> always;
+        proxy_pass                          http://registry;
+        proxy_set_header  Host              <span class="nv">$http_host</span>;   <span class="c"># required for docker client's sake</span>
+        proxy_set_header  X-Real-IP         <span class="nv">$remote_addr</span>; <span class="c"># pass on real client's IP</span>
+        proxy_set_header  X-Forwarded-For   <span class="nv">$proxy_add_x_forwarded_for</span>;
+        proxy_set_header  X-Forwarded-Proto <span class="nv">$scheme</span>;
+        proxy_read_timeout                  900;
+    <span class="o">}</span>
+
+<span class="o">}</span>
+
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c"># registry-upstream.conf</span>
+
+upstream registry <span class="o">{</span>
+        server 127.0.0.1:5000;
+<span class="o">}</span>                             
+</code></pre>
+</div>
+
+<p>生成认证文件.htpasswd</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>yum install httpd-tool -y
+
+<span class="gp">$ </span>htpasswd -cb /etc/nginx/conf.d/.htpasswd <span class="k">${</span><span class="nv">username</span><span class="k">}</span> <span class="k">${</span><span class="nv">password</span><span class="k">}</span>
+</code></pre>
+</div>
+
+<p>重启nginx，就算是完成了</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>systemctl restart nginx
+</code></pre>
+</div>
+
+<h6 id="如何使用-1">如何使用</h6>
+
+<p>在所有要访问docker registry的主机上执行如下操作，目的是为了让其他主机信任registry主机签发的证书</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>mkdir -p /etc/docker/certs.d/registry.quarkfinance.com
+</code></pre>
+</div>
+
+<p>将registry主机上生成的证书<code class="highlighter-rouge">docker_registry.crt</code>复制到所有要访问docker registry的主机上</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nv">ip</span><span class="o">=(</span>192.168.1.1 192.168.1.2 192.168.1.3<span class="o">)</span>
+<span class="gp">$ </span><span class="k">for </span>i <span class="k">in</span> <span class="k">${</span><span class="nv">ip</span><span class="p">[*]</span><span class="k">}</span>;
+    <span class="se">\ </span><span class="k">do</span>
+    <span class="se">\ </span>scp ~/distribution-library-image/registry/certs/docker_registry.crt
+    <span class="se">\ </span><span class="nv">$i</span>:/etc/docker/certs.d/registry.quarkfinance.com/
+    <span class="se">\ </span><span class="k">done</span>
+</code></pre>
+</div>
+
+<p>试着push，提示没有认证</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@k8s-master02 registry.quarkfinance.com]# docker push registry.quarkfinance.com/calico/node:v1.1.0-rc8
+The push refers to a repository <span class="o">[</span>registry.quarkfinance.com/calico/node]
+
+a48093c264c7: Preparing
+ca135d205d41: Preparing
+cb8d3fea875c: Preparing
+24a574387e35: Preparing
+no basic auth credentials
+</code></pre>
+</div>
+
+<p>我们先登录</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@k8s-master02 registry.quarkfinance.com]# docker login registry.quarkfinance.com
+Username: admin
+Password:
+Login Succeeded
+
+</code></pre>
+</div>
+
+<p>再push</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="o">[</span>root@k8s-master02 registry.quarkfinance.com]# docker push registry.quarkfinance.com/calico/node:v1.1.0-rc8
+The push refers to a repository <span class="o">[</span>registry.quarkfinance.com/calico/node]
+a48093c264c7: Pushed
+ca135d205d41: Pushed
+cb8d3fea875c: Pushed
+24a574387e35: Pushed
+9f8566ee5135: Pushed
+v1.1.0-rc8: digest: sha256:234b00b8712c80d0e8d0170c6cc65c005c0057484fe2c463d439f37ddb1fd889 size: 1371
+</code></pre>
+</div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-Registry/';
+              this.page.identifier = '/2017/07/06/Docker-Registry/';
+              this.page.title = 'Docker基础-docker registry的几种方式';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>
