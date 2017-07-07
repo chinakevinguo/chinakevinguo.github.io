@@ -10,7 +10,6 @@ script:
 - bundle install
 - bundle exec jekyll build
 after_success:
-- ssh root@oo3p.com
 - git clone https://github.com/chinakevinguo/oo3p.com.git
 - cd oo3p.com.git && rm -rf * &&cp -r ../_site/* .
 - git config user.name "chinakevinguo"
