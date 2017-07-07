@@ -17,7 +17,7 @@ after_success:
 - git add --all .
 - git commit -m "Travis CI Auto Builder"
 - git push --force https://${JEKYLL_GITHUB_TOKEN}@github.com/chinakevinguo/oo3p.com.git master
-- ssh -o stricthostkeychecking=no root@oo3p.com "cd /usr/local/src/chinakevinguo.github.io && git pull"
+- rsync -rv --delete -e 'ssh -o stricthostkeychecking=no -p 22' _site/ root@oo3p.com:/usr/local/src/chinakevinguo.github.io/_site
 branches:
   only:
   - master
