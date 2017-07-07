@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker常用命令 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-Command-Usage/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker常用命令">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="Docker CommandDocker container management```bash#运行容器docker run [OPTIONS] IMAGE [COMMAND] [ARG…]  -t 分配一个terminal窗口  -i 允许和容器进行交互  -d 后台运行一个容器  -P 将容器内部的所有exposed的端口映射为宿主机上的随意端口  -p 将容器内部的端口绑定到宿主机上指定的端口     后面跟 ：表示将容器内部的这个端口隐射到宿主机上的随意端口     后面跟: ：表示将隐射到  --name 为容器命名  --net 为容器指定网络  -v 为容器挂载卷组  --volume-driver 指定容器卷组的驱动">
+    <meta name="og:description" content="Docker CommandDocker container management```bash#运行容器docker run [OPTIONS] IMAGE [COMMAND] [ARG…]  -t 分配一个terminal窗口  -i 允许和容器进行交互  -d 后台运行一个容器  -P 将容器内部的所有exposed的端口映射为宿主机上的随意端口  -p 将容器内部的端口绑定到宿主机上指定的端口     后面跟 ：表示将容器内部的这个端口隐射到宿主机上的随意端口     后面跟: ：表示将隐射到  --name 为容器命名  --net 为容器指定网络  -v 为容器挂载卷组  --volume-driver 指定容器卷组的驱动">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-Command-Usage/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker常用命令</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h3 id="docker-command">Docker Command</h3>
+<h4 id="docker-container-management">Docker container management</h4>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#运行容器</span>
+docker run <span class="o">[</span>OPTIONS] IMAGE <span class="o">[</span>COMMAND] <span class="o">[</span>ARG...]
+  -t 分配一个terminal窗口
+  -i 允许和容器进行交互
+  -d 后台运行一个容器
+  -P 将容器内部的所有exposed的端口映射为宿主机上的随意端口
+  -p 将容器内部的端口绑定到宿主机上指定的端口
+     后面跟&lt;port&gt; ：表示将容器内部的这个端口隐射到宿主机上的随意端口
+     后面跟&lt;port1&gt;:&lt;port2&gt; ：表示将&lt;port2容器内部端口&gt;隐射到&lt;port1宿主机端口&gt;
+  --name 为容器命名
+  --net 为容器指定网络
+  -v 为容器挂载卷组
+  --volume-driver 指定容器卷组的驱动
+
+<span class="gp">$ </span>docker run -d -P --name web -v /src/webapp:/webapp training/webapp python app.py
+<span class="gp">$ </span>docker run -d -P --name web training/webapp python app.py
+<span class="gp">$ </span>docker run -d -p 80:5000 trainning/webapp python app.py
+<span class="gp">$ </span>docker run ubuntu /bin/echo <span class="s2">"Hello world"</span>
+<span class="gp">$ </span>docker run -ti ubuntu /bin/bash
+</code></pre>
+</div>
+<!--more-->
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#启动容器，可同时启动多个容器</span>
+docker start <span class="o">[</span>OPTIONS] CONTAINER <span class="o">[</span>CONTAINER...]
+
+<span class="gp">$ </span>docker start 215b04f73370
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#停止容器运行，可同时停止多个容器</span>
+docker stop <span class="o">[</span>OPTIONS] CONTAINER <span class="o">[</span>CONTAINER...]
+
+<span class="gp">$ </span>docker stop 215b04f73370
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#重启重启，可同时重启多个容器</span>
+docker restart <span class="o">[</span>OPTIONS] CONTAINER <span class="o">[</span>CONTAINER...]
+
+<span class="gp">$ </span>docker restart 215b04f73370
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#删除容器</span>
+docker rm <span class="o">[</span>OPTIONS] CONTAINER <span class="o">[</span>CONTAINER...]
+  -f 强制删除一个正在运行的容器<span class="o">(</span>实际上是先停止容器，然后再删除容器<span class="o">)</span>
+  -v 删除和容器关联的卷
+
+<span class="gp">$ </span>docker rm -f 215b04f73370
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#列出容器清单</span>
+docker ps <span class="o">[</span>OPTIONS]
+  -a 列出所有容器,包括已经停止的容器
+  -q 值显示容器ID
+  -l 列出最近创建的容器
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#连接到一个正在运行的容器</span>
+docker attach <span class="o">[</span>OPTIONS] <span class="o">[</span>CONTAINER]
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#在一个已经运行的容器里运行命令</span>
+docker <span class="nb">exec</span> <span class="o">[</span>OPTIONS] CONTAINER COMMAND <span class="o">[</span>ARG...]
+
+<span class="gp">$ </span>docker <span class="nb">exec</span> -ti db1 /bin/bash
+</code></pre>
+</div>
+
+<h4 id="docker-container-state-management">Docker container state management</h4>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#查看容器内部日志</span>
+docker logs <span class="o">[</span>OPTIONS] CONTAINER
+  -f 容器日志追踪
+
+<span class="gp">$ </span>docker logs grave_roentgen
+<span class="gp">$ </span>docker logs 20348fdf82e4
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#查看容器内部运行的进程</span>
+docker top CONTAINER
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#获取容器、images、task的配置信息和状态信息</span>
+docker inspect <span class="o">[</span>OPTIONS] CONTAINER|IMAGE|TASK <span class="o">[</span>CONTAINER|IMAGE|TASK...]
+  -f 按照给定的模板来输出结果
+
+<span class="gp">$ </span>docker inspect -f <span class="s1">'{ { range .NetworkSettings.Networks } }{ { .IPAddress } }{ { end } }'</span> romantic_mahavira
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#查看容器内公开端口隐射在宿主机上的端口</span>
+docker port CONTAINER <span class="o">[</span>PRIVATE_PORT[/PROTO]]
+
+<span class="gp">$ </span>docker port 215b04f73370
+</code></pre>
+</div>
+
+<h4 id="docker-images-management">Docker images management</h4>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#列出image清单</span>
+docker images <span class="o">[</span>OPTIONS] <span class="o">[</span>REPOSITORY[:TAG]]
+  -a 显示所有image
+  -q 只显示image ID
+  --digests 显示摘要信息
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#拉取image镜像</span>
+docker pull <span class="o">[</span>OPTIONS] IMAGENAME[:TAG|@DIGEST]
+  -a 将所有tag image下载下来
+  --disable-content-trust<span class="o">=</span><span class="nb">true </span>取消检查image
+
+<span class="gp">$ </span>docker pull chinakevinguo/docker-whale:latest
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#查找images</span>
+docker search <span class="o">[</span>OPTIONS] image
+
+<span class="gp">$ </span>docker search sinatra
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#登录到docke服务器</span>
+docker login <span class="o">[</span>OPTIONS] <span class="o">[</span>SERVER]
+  -u 用户名
+  -p 密码
+
+<span class="gp">$ </span>docker login
+Username: chinakevinguo
+Password:
+Login Succeeded
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#将经过修改的容器构建成新的镜像，一般不推荐这种用法</span>
+docker commit <span class="o">[</span>OPTIONS] CONTAINER <span class="o">[</span>REPOSITORY[:TAG]]
+  -a 作者
+  -m 描述
+
+<span class="gp">$ </span>docker commit -m <span class="s2">"Added json gem"</span> -a <span class="s2">"Kevin Guo"</span> goofy_bohr chinakevinguo/sinatra:v2
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#通过dockerfile构建镜像</span>
+docker build <span class="o">[</span>OPTIONS] PATH | URL
+  -t 指定image的REPOSITORY，可以指定多个REPOSITORY
+  -f 指定你的dockerfile的名称路径（默认是<span class="nv">$PATH</span>/Dockerfile）
+
+<span class="gp">$ </span>docker build -t chinakevinguo/sinatra:v3  ~/sinatra
+<span class="gp">$ </span>docker build -t chinakevinguo/sinatra:v3 -f ~/sinatra/mydockerfile .
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#为image打tag，也可以算是为images重命名</span>
+docker tag IMAGE[:TAG] IMAGE[:TAG]
+
+<span class="gp">$ </span>docker tag chinakevinguo/sinatrasdfa:v3 chinakevinguo/sinatra:v5
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#上传image到dockerHub上</span>
+docker push <span class="o">[</span>OPTIONS] NAME[:TAG]
+
+<span class="gp">$ </span>docker push chinakevinguo/docker-whale:latest
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#删除镜像</span>
+docker rmi <span class="o">[</span>OPTIONS] IMAGE <span class="o">[</span>IMAGE...]
+  -f 强制删除镜像<span class="o">(</span>实际上是先删除了基于该镜像创建的容器之后再删除的该镜像<span class="o">)</span>
+<span class="gp">$ </span>docker rmi -f web1
+</code></pre>
+</div>
+
+<h4 id="docker-network-management">Docker network management</h4>
+<ul>
+  <li>host模式：容器和宿主机共享network namespace</li>
+  <li>container模式：容器和另外一个容器共享network namespace。kubernetes中的pod就是多容器共享一个network namespace</li>
+  <li>none模式：容器有独立的network namespace，但没有对其进行任何的网络配置</li>
+  <li>bridge模式：docker默认模式，容器通过一个网桥获取ip，以NAT的方式和外界通信
+<img src="/images/posts/docker-bridge-module.png" alt="" />
+<strong>总结一下bridge网络就是：docker会在机器上自己维护一个网络，并通过docker0这个虚拟交换机和主机本身的网络连接在一起</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#docker网络管理</span>
+docker network COMMAND
+
+COMMANDS:
+  create       创建一个网络
+  connect      链接容器到网络
+  disconnect   将容器从网络断开
+  inspect      显示网络的详细信息
+  ls           列出网络
+  rm           删除一个或者更多网络
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#创建一个网络</span>
+docker network create <span class="o">[</span>OPTIONS] YOURNETWORK
+  -d 指定docker使用哪种模式的网络
+
+<span class="gp">$ </span>docker network create -d bridge my-bridge-network
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#将容器从网络断开</span>
+docker network disconnect <span class="o">[</span>OPTIONS] NETWORK CONTAINER
+
+<span class="gp">$ </span>docker network disconnect bridge web1
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#将容器链接到网络</span>
+docker network connect <span class="o">[</span>OPTIONS] NETWORK CONTAINER
+  --ip   指定ip地址
+  --link 添加连接到其他容器
+
+<span class="gp">$ </span>docker network connect my-bridge-network web1
+</code></pre>
+</div>
+
+<h4 id="docker-container-volume-management">Docker container volume management</h4>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#docker volume 管理</span>
+docker volume COMMAND
+  COMMANDS：
+    create    创建卷组
+    inspect   显示卷组详细信息
+    ls        列出卷组
+    rm        删除卷组
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#为容器挂载卷组</span>
+<span class="gp">$ </span>docker run -d -P --name web -v /src/webapp:/webapp training/webapp python app.py
+</code></pre>
+</div>
+<p>这个命令是将宿主机上的/src/webapp挂载到容器的/webapp，如果/webapp存在，则/src/webapp会覆盖挂载，但是不会删除以前的内容，取消此次挂载后，以前的内容又可以访问了。
+容器内部的目录必须指定绝对路径，而宿主机上的目录即可以是绝对路径，也可以仅仅是一个名字或者什么都不写，如果只是一个名字$NAME，则会默认挂载到/var/lib/docker/volumes/$NAME/_data，如果什么都不写，则会挂载到/var/lib/docker/volumes/下的一个随机生成的字符串下。</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#不指定名字，默认挂载</span>
+<span class="gp">$ </span>docker run -d -P --name web -v /webapp training/webapp python app.py
+
+<span class="gp">$ </span>docker inspect web
+<span class="s2">"Name"</span>: <span class="s2">"fac362...80535"</span>,
+<span class="s2">"Source"</span>: <span class="s2">"/var/lib/docker/volumes/fac362...80535/_data"</span>,
+<span class="s2">"Destination"</span>: <span class="s2">"/webapp"</span>
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#仅仅指定名字</span>
+<span class="gp">$ </span>docker run -d -P --name web -v webapp:/webapp training/webapp python app.py
+
+<span class="gp">$ </span>docker inspect web
+<span class="s2">"Name"</span>: <span class="s2">"webapp"</span>,
+<span class="s2">"Source"</span>: <span class="s2">"/var/lib/docker/volumes/webapp/_data"</span>,
+<span class="s2">"Destination"</span>: <span class="s2">"/webapp"</span>
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#指定绝对路径</span>
+<span class="gp">$ </span>docker run -d -P --name web -v /src/webapp:/webapp training/webapp python app.py
+
+<span class="gp">$ </span>docker inspect web
+<span class="s2">"Source"</span>: <span class="s2">"/src/webapp"</span>,
+<span class="s2">"Destination"</span>: <span class="s2">"/webapp"</span>,
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#挂载共享卷组作为数据卷</span>
+<span class="gp">$ </span>docker run -d -P --volume-driver<span class="o">=</span>flocker -v my-named-volume:/webapp --name web training/webapp python app.py
+
+<span class="c">#先创建共享卷组，然后再进行挂载</span>
+<span class="gp">$ </span>docker volume create -d flocker -o size-20GB my-named-volume
+<span class="gp">$ </span>docker run -d -P -v my-named-volume:/webapp --name web training/webapp python app.py
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#将容器作为卷组挂载进容器</span>
+
+<span class="c">#创建一个卷组容器</span>
+<span class="gp">$ </span>docker create -v /dbdata --name dbstore training/postgres /bin/true
+
+<span class="c">#使用--volumes-from 将dbdata挂载进其他容器</span>
+<span class="gp">$ </span>docker run -d --volumes-from dbstore --name db1 training/postgres
+<span class="gp">$ </span>docker run -d --volumes-from dbstore --name db2 training/postgres
+</code></pre>
+</div>
+
+<h4 id="backuprestoremigrate-data-volumes">Backup，restore，migrate data volumes</h4>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#将卷组容器挂载到对应的容器之后，进行卷组数据备份</span>
+<span class="gp">$ </span>docker run --rm --volumes-from dbstore -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/backup ubuntu tar cvf /backup/backup.tar /dbdata
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#数据恢复</span>
+<span class="gp">$ </span>docker run -v /dbdata --name dbstore2 ubuntu /bin/bash
+<span class="gp">$ </span>docker run --rm --volumes-from dbstore2 -v <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/backup ubuntu bash -c <span class="s2">"cd /dbdata &amp;&amp; tar xvf /backup/backup.tar --strip 1"</span>
+</code></pre>
+</div>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#在使用--rm的时候，会删除匿名卷组，而不会删除定义好的命名卷组</span>
+<span class="gp">$ </span>docker run --rm -v /foo -v awesome:/bar busybox top
+</code></pre>
+</div>
+<p><strong>所谓匿名卷组：即那些指定了路径和那些没有指定命名的挂载项目</strong></p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-Command-Usage/';
+              this.page.identifier = '/2017/07/06/Docker-Command-Usage/';
+              this.page.title = 'Docker基础-docker常用命令';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

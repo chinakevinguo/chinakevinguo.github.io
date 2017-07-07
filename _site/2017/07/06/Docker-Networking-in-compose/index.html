@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker compose网络 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-Networking-in-compose/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker compose网络">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="  注意： 本文涉及的compose只适用于compose文件格式为version 2的版本，v1(旧的)不支持网络功能">
+    <meta name="og:description" content="  注意： 本文涉及的compose只适用于compose文件格式为version 2的版本，v1(旧的)不支持网络功能">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-Networking-in-compose/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker compose网络</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <blockquote>
+  <p><strong>注意：</strong> 本文涉及的compose只适用于compose文件格式为version 2的版本，v1(旧的)不支持网络功能</p>
+</blockquote>
+
+<p>默认compose会为你的app配置一个单独的网络。服务中的每个容器加入到这个默认的网络且在这个网络的容器都能互相通信，它们也能通过与容器名称相同的主机名发现对方。</p>
+
+<blockquote>
+  <p><strong>注意：</strong> app的网络基于”项目名称”设置网络名称，这个项目名称基于项目所处的目录名。可以使用<code class="highlighter-rouge">--project-name</code>选项或<code class="highlighter-rouge">COMPOSE_PROJECT_NAME</code>环境变量来覆盖。</p>
+</blockquote>
+
+<!--more-->
+<p>例如，假设app在一个名为myapp的目录，<code class="highlighter-rouge">docker-compose.yml</code>内容如下：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>version: <span class="s1">'2'</span>
+
+services:
+  web:
+    build: .
+    ports:
+      - <span class="s2">"8000:8000"</span>
+  db:
+    image: postgres
+</code></pre>
+</div>
+<p>当执行<code class="highlighter-rouge">docker-compose up</code>时，网络部分设置如下：
+1.创建了称之为myapp_default的网络
+2.使用web的配置创建容器，然后这个容器加入到myapp_default网络
+3.使用db的配置创建容器，这个容器加入到myapp_default网络</p>
+
+<p>每个容器现在能直接查找主机名web或db来得到容器的IP地址。例如，web应用程序的代码可以连接URL postgres://db:5432并开始使用postgres数据库。
+由于web明确的映射了一个端口，外部网络也就能通过在docker主机的网络接口的8000端口连接容器。</p>
+
+<h1 id="容器更新">容器更新</h1>
+
+<p>如果更改了服务的配置并执行<code class="highlighter-rouge">docker-compose up</code>来更新它，将删除旧的容器并且新的容器会加入到相同的网络，分配到了不同的IP地址，不过主机名不变。运行中的容器应该能够查找主机名并连接到新的地址，不过旧的地址将失效。</p>
+
+<p>如果任何一个容器与旧容器有连接，它们会被关闭掉。容器有责任检测这种情况然后重新查找旧容器的主机来重新连接。</p>
+
+<h1 id="links">Links</h1>
+
+<p>links可以为一个容器定义一个额外的别名。即使服务没有启动，它们也能进行通信。默认任何服务都可以通过该服务的名称访问其他的服务。例如：在web容器中可以通过db和database访问db容器</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>version: <span class="s1">'2'</span>
+services:
+  web:
+    build: .
+    links:
+      - <span class="s2">"db:database"</span>
+  db:
+    image: postgres
+</code></pre>
+</div>
+
+<h1 id="多主机网络">多主机网络</h1>
+
+<p>当在swarm集群中部署compose app的时候，你可以使用内置的<code class="highlighter-rouge">overlay</code>driver来启用容器之间的多主机通信，这不会更改你的compose文件和app code。</p>
+
+<p>请参阅<a href="https://docs.docker.com/engine/userguide/networking/get-started-overlay/">Getting started with multi-host networking</a>来了解怎么配置swarm集群。swarm默认是使用<code class="highlighter-rouge">overlay</code>网络驱动，当然你也可以自己自定义。详情在下一段</p>
+
+<h1 id="指定自定义网络">指定自定义网络</h1>
+
+<p>除了使用默认的app网络之外，还可以使用最顶层的<code class="highlighter-rouge">networks</code>关键字来指定自定义的网络。这让你可以创建更复杂的网络并制定自定义网络驱动及其选项。也可以使用它将服务连接到不是有compose管理的外部网络。</p>
+
+<p>每个服务都能指定由networks关键字配置的网络，可以配置service级别和top级的网络。</p>
+
+<p>下面的示例compose文件定义了两个自定义网络。proxy服务与db服务隔离，因为它们没有指定相同的网络。</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>version: <span class="s1">'2'</span>
+
+services:
+  proxy:
+    build: ./proxy
+    networks:
+      - front
+  app:
+    build: ./app
+    networks:
+      - front
+      - back
+  db:
+    image: postgres
+    networks:
+      - back
+
+networks:
+  front:
+    <span class="c"># Use a custom driver</span>
+    driver: custom-driver-1
+  back:
+    <span class="c"># Use a custom driver which takes special options</span>
+    driver: custom-driver-2
+    driver_opts:
+      foo: <span class="s2">"1"</span>
+      bar: <span class="s2">"2"</span>
+</code></pre>
+</div>
+
+<h1 id="配置默认网络">配置默认网络</h1>
+
+<p>除了指定你自己的网络之外，还可以通过在名为default的网络下定义一个条目来更改应用范围内的默认网络设置：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>version: <span class="s1">'2'</span>
+
+services:
+  web:
+    build: .
+    ports:
+      - <span class="s2">"8000:8000"</span>
+  db:
+    image: postgres
+
+networks:
+  default:
+    <span class="c"># Use a custom driver</span>
+    driver: custom-driver-1
+</code></pre>
+</div>
+
+<h1 id="使用预先存在的网络">使用预先存在的网络</h1>
+
+<p>如果你希望你的容器加入一个预先存在的网络，使用external选项：</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>networks:
+  default:
+    external:
+      name: my-pre-existing-network
+</code></pre>
+</div>
+<p>compose检测到有external选项后，不会创建名为[PROJECTNAME]_default的网络，而是会查找一个名为my-pre-existing-network的网络，并将应用程序连接到它。</p>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-Networking-in-compose/';
+              this.page.identifier = '/2017/07/06/Docker-Networking-in-compose/';
+              this.page.title = 'Docker基础-docker compose网络';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

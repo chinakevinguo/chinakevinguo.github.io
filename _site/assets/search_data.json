@@ -1,5 +1,17 @@
 {
   
+  "2017-07-06-video-test": {
+    "title": "video",
+    "url": " /2017/07/06/video-test/",
+    "category": "生活"
+  },
+  
+  "2017-07-06-saltstack-e4-b9-8bpillar": {
+    "title": "saltstack之pillar",
+    "url": " /2017/07/06/saltstack%E4%B9%8Bpillar/",
+    "category": "saltstack"
+  },
+  
   "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-3": {
     "title": "kargo容器化部署kubernetes高可用集群(3)",
     "url": " /2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/",
@@ -16,6 +28,234 @@
     "title": "kargo容器化部署kubernetes高可用集群(1)",
     "url": " /2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(1)/",
     "category": "kubernetes"
+  },
+  
+  "2017-07-06-ansible-client": {
+    "title": "ansible客户端配置",
+    "url": " /2017/07/06/ansible-client/",
+    "category": "ansible"
+  },
+  
+  "2017-07-06-maven-setting-xml": {
+    "title": "Maven之setting.xml",
+    "url": " /2017/07/06/Maven-setting.xml/",
+    "category": "maven"
+  },
+  
+  "2017-07-06-dockerfile-reference": {
+    "title": "Docker基础-Dockerfile常用指令",
+    "url": " /2017/07/06/Dockerfile-reference/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-storage-driver": {
+    "title": "Docker基础-docker 存储驱动",
+    "url": " /2017/07/06/Docker-storage-driver/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-overlay-security-model": {
+    "title": "Docker基础-docker muti-host之overlay在docker swarm安全模式下的使用",
+    "url": " /2017/07/06/Docker-overlay-security-model/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-network-with-macvlan": {
+    "title": "Docker基础-docker muti-host之macvlan",
+    "url": " /2017/07/06/Docker-network-with-Macvlan/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-network-command": {
+    "title": "Docker基础-docker network常用命令",
+    "url": " /2017/07/06/Docker-network-command/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-multi-host-networking-with-vagrant": {
+    "title": "Docker基础-docker multi-host网络测试",
+    "url": " /2017/07/06/Docker-multi-host-networking-with-vagrant/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-multi-host-networking-with-docker-machine": {
+    "title": "Docker基础-docker multi-host网络之overlay",
+    "url": " /2017/07/06/Docker-multi-host-networking-with-docker-machine/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-links": {
+    "title": "Docker基础-docker容器之间如何通过link进行通信",
+    "url": " /2017/07/06/Docker-links/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-install-docker-compose": {
+    "title": "Docker基础-docker compose安装",
+    "url": " /2017/07/06/Docker-install-docker-compose/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-getting-started-compose": {
+    "title": "Docker基础-docker compose基础知识",
+    "url": " /2017/07/06/Docker-getting-started-compose/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-format-command-and-log-output": {
+    "title": "Docker基础-docker 日志输出的格式化",
+    "url": " /2017/07/06/Docker-format-command-and-log-output/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-extending-services-in-compose": {
+    "title": "Docker基础-docker compose配置共享",
+    "url": " /2017/07/06/Docker-extending-services-in-compose/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-environment-file": {
+    "title": "Docker基础-docker在文件中声明默认环境变量",
+    "url": " /2017/07/06/Docker-environment-file/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-custom-docker0": {
+    "title": "Docker基础-docker自定义bridge网络",
+    "url": " /2017/07/06/Docker-custom-docker0/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-control-and-configure-docker-with-systemd": {
+    "title": "Docker基础-自定义docker daemon",
+    "url": " /2017/07/06/Docker-control-and-configure-docker-with-systemd/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-container-networking": {
+    "title": "Docker基础-docker网络",
+    "url": " /2017/07/06/Docker-container-networking/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-container-communication": {
+    "title": "Docker基础-docker容器之间通信",
+    "url": " /2017/07/06/Docker-container-communication/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-configuring-logging-drivers": {
+    "title": "Docker基础-docker日志驱动配置",
+    "url": " /2017/07/06/Docker-configuring-logging-drivers/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-config-dns": {
+    "title": "Docker基础-docker在自定义的网络上定义DNS",
+    "url": " /2017/07/06/Docker-config-dns/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-build-bridges": {
+    "title": "Docker基础-自定义docker bridge",
+    "url": " /2017/07/06/Docker-build-bridges/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-bind": {
+    "title": "Docker基础-bridge绑定容器端口",
+    "url": " /2017/07/06/Docker-bind/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-automatically-start-containers": {
+    "title": "Docker基础-自动启动容器",
+    "url": " /2017/07/06/Docker-automatically-start-containers/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-view-a-containers-logs": {
+    "title": "Docker基础-docker容器日志处理方式",
+    "url": " /2017/07/06/Docker-View-a-containers-logs/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-using-compose-in-production": {
+    "title": "Docker基础-docker compose应用在生产环境",
+    "url": " /2017/07/06/Docker-Using-compose-in-production/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-use-compose-with-swarm": {
+    "title": "Docker基础-在swarm上使用docker compose",
+    "url": " /2017/07/06/Docker-Use-compose-with-swarm/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-stacks-and-distributed-application-bundles": {
+    "title": "Docker基础-docker stacks",
+    "url": " /2017/07/06/Docker-Stacks-and-Distributed-Application-Bundles/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-registry": {
+    "title": "Docker基础-docker registry的几种方式",
+    "url": " /2017/07/06/Docker-Registry/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-overview": {
+    "title": "Docker基础-docker 简介",
+    "url": " /2017/07/06/Docker-Overview/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-overview-of-docker-compose": {
+    "title": "Docker基础-docker compose简介",
+    "url": " /2017/07/06/Docker-Overview-of-Docker-Compose/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-networking-in-compose": {
+    "title": "Docker基础-docker compose网络",
+    "url": " /2017/07/06/Docker-Networking-in-compose/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-log-tag-for-logging-driver": {
+    "title": "Docker基础-docker 容器日志命名",
+    "url": " /2017/07/06/Docker-Log-tag-for-logging-driver/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-limit-container-resources": {
+    "title": "Docker基础-docker limit资源限制",
+    "url": " /2017/07/06/Docker-Limit-container-resources/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-keep-containers-alive-during-daemon-downtime": {
+    "title": "Docker基础-当docker daemon停止时依然保持容器运行",
+    "url": " /2017/07/06/Docker-Keep-containers-alive-during-daemon-downtime/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-environment-variables-in-compose": {
+    "title": "Docker基础-docker 环境变量在compose文件中的使用",
+    "url": " /2017/07/06/Docker-Environment-variables-in-compose/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-configure-run-docker-on-various-distributions": {
+    "title": "Docker基础-docker在各个平台的基本配置",
+    "url": " /2017/07/06/Docker-Configure-run-docker-on-various-distributions/",
+    "category": "docker"
+  },
+  
+  "2017-07-06-docker-command-usage": {
+    "title": "Docker基础-docker常用命令",
+    "url": " /2017/07/06/Docker-Command-Usage/",
+    "category": "docker"
   },
   
 
@@ -72,7 +312,245 @@
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
+  
+  "2017-07-06-docker-command-usage": {
+    "title": "Docker基础-docker常用命令",
+    "url": "/2017/07/06/Docker-Command-Usage/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-configure-run-docker-on-various-distributions": {
+    "title": "Docker基础-docker在各个平台的基本配置",
+    "url": "/2017/07/06/Docker-Configure-run-docker-on-various-distributions/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-environment-variables-in-compose": {
+    "title": "Docker基础-docker 环境变量在compose文件中的使用",
+    "url": "/2017/07/06/Docker-Environment-variables-in-compose/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-keep-containers-alive-during-daemon-downtime": {
+    "title": "Docker基础-当docker daemon停止时依然保持容器运行",
+    "url": "/2017/07/06/Docker-Keep-containers-alive-during-daemon-downtime/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-limit-container-resources": {
+    "title": "Docker基础-docker limit资源限制",
+    "url": "/2017/07/06/Docker-Limit-container-resources/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-log-tag-for-logging-driver": {
+    "title": "Docker基础-docker 容器日志命名",
+    "url": "/2017/07/06/Docker-Log-tag-for-logging-driver/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-networking-in-compose": {
+    "title": "Docker基础-docker compose网络",
+    "url": "/2017/07/06/Docker-Networking-in-compose/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-overview-of-docker-compose": {
+    "title": "Docker基础-docker compose简介",
+    "url": "/2017/07/06/Docker-Overview-of-Docker-Compose/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-overview": {
+    "title": "Docker基础-docker 简介",
+    "url": "/2017/07/06/Docker-Overview/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-registry": {
+    "title": "Docker基础-docker registry的几种方式",
+    "url": "/2017/07/06/Docker-Registry/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-stacks-and-distributed-application-bundles": {
+    "title": "Docker基础-docker stacks",
+    "url": "/2017/07/06/Docker-Stacks-and-Distributed-Application-Bundles/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-use-compose-with-swarm": {
+    "title": "Docker基础-在swarm上使用docker compose",
+    "url": "/2017/07/06/Docker-Use-compose-with-swarm/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-using-compose-in-production": {
+    "title": "Docker基础-docker compose应用在生产环境",
+    "url": "/2017/07/06/Docker-Using-compose-in-production/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-view-a-containers-logs": {
+    "title": "Docker基础-docker容器日志处理方式",
+    "url": "/2017/07/06/Docker-View-a-containers-logs/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-automatically-start-containers": {
+    "title": "Docker基础-自动启动容器",
+    "url": "/2017/07/06/Docker-automatically-start-containers/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-bind": {
+    "title": "Docker基础-bridge绑定容器端口",
+    "url": "/2017/07/06/Docker-bind/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-build-bridges": {
+    "title": "Docker基础-自定义docker bridge",
+    "url": "/2017/07/06/Docker-build-bridges/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-config-dns": {
+    "title": "Docker基础-docker在自定义的网络上定义DNS",
+    "url": "/2017/07/06/Docker-config-dns/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-configuring-logging-drivers": {
+    "title": "Docker基础-docker日志驱动配置",
+    "url": "/2017/07/06/Docker-configuring-logging-drivers/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-container-communication": {
+    "title": "Docker基础-docker容器之间通信",
+    "url": "/2017/07/06/Docker-container-communication/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-container-networking": {
+    "title": "Docker基础-docker网络",
+    "url": "/2017/07/06/Docker-container-networking/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-control-and-configure-docker-with-systemd": {
+    "title": "Docker基础-自定义docker daemon",
+    "url": "/2017/07/06/Docker-control-and-configure-docker-with-systemd/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-custom-docker0": {
+    "title": "Docker基础-docker自定义bridge网络",
+    "url": "/2017/07/06/Docker-custom-docker0/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-environment-file": {
+    "title": "Docker基础-docker在文件中声明默认环境变量",
+    "url": "/2017/07/06/Docker-environment-file/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-extending-services-in-compose": {
+    "title": "Docker基础-docker compose配置共享",
+    "url": "/2017/07/06/Docker-extending-services-in-compose/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-format-command-and-log-output": {
+    "title": "Docker基础-docker 日志输出的格式化",
+    "url": "/2017/07/06/Docker-format-command-and-log-output/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-getting-started-compose": {
+    "title": "Docker基础-docker compose基础知识",
+    "url": "/2017/07/06/Docker-getting-started-compose/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-install-docker-compose": {
+    "title": "Docker基础-docker compose安装",
+    "url": "/2017/07/06/Docker-install-docker-compose/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-links": {
+    "title": "Docker基础-docker容器之间如何通过link进行通信",
+    "url": "/2017/07/06/Docker-links/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-multi-host-networking-with-docker-machine": {
+    "title": "Docker基础-docker multi-host网络之overlay",
+    "url": "/2017/07/06/Docker-multi-host-networking-with-docker-machine/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-multi-host-networking-with-vagrant": {
+    "title": "Docker基础-docker multi-host网络测试",
+    "url": "/2017/07/06/Docker-multi-host-networking-with-vagrant/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-network-command": {
+    "title": "Docker基础-docker network常用命令",
+    "url": "/2017/07/06/Docker-network-command/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-network-with-macvlan": {
+    "title": "Docker基础-docker muti-host之macvlan",
+    "url": "/2017/07/06/Docker-network-with-Macvlan/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-overlay-security-model": {
+    "title": "Docker基础-docker muti-host之overlay在docker swarm安全模式下的使用",
+    "url": "/2017/07/06/Docker-overlay-security-model/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-docker-storage-driver": {
+    "title": "Docker基础-docker 存储驱动",
+    "url": "/2017/07/06/Docker-storage-driver/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-dockerfile-reference": {
+    "title": "Docker基础-Dockerfile常用指令",
+    "url": "/2017/07/06/Dockerfile-reference/",
+    "category": "[&quot;docker&quot;]"
+  },
+  
+  "2017-07-06-maven-setting-xml": {
+    "title": "Maven之setting.xml",
+    "url": "/2017/07/06/Maven-setting.xml/",
+    "category": "[&quot;maven&quot;]"
+  },
+  
+  "2017-07-06-ansible-client": {
+    "title": "ansible客户端配置",
+    "url": "/2017/07/06/ansible-client/",
+    "category": "[&quot;ansible&quot;, &quot;kargo&quot;]"
+  },
   
   "2017-07-06-kargo-e5-ae-b9-e5-99-a8-e5-8c-96-e9-83-a8-e7-bd-b2kubernetes-e9-ab-98-e5-8f-af-e7-94-a8-e9-9b-86-e7-be-a4-1": {
     "title": "kargo容器化部署kubernetes高可用集群(1)",
@@ -90,6 +568,18 @@
     "title": "kargo容器化部署kubernetes高可用集群(3)",
     "url": "/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4(3)/",
     "category": "[&quot;kubernetes&quot;, &quot;docker&quot;]"
+  },
+  
+  "2017-07-06-saltstack-e4-b9-8bpillar": {
+    "title": "saltstack之pillar",
+    "url": "/2017/07/06/saltstack%E4%B9%8Bpillar/",
+    "category": "[&quot;saltstack&quot;]"
+  },
+  
+  "2017-07-06-video-test": {
+    "title": "video",
+    "url": "/2017/07/06/video-test/",
+    "category": "[&quot;生活&quot;]"
   }
   
 }

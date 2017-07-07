@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Maven之setting.xml &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Maven-setting.xml/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Maven之setting.xml">
+      
+    <meta name="keywords" content="maven">
+    <meta name="og:keywords" content="maven">
+      
+    <meta name="description" content="什么是MavenMaven是一个项目管理和综合工具，用java编写，能简化和标准化项目建设过程。处理编译，部署，文档，团队协作和其他任务的无缝连接。 Maven增加可重用性并负责建立相关的任务。Maven资源库      Maven本地资源库    Maven私服库    Maven中央仓库一般在打包编译的时候，会先从本地仓库中查找，如果本地仓库没有，就会去设定好的私服仓库去查找，私服仓库上如果有就下载下来，没有私服仓库就会去中央仓库查找  ">
+    <meta name="og:description" content="什么是MavenMaven是一个项目管理和综合工具，用java编写，能简化和标准化项目建设过程。处理编译，部署，文档，团队协作和其他任务的无缝连接。 Maven增加可重用性并负责建立相关的任务。Maven资源库      Maven本地资源库    Maven私服库    Maven中央仓库一般在打包编译的时候，会先从本地仓库中查找，如果本地仓库没有，就会去设定好的私服仓库去查找，私服仓库上如果有就下载下来，没有私服仓库就会去中央仓库查找  ">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Maven-setting.xml/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Maven之setting.x">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Maven之setting.xml</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#maven" title="maven">maven</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h3 id="什么是maven">什么是Maven</h3>
+<p>Maven是一个项目管理和综合工具，用java编写，能简化和标准化项目建设过程。处理编译，部署，文档，团队协作和其他任务的无缝连接。 Maven增加可重用性并负责建立相关的任务。
+<!--more--></p>
+<h3 id="maven资源库">Maven资源库</h3>
+<blockquote>
+  <ul>
+    <li>Maven本地资源库</li>
+    <li>Maven私服库</li>
+    <li>Maven中央仓库
+一般在打包编译的时候，会先从本地仓库中查找，如果本地仓库没有，就会去设定好的私服仓库去查找，私服仓库上如果有就下载下来，没有私服仓库就会去中央仓库查找</li>
+  </ul>
+</blockquote>
+
+<h3 id="maven的settingsxml文件">Maven的settings.xml文件</h3>
+<p>在安装好maven之后，我们首先要做的是根据我们的需求配置maven的settings.xml文件
+settings.xml对于maven来说，相当于全局性的配置，用于所有的项目。在Maven2中存在两个settings.xml，一个位于maven2的安装目录conf下面，作为全局性配置。对于团队设置，保持一致的定义是关键，所以conf下的settings.xml就作为团队共同的配置文件。而对于每个单独的成员，如果有特殊的需要自定义的设置，如用户信息之类，就可以在~/.m2/settings.xml中进行设定</p>
+
+<h3 id="settingsxml的基本结构如下">settings.xml的基本结构如下</h3>
+<div class="language-xml highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;settings</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span>  
+          <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>  
+          <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0</span>  
+                               <span class="err">http://maven.apache.org/xsd/settings-1.0.0.xsd"</span><span class="nt">&gt;</span>  
+  <span class="nt">&lt;localRepository/&gt;</span>  
+  <span class="nt">&lt;interactiveMode/&gt;</span>  
+  <span class="nt">&lt;usePluginRegistry/&gt;</span>  
+  <span class="nt">&lt;offline/&gt;</span>  
+  <span class="nt">&lt;pluginGroups/&gt;</span>  
+  <span class="nt">&lt;servers/&gt;</span>  
+  <span class="nt">&lt;mirrors/&gt;</span>  
+  <span class="nt">&lt;proxies/&gt;</span>  
+  <span class="nt">&lt;profiles/&gt;</span>  
+  <span class="nt">&lt;activeProfiles/&gt;</span>  
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#表示本地仓库的位置，默认在~/.m2/repository</span>
+&lt;localRepository&gt;/path/to/local/repo&lt;localRepository/&gt;
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#如果不想每次编译都去查找中心库，就设置为true，前提是你必须已经下载好了必须的依赖包，默认是false</span>
+&lt;offline&gt;false&lt;offline/&gt;
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#在POM文件中定义了distributionManagement元素，然而特定的username和password不能用于pom.xml，所以通过此配置来保存server信息，这里的id必须和后面repository中定义的id一致，主要是用来部署到nexus私服</span>
+&lt;server&gt;
+  &lt;id&gt;release&lt;/id&gt;
+  &lt;username&gt;admin&lt;/username&gt;
+  &lt;password&gt;admin123&lt;/password&gt;
+&lt;/server&gt;
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#表示镜像仓库，指定库的镜像，这里的mirrorOf表示此镜像是那个库的镜像，*表示所有库</span>
+&lt;mirrors&gt;
+&lt;mirror&gt;
+  &lt;id&gt;nexus&lt;/id&gt;
+  &lt;mirrorOf&gt;<span class="k">*</span>&lt;/mirrorOf&gt;
+  &lt;name&gt;Nexus Repository&lt;/name&gt;
+  &lt;url&gt;http://192.168.56.22:8081/nexus/content/groups/public/&lt;/url&gt;
+&lt;/mirror&gt;
+&lt;mirrors/&gt;
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#代理服务器设置，主要用于无法直接访问中心的库用户设置</span>
+<span class="gp">&lt;proxies&gt;  </span>
+   &lt;proxy&gt;  
+     &lt;id&gt;myproxy&lt;/id&gt;  
+     &lt;active&gt;true&lt;/active&gt;  
+     &lt;protocol&gt;http&lt;/protocol&gt;  
+     &lt;host&gt;proxy.somewhere.com&lt;/host&gt;  
+     &lt;port&gt;8080&lt;/port&gt;  
+     &lt;username&gt;proxyuser&lt;/username&gt;  
+     &lt;password&gt;somepassword&lt;/password&gt;  
+     &lt;nonProxyHosts&gt;<span class="k">*</span>.google.com|ibiblio.org&lt;/nonProxyHosts&gt;  
+   &lt;/proxy&gt;  
+ &lt;/proxies&gt;
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#自定义配置，可以指定repositories，properties，pluginRepositories，activation等元素</span>
+<span class="c">#这里的repositories表示，开发团队自己的开发库，定义这个库，一般是为了方便distributionManagement发布</span>
+&lt;profiles&gt;
+&lt;profile&gt;
+      &lt;id&gt;nexus&lt;/id&gt;
+      &lt;repositories&gt;
+        &lt;repository&gt;
+            &lt;id&gt;public&lt;/id&gt;
+            &lt;name&gt;public&lt;/name&gt;
+            &lt;url&gt;http://192.168.56.22:8081/nexus/content/groups/public/&lt;/url&gt;
+            &lt;releases&gt;&lt;enabled&gt;true&lt;/enabled&gt;&lt;/releases&gt;
+            &lt;snapshots&gt;&lt;enabled&gt;false&lt;/enabled&gt;&lt;/snapshots&gt;
+        &lt;/repository&gt;
+      &lt;/repositories&gt;
+&lt;/profile&gt;
+&lt;/profiles&gt;
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#properties作为maven的占位符之，包括5中类型值：</span>
+env.x：返回当前的环境变量
+project.x：返回pom文件中定义的project元素值
+settings.x：返回settings.xml中定义的元素
+java系统属性：返回经过java.lang.System.getProperties<span class="o">()</span>返回的值
+x：用户自定义的值
+</code></pre>
+</div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="c">#激活指定的profile，通过profile id 来指定</span>
+<span class="gp">&lt;activeProfiles&gt;  </span>
+    &lt;activeProfile&gt;env-test&lt;/activeProfile&gt;
+&lt;/activeProfiles&gt;
+</code></pre>
+</div>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Maven-setting.xml/';
+              this.page.identifier = '/2017/07/06/Maven-setting.xml/';
+              this.page.title = 'Maven之setting.xml';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>

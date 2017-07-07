@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Docker基础-docker limit资源限制 &mdash; KevinGuo</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://0.0.0.0:80/2017/07/06/Docker-Limit-container-resources/">
+    <link rel="alternate" type="application/atom+xml" title="KevinGuo" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Docker基础-docker limit资源限制">
+      
+    <meta name="keywords" content="docker">
+    <meta name="og:keywords" content="docker">
+      
+    <meta name="description" content="默认情况下，容器没有资源约束，可以使用与主机的内核调度程序允许的的资源一样多的资源。docker提供了在运行docker run指定选项来控制容器内存，cpu或IO的方法。这部分提供了有关何时应该设置这类限制以及设置这些限制可能有什么影响的详细信息。">
+    <meta name="og:description" content="默认情况下，容器没有资源约束，可以使用与主机的内核调度程序允许的的资源一样多的资源。docker提供了在运行docker run指定选项来控制容器内存，cpu或IO的方法。这部分提供了有关何时应该设置这类限制以及设置这些限制可能有什么影响的详细信息。">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://0.0.0.0:80/2017/07/06/Docker-Limit-container-resources/">
+    <meta property="og:site_name" content="KevinGuo">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2017-07-06">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="KevinGuo"><span class="octicon octicon-mark-github"></span> KevinGuo</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/wiki/" class=" site-header-nav-item" target="" title="维基">维基</a>
+                
+                <a href="/links/" class=" site-header-nav-item" target="" title="链接">链接</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Docker基础-docker">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Docker基础-docker limit资源限制</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2017/07/06
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#docker" title="docker">docker</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <p>默认情况下，容器没有资源约束，可以使用与主机的内核调度程序允许的的资源一样多的资源。docker提供了在运行<code class="highlighter-rouge">docker run</code>指定选项来控制容器内存，cpu或IO的方法。这部分提供了有关何时应该设置这类限制以及设置这些限制可能有什么影响的详细信息。</p>
+
+<!--more-->
+<h1 id="memory">Memory</h1>
+<p>Docker 可以强制执行硬内存限制，其允许容器使用不超过用户或系统给定的内存大小，或者软限制，允许容器在满足条件的情况下使用所需内存，例如,当内核检测到主机上的内存不足或有争抢。下面的选项单独使用或集中使用会有不同的效果。
+这些选项中大部分都是采用正整数，后面跟一个后缀b,k,m,g，表示字节，千字节，兆字节，千兆字节。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Option</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">-m or –memory=</td>
+      <td style="text-align: left">容器可以使用的最大内存大小，如果你设置了这个选项，那么内存最小也要4m</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–memory-swarp*</td>
+      <td style="text-align: left">容器可以交换到硬盘的内存大小，可参考<a href="https://docs.docker.com/engine/admin/resource_constraints/#memory-swap-details">–memory-swap details</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–memory-swappiness</td>
+      <td style="text-align: left">默认情况下，主机内核可以交换容器使用的匿名页面的百分比，可以在0-100之间设置<code class="highlighter-rouge">--memory-swappiness</code>的百分比，可参考<a href="https://docs.docker.com/engine/admin/resource_constraints/#memory-swappiness-details">–memory-swappiness details</a></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–memory-reservation</td>
+      <td style="text-align: left">允许你指定一个小于<code class="highlighter-rouge">--memory</code>的软限制，当docker在主机上检测到争用或低内存时激活该限制。如果使用<code class="highlighter-rouge">--memory-reservation</code>，则必须将其设置为低于<code class="highlighter-rouge">--memory</code>，以使其优先。因为它是一个软限制，不保证容器不会超过限制。</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–kernel-memory</td>
+      <td style="text-align: left">容器可以使用的最大内核内存，最小值是4m。因为内核内存无法交换出来，一个缺少内核内存的容器可能会阻塞主机资源，这会对主机和其他容器产生副作用</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–oom-kill-disable</td>
+      <td style="text-align: left">默认情况下，如果发生内存不足(OOM)错误，内核会杀死容器中的进程。我们可以使用<code class="highlighter-rouge">--oom-kill-disable</code>选项来改变设置，如果你设置了<code class="highlighter-rouge">-m/--memory</code>选项，那么容器会一直耗尽到<code class="highlighter-rouge">-m</code>限制的内存大小。而如果你没有设定<code class="highlighter-rouge">-m</code>，主机会尽可能的耗尽内存，内核可能需要杀死主机系统的进程以释放内存。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="memory-swap-details">–memory-swap details</h2>
+
+<blockquote>
+  <ul>
+    <li>如果没有设置<code class="highlighter-rouge">--memory-swap</code>，而设置了<code class="highlighter-rouge">--memory</code>，容器能够使用<code class="highlighter-rouge">--memory</code>值的两倍的swap。例如：<code class="highlighter-rouge">--memory=300m</code>,<code class="highlighter-rouge">--memory-swap</code>没有设置，那么容器能够使用300m内存和600m swap。</li>
+    <li>如果<code class="highlighter-rouge">--memory</code>和<code class="highlighter-rouge">--memory-swap</code>都设置了，<code class="highlighter-rouge">--memory-swap</code>表示能够使用内存和swap的总数，<code class="highlighter-rouge">--memory</code>控制非swap的内存大小。例如：<code class="highlighter-rouge">--memory=300m</code>,<code class="highlighter-rouge">--memory-swap=1g</code>，那么容器能够使用300m内存和700m的swap。</li>
+    <li>如果设置为-1(默认)，表示容器可以无限使用swap</li>
+  </ul>
+</blockquote>
+
+<h2 id="memory-swappiness-details">–memory-swappiness details</h2>
+
+<blockquote>
+  <ul>
+    <li>如果值为0，关闭匿名页面交换</li>
+    <li>值100，将所有匿名页面设置为可交换</li>
+    <li>默认情况下，如果不设置<code class="highlighter-rouge">--memory-swappiness</code>，容器将继承主机计算机的值</li>
+  </ul>
+</blockquote>
+
+<h2 id="kernel-memory-details">–kernel-memory details</h2>
+
+<p>内核内存限制以分配给容器的总内存来表示，有以下几种场景：</p>
+
+<blockquote>
+  <ul>
+    <li>没有限制<code class="highlighter-rouge">--memory</code>，没有限制<code class="highlighter-rouge">--kernel-memory</code>： 这是默认值</li>
+    <li>没有限制<code class="highlighter-rouge">--memory</code>，有限制<code class="highlighter-rouge">--kernel-memory</code>: 当所有的cgroups所需的内存量超过主机实际拥有的内存量时，适合设置为这样子。你可以设置内核内存不超过主机可用内存，容器需要更多内存只能等待了。</li>
+    <li>有限制<code class="highlighter-rouge">--memory</code>，没有限制<code class="highlighter-rouge">--kernel-memory</code>：总内存是限制的，不过内核内存无限制</li>
+    <li>有限制<code class="highlighter-rouge">--memory</code>，有限制<code class="highlighter-rouge">--kernel-memory</code>：用户和内核限制都限制时，对调试内存相关问题会有帮助。如果一个容器用完了这两种内存之中的一种，它不会影响到其他的容器和主机。如果内核内存限制比用户内存低，使用完内核内存后，会导致容器长生OOM错误，反之，则不会。</li>
+  </ul>
+</blockquote>
+
+<h1 id="cpu">CPU</h1>
+
+<p>默认情况下，所有容器获得CPU周期的比例相同，你可以通过下面的选项来对容器的CPU使用进行调整。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Option</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">–cpu-shares</td>
+      <td style="text-align: left">设置权重，修改默认的1024增大或者减小。当其他容器有空闲CPU时，其他容器可使用空闲CPU时间</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–cpu-period</td>
+      <td style="text-align: left">容器的一个逻辑CPU的调度周期。默认值是100000（100ms），当然我们也可以自己设置CPU周期，限制容器CPU用量，通常和<code class="highlighter-rouge">--cpu-quota</code>参数使用</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–cpu-quota</td>
+      <td style="text-align: left">在由<code class="highlighter-rouge">--cpu-period</code>设置的时间段内，容器可以调度的最大CPU使用量，默认是0，以为着允许容器获得1个CPU的100%的资源量。设置50000限制CPU资源的50%</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–cpuset-cpus</td>
+      <td style="text-align: left">定容器允许运行的CPU号(在多核心系统中)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="block-io">Block IO</h1>
+
+<p>有两个选项可用于调整容器对直连块IO设备的访问。你还可以按照每秒字节数或每秒IO操作来指定带宽限制。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Option</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">blkio-weight</td>
+      <td style="text-align: left">默认情况下，每个容器可以使用相同比例的IO带宽。默认权重是500，要提高或者降低，可以设置<code class="highlighter-rouge">--blkio-weight</code>来设置介于10-1000之间的值，此设置会平等的影响到所有块IO设备</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">blkio-weight-device</td>
+      <td style="text-align: left">与<code class="highlighter-rouge">--blkio-weight</code>相同，但你可以使用<code class="highlighter-rouge">--blkio-weight-device=DEVICE_NAME:WEGITH</code>为每个设备设置权重。</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–device-read-bps和–device-write-bps</td>
+      <td style="text-align: left">根据大小限制设备读取或写入的速率，使用kb，mb或gb后缀</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">–device-read-iops和–device-write-iops</td>
+      <td style="text-align: left">通过IO操作/秒限制设备读取或写入的速率</td>
+    </tr>
+  </tbody>
+</table>
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+
+  
+
+  
+      
+        
+        <!-- Disqus Protection, see https://github.com/mzlogin/mzlogin.github.io/issues/2 -->
+        
+        
+          <div id="disqus_thread"></div>
+          <script>
+            var disqus_config = function () {
+              this.page.url = 'http://0.0.0.0:80/2017/07/06/Docker-Limit-container-resources/';
+              this.page.identifier = '/2017/07/06/Docker-Limit-container-resources/';
+              this.page.title = 'Docker基础-docker limit资源限制';
+            };
+            (function() { // DON'T EDIT BELOW THIS LINE
+              var d = document, s = d.createElement('script');
+
+              s.type = 'text/javascript';
+              s.async = true;
+              var shortname = 'oo3p';
+
+              s.src = '//' + shortname + '.disqus.com/embed.js';
+
+              s.setAttribute('data-timestamp', +new Date());
+              (d.head || d.body).appendChild(s);
+            })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        
+      
+    
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+
+    
+<h3 class="post-directory-title mobile-hidden">Table of Contents</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2015
+                    <span title="KevinGuo">KevinGuo</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="http://github.com/chinakevinguo/chinakevinguo.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/wiki/" title="维基" target="">维基</a>
+                </li>
+                
+                <li>
+                    <a href="/links/" title="链接" target="">链接</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+    <div style="display:none">
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-80669434-1', 'auto');
+        ga('send', 'pageview');
+
+      </script>
+    </div>
+    
+</body>
+</html>
