@@ -11,13 +11,13 @@ script:
 - bundle exec jekyll build
 after_success:
 - ssh root@oo3p.com
-- git clone https://github.com/chinakevinguo/chinakevinguo.github.io.git
-- cd chinakevinguo.github.io
+- git clone https://github.com/chinakevinguo/oo3p.com.git
+- cd oo3p.com.git && rm -rf * &&cp -r ../_site/* .
 - git config user.name "chinakevinguo"
 - git config user.email "chinakevinguo@live.com"
 - git add --all .
 - git commit -m "Travis CI Auto Builder"
-- git push --force https://${JEKYLL_GITHUB_TOKEN}@github.com/chinakevinguo/chinakevinguo.github.io.git
+- git push --force https://${JEKYLL_GITHUB_TOKEN}@github.com/chinakevinguo/oo3p.com.git
 branches:
   only:
   - master
