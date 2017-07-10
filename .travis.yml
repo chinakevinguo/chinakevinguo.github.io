@@ -20,7 +20,7 @@ after_success:
 - git commit -m "Travis CI Auto Builder"
 - git push --force https://${JEKYLL_GITHUB_TOKEN}@github.com/chinakevinguo/oo3p.com.git master
 # - rsync -rv --delete -e 'ssh -o stricthostkeychecking=no -p 22' _site/ root@oo3p.com:/usr/local/src/chinakevinguo.github.io/_sit
-- ssh root@oo3p.com "cd /usr/local/src/chinakevinguo.github.io && git pull && bundle exec jekyll serve -H 0.0.0.0 -P 80 --detach"
+- ssh root@oo3p.com "cd /usr/local/src/chinakevinguo.github.io && sh deploy.sh"
 branches:
   only:
   - master
