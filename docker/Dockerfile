@@ -5,8 +5,7 @@ MAINTAINER KevinGuo <chinakevinguo@live.com>
 ENV TZ 'Asia/Shanghai'
 
 RUN apk upgrade --no-cache && \
-    apk add --no-cache bash tzdata nodejs py-pygments git gcc musl-dev make && \
-    apt-get install ruby-dev && \
+    apk add --no-cache bash tzdata nodejs py-pygments git gcc musl-dev make ruby-dev && \
     git clone https://github.com/chinakevinguo/chinakevinguo.github.io.git /root/chinakevinguo.github.io && \
     cd /root/chinakevinguo.github.io && \
     gem install --no-document bundle && \
