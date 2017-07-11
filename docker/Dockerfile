@@ -6,6 +6,7 @@ ENV TZ 'Asia/Shanghai'
 
 RUN apk upgrade --no-cache && \
     apk add --no-cache bash tzdata nodejs py-pygments git gcc musl-dev make && \
+    sudo apt-get install ruby-dev && \
     git clone https://github.com/chinakevinguo/chinakevinguo.github.io.git /root/chinakevinguo.github.io && \
     cd /root/chinakevinguo.github.io && \
     gem install --no-document bundle && \
