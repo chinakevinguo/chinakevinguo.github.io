@@ -8,7 +8,7 @@ RUN apk upgrade --no-cache && \
     apk add --no-cache bash tzdata nodejs py-pygments git gcc musl-dev make ruby-dev libffi-dev && \
     git clone https://github.com/chinakevinguo/chinakevinguo.github.io.git /root/chinakevinguo.github.io && \
     cd /root/chinakevinguo.github.io && \
-    gem install --no-document bundle ffi && \
+    gem install --no-document bundle ffi native && \
     bundle install && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
