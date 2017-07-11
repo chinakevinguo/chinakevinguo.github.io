@@ -9,6 +9,7 @@ RUN apk upgrade --no-cache && \
     git clone https://github.com/chinakevinguo/chinakevinguo.github.io.git /root/chinakevinguo.github.io && \
     cd /root/chinakevinguo.github.io && \
     gem install --no-document bundle && \
+    bundle install ffi && \
     bundle install && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
