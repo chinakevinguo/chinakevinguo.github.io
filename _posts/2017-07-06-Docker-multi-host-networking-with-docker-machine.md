@@ -6,11 +6,12 @@ description: docker multi-host网络之overlay
 keywords: docker
 ---
 本章主要是通过例子来讲解multi-host network，Docker engine 支持使用`overlay`驱动的网络开箱即用，不像`bridge`网络，`overlay`网络的使用，需要做一些前提准备工作：
+<!--more-->
 * [Docker Engine在swarm模式下运行](https://docs.docker.com/engine/userguide/networking/get-started-overlay/#overlay-networking-and-swarm-mode)
 OR
 * [Docker Engine运行在使用kv存储的集群](https://docs.docker.com/engine/userguide/networking/get-started-overlay/#overlay-networking-with-an-external-key-value-store)
 
-<!--more-->
+
 ## overlay networking and swarm mode
 在[swarm mode](https://docs.docker.com/engine/swarm/swarm-mode/)下运行Docker Engine，你可以在管理节点上创建`overlay`网络
 swarm使`overlay`网络只有在swarm中的service需要时才可用，比如当你创建了一个`overlay`网络时，管理节点会首先将`overlay`同步到其他管理节点，然后当你创建的service使用这个`overlay`网络的时候，`overlay`才会同步到这些service所在的节点。
