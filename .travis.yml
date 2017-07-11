@@ -13,7 +13,7 @@ script:
 - bundle exec jekyll build
 after_success:
 - git clone https://github.com/chinakevinguo/oo3p.com.git
-- cd oo3p.com && rm -rf * &&cp -r ../_site/* .
+- cd oo3p.com && rm -rf * && cp -r ../_site/* .
 - git config user.name "chinakevinguo"
 - git config user.email "chinakevinguo@live.com"
 - git add --all .
