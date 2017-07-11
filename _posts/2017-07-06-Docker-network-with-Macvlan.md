@@ -5,9 +5,13 @@ categories: [docker]
 description: docker muti-host之macvlan
 keywords: docker
 ---
-在这篇文章中，我将向您展示如何使用`macvlan`接口与Docker进行网络连接。使用`macvlan`接口为Docker容器提供一个有趣的网络配置，可能(取决于您的环境)地址与标准Linux网桥配置。`macvlan`接口，如果你不熟悉它们，它们是一个最近才添加到Linux内核的东西，使用户能够添加多个基于MAC地址的逻辑接口到单个物理接口。这些逻辑接口必须位于与关联的物理接口相同的广播域中，换句话说，Docker容器将在与主机相同的网络上(没有iptables规则，没有Linux网桥)，只是直接连接到主机的网络。
+在这篇文章中，我将向您展示如何使用`macvlan`接口与Docker进行网络连接。'
 
 <!--more-->
+
+'使用`macvlan`接口为Docker容器提供一个有趣的网络配置，可能(取决于您的环境)地址与标准Linux网桥配置。`macvlan`接口，如果你不熟悉它们，它们是一个最近才添加到Linux内核的东西，使用户能够添加多个基于MAC地址的逻辑接口到单个物理接口。这些逻辑接口必须位于与关联的物理接口相同的广播域中，换句话说，Docker容器将在与主机相同的网络上(没有iptables规则，没有Linux网桥)，只是直接连接到主机的网络。
+
+
 
 Docker官网的解释是，`macvlan`驱动使Docker用户的使用实例和审查实施硬件化和就绪化，Libnetwork使用户能够完全控制IPv4和IPv6的寻址。Vlan驱动程序就是在此基础上构建，使运营商能够完全控制第二层的vlan tag。
 
