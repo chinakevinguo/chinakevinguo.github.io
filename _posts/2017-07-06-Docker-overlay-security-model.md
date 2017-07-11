@@ -8,7 +8,9 @@ keywords: docker
 
 # Docker swarm mode overlay network security model
 overlay 网络在docker swarm下的安全模式也是开箱即用的。swarm 节点之间通过`gossip`协议来交换overlay 网络信息。节点使用GCM模式下的[AES algorithm](https://en.wikipedia.org/wiki/Galois/Counter_Mode)对通过`gossip`协议来交换的信息进行加密和认证.管理节点每12小时轮询加密key一次
+
 <!--more-->
+
 你还可以加密在overlay网路上运行的容器之间的交换数据，你可以通过使用`--opt`来开启加密：
 ```bash
 $ docker network create --opt encrypted --driver overlay my-multi-host-network
