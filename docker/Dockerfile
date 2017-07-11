@@ -6,7 +6,7 @@ ENV TZ 'Asia/Shanghai'
 
 RUN apk upgrade --no-cache && \
     apk add --no-cache bash tzdata nodejs py-pygments git gcc musl-dev make && \
-    git clone https://github.com/chinakevinguo/chinakevinguo.github.io && \
+    git clone https://github.com/chinakevinguo/chinakevinguo.github.io.git && \
     cd /root/chinakevinguo.github.io && \
     gem install --no-document bundle && \
     bundle install && \
