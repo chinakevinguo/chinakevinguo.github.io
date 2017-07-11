@@ -8,7 +8,9 @@ keywords: docker
 这篇主要解释了怎么绑定你自己的bridge来替换docker默认的bridge，这个默认的bridge网络是在安装docker的时候自动安装的。
 
 > **Note:** docker允许你创建默认bridge网络之外的自定义bridge网络。
+
 <!--more-->
+
 你可以在启动docker之前设定你自己的bridge网络，并使用`-b BRIDGE` or `--bridge=BRIDGE` 来告诉docker使用它。如果已经有偶docker启动并运行，并且使用的是docker0的默认配置，你可以直接创建自定义的bridge网络，并重启docker，或者停止服务之后删除接口
 ```bash
 # 停止docker服务，并删除docker0接口

@@ -7,8 +7,9 @@ keywords: docker
 ---
 # 什么是Docker
 Docker是一个提供开发、传输及运行应用程序的开放平台，Docker能将应用程序和基础架构平台进行分离，以便快速交付，使用Docker，你能用像管理基础架构一样的的方式来管理你的应用程序，通过利用Docker来开发，测试，部署，传输代码，可以显著的提高开发部署的效率。
-Docker使用Google公司推出的Go语言进行开发实现，基于Linux内核的[Control groups](https://zh.wikipedia.org/wiki/Cgroups),[Union file systems](https://en.wikipedia.org/wiki/Union_mount)，[Namespace](https://en.wikipedia.org/wiki/Linux_namespaces)等技术，对进程进行封装隔离，属于操作系统层面的虚拟化技术。由于隔离的进程独立于宿主机和其他被隔离的进程，因此也称其为容器。最初实现是基于LXC，从0.7之后开始去除LXC，转而使用自行开发的libcontainer，从1.11开始，则进一步演进为使用RUNC和containerd
 <!--more-->
+Docker使用Google公司推出的Go语言进行开发实现，基于Linux内核的[Control groups](https://zh.wikipedia.org/wiki/Cgroups),[Union file systems](https://en.wikipedia.org/wiki/Union_mount)，[Namespace](https://en.wikipedia.org/wiki/Linux_namespaces)等技术，对进程进行封装隔离，属于操作系统层面的虚拟化技术。由于隔离的进程独立于宿主机和其他被隔离的进程，因此也称其为容器。最初实现是基于LXC，从0.7之后开始去除LXC，转而使用自行开发的libcontainer，从1.11开始，则进一步演进为使用RUNC和containerd
+
 # Docker Engine
 Docker engine 是一个C/S架构应用程序，包含如下组件，如下图：
 * Docker server daemon

@@ -7,11 +7,11 @@ keywords: docker
 ---
 
 tag 选项指定你该为容器的日志如何命名。默认是容器ID的前12个字符。要覆盖默认值，可指定一个tag选项:
-
+<!--more-->
 ```bash
 $ docker run --log-driver=fluentd --log-opt fluentd-address=myhost.local:24224 --log-opt tag="mailer"
 ```
-<!--more-->
+
 docker支持一些特殊的标记模板，你可以在指定的时候使用
 
 | 标记 | 描述 |

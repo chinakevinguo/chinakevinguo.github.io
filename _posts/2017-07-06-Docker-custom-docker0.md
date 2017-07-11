@@ -7,7 +7,9 @@ keywords: docker
 ---
 本章节主要讲了如何自定义docker默认的bridge网络，这个`bridge`网络是在docker安装的时候，系统默认创建的。
 > **Note:** docker允许创建除了默认`bridge`网络之外的bridge网络
+
 <!--more-->
+
 默认情况下，docker服务器会创建和配置宿主机的docker0接口作为linux内核中的以太网网桥，可以在其他物理或虚拟接口之间来回床底数据包，使其作为单个以太网网络运行。
 docker为 `docker0`配置IP地址，子网掩码和ip范围。主机可以为连接到`docker0`的容器发送和接受数据，并给他一个`MTU`(最大传输单元或最大包长-1500字节)，这些选项都是可以配置在docker的启动配置文件中：
 * `--bip=CIDR` 为docker0配置IP地址

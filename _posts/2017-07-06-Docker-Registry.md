@@ -10,11 +10,11 @@ keywords: docker
 `Private Registry`:私有仓库，自己搭建
 `DockerHub`：由`Docker`维护
 `Docker Trusted Registry`：采购
-
+<!--more-->
 ## 今天我们主要介绍，如何搭建自己的`Private Registry`
 ### Why use it
 官网列了三条，其实就一句话，能够自己管理自己的IMAGE
-<!--more-->
+
 ### Storage
 默认是存储在本地，所有的数据都作为`Docker volume`持久保存在本地主机上，适用于开发和小型部署，还支持其他云存储方式，如S3,Microsoft Azure,OpenStack Swift和Aliyun OSS，如果使用其他的存储方式，用户需要自己编写[Storage API](https://docs.docker.com/registry/storage-drivers/)。
 ### Running a domain registry

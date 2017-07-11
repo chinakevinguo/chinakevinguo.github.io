@@ -8,6 +8,7 @@ keywords: kargo,kubernetes,docker
 
 > 上一篇已经使用kargo搭建了kubernetes高可用集群，这里重点通过剥析kargo生成的配置文件来更加细化的了解下kubernetes，方便后期对kubernetes的自定义。所有的配置文件，我会放到[github](https://github.com/chinakevinguo/kubernetes-custom/tree/master/kubernetes%20%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4%E7%BB%84%E4%BB%B6)上
 
+<!--more-->
 # etcd service
 
 kargo中也将etcd以容器的方式运行，不过不是放在manifest中，而是单独用systemd的方式管理起来，然后通过etcd cluster来实现高可用
@@ -23,7 +24,7 @@ kargo中也将etcd以容器的方式运行，不过不是放在manifest中，而
 /etc/ssl/etcd/openssl.conf # 生成etcd证书所需要的openssl文件
 /usr/local/bin/etcd-scripts/ # 生成etcd证书的脚本文件
 ```
-<!--more-->
+
 ### etcd shell脚本
 
 ```bash

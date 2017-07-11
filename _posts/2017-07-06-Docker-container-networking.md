@@ -7,6 +7,10 @@ keywords: docker
 ---
 # Docker container networking
 
+介绍docker网络常见的集中模式
+
+<!--more-->
+
 ## 默认的网络模式
 这部分主要介绍了Docker Engine本机提供的默认网络特性，描述了默认创建的网络类型，以及如何创建用户自定义网络，同时还描述了在单个主机或集群上创建网络需要哪些资源。
 当你安装Docker的时候，Docker默认安装了三种网络，你可以使用`docker network ls`命令进行查看：
@@ -18,7 +22,7 @@ NETWORK ID          NAME                DRIVER
 9f904ee27bf5        none                null
 cf03ee007fb4        host                host
 ```
-<!--more-->
+
 当运行容器的时候，可以使用`--network`来指定将容器运行在那个网络上
 
 **bridge**网络模式，表示Docker默认安装的docker0网络，除非你通过`--network`进行了指定，否则Docker daemon会将所有容器都连接到docker0网络，你可以使用`ifconfig`命令对docker0网络进行查看：

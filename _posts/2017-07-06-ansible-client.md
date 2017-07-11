@@ -6,6 +6,10 @@ description: ansible客户端配置
 keywords: kargo,kubernetes,docker,ansible
 ---
 
+为kargo kubernetes准备ansible客户端
+
+<!--more-->
+
 1.ansible-client 免密钥登录所有要部署的节点
 ```bash
 $ ssh-keygen -t rsa -P ''
@@ -17,7 +21,6 @@ $ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33
 $ for x in ${ip[*]}; do ssh-copy-id -i ~/.ssh/id_rsa.pub $x; done
 ```
 
-<!--more-->
 2.ansible-client 上安装pip,python,setuptools,最好能先`yum update`一下
 ```bash
 # setuptools安装

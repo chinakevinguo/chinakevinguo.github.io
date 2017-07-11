@@ -10,11 +10,13 @@ keywords: docker
 
 可以在compose文件中引用运行`docker-compose`所在的shell中的环境变量，如：
 
+<!--more-->
+
 ```bash
 web:
   image: "webapp:${TAG}"
 ```
-<!--more-->
+
 # 在容器中设置环境变量
 
 可以在compose文件中的`environment`关键字下设置容器的环境变量，就像使用`docker run -e VARIABLE=VALUE`一样

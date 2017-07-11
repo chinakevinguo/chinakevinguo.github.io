@@ -8,6 +8,7 @@ keywords: kargo,kubernetes,docker
 
 > 捣鼓kubernetes有一段时间了，先后用过`yum`,`kubeadm`,`custom`等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到[漠然](https://mritd.me/)大神的[快速部署kubernetes高可用集群](https://mritd.me/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/)，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。
 
+<!--more-->
 # 一、基础环境
 
 ## 1.准备好要部署的机器
@@ -22,7 +23,7 @@ keywords: kargo,kubernetes,docker
 | 172.30.33.94 | k8s-node02-ingress02 |
 | 192.168.1.1 | ansible-client |
 
-<!--more-->
+
 ## 2.准备部署机器 [ansible-client](http://www.oo3p.com/2017/04/17/ansible-client/)
 
 ## 3.准备所需要镜像,由于被墙，所需镜像可以在百度云去下载，[点击这里](http://pan.baidu.com/s/1i5sUzmH)

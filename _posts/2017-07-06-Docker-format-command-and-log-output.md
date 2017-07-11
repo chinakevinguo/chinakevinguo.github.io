@@ -7,6 +7,7 @@ keywords: docker
 ---
 
 docker 使用[Go template](https://golang.org/pkg/text/template/)来允许用户操作某些命令和日志的输出格式。详细如下：
+<!--more-->
 * [Docker Images formatting](https://docs.docker.com/engine/reference/commandline/images/posts/#formatting)
 * [Docker Inspect formatting](https://docs.docker.com/engine/reference/commandline/inspect/#examples)
 * [Docker Log Tag formatting](https://docs.docker.com/engine/admin/logging/log_tags/)
@@ -15,7 +16,7 @@ docker 使用[Go template](https://golang.org/pkg/text/template/)来允许用户
 * [Docker Volume Inspect formatting](https://docs.docker.com/engine/reference/commandline/volume_inspect/)
 * [Docker Version formatting](https://docs.docker.com/engine/reference/commandline/version/#examples)
 
-<!--more-->
+
 # 函数模板
 Docker提供了一组基本函数来操作模板元素，下面简单举例几个可用函数的完整列表和示例：
 ## Json

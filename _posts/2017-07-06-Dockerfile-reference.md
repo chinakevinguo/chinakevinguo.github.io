@@ -9,6 +9,7 @@ keywords: docker
 
 ## Format
 Dockerfile的指令是不区分大小写的，然而，通常我们约定俗成的都使用大写，为了与Dockerfile中的参数区分开。
+<!--more-->
 ```bash
 #Comment
 INSTRUCTION arguments
@@ -20,7 +21,7 @@ Dockerfile的指令在Dockerfile中按照顺序执行，第一条必须是`FROM`
 #Comment
 RUN echo "we are running some # of cool things"
 ```
-<!--more-->
+
 #### Parser directives
 ```bash
 #指定转义字符是什么，默认情况下的转义字符是反斜杠，但是，有时候，我们需要用转义字符来表示windows里面的文件路径分隔符，那么这个时候，我就需要用别的方式来表示转义字符了

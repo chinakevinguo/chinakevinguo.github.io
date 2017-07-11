@@ -7,12 +7,13 @@ keywords: docker
 ---
 
 这一章，我们构建一个在docker compose上运行的简单python web程序。该应用使用Flask框架并在redis中维护一个命中计数器。
+<!--more-->
 
 # 前提准备
 
 确保你安装了docker engine和docker compose。不需要安装python或redis，这些都由docker image来提供。
 
-<!--more-->
+
 # 步骤1：建立
 
 1.建立项目目录

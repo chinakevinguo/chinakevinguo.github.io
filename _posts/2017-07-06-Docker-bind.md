@@ -8,6 +8,8 @@ keywords: docker
 本章节主要讲解了在Docker默认的`bridge`网络上绑定容器端口，这个`bridge`网络是在docker安装的时候，系统默认创建的。
 > **Note:** docker允许创建除了默认`bridge`网络之外的bridge网络
 
+<!--more-->
+
 默认情况下docker容器可以连接到外网，但是外网不能连接到容器。由于docker服务器在启动的时候会创建主机上的iptables规则，所以每个容器都会有自己的nat规则
 ```bash
 $ iptables -t nat -L -n

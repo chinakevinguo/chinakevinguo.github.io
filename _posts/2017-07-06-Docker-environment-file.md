@@ -6,7 +6,7 @@ description: docker 在文件中声明默认环境变量
 keywords: docker
 ---
 
-compose 支持在名为`.env`的文件中声明默认环境变量，该文件和`docker-compose.yml`文件在同样的目录[即docker-compose命令执行的目录]
+compose 支持在名为`.env`的文件中声明默认环境变量，该文件和`docker-compose.yml`文件在同样的目录 (即docker-compose命令执行的目录)
 
 env文件中的格式是`VAR=VAL`,其中以#开头的为注释，空格也会被忽略。
 

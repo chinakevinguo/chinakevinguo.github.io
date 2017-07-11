@@ -8,6 +8,8 @@ keywords: docker
 Docker 包含多个日志记录机制，来帮助你从运行的容器或服务获取日志信息。这些机制成为日志驱动。
 每一个docker daemon都有一个默认的日志驱动，每个容器都默认都是使用这个日志驱动，除非你自定义了其他的日志驱动。
 
+<!--more-->
+
 # 为docker daemon配置 默认的日志驱动
 要将docker daemon配置为默认的日志驱动程序，请使用`--log-driver=<VALUE>`选项。如果驱动程序有可配置的选项，则可以使用一个或多个`--log-opt<NAME>=<VALUE>`来进行设置。
 如果你没有指定日志驱动，那么默认是`json-file`。因此诸如`docker inspect`等命令输出的内容都是json格式的。
@@ -18,7 +20,7 @@ $ docker info |grep 'Logging Driver'
 
 Logging Driver: json-file
 ```
-<!--more-->
+
 # 为容器配置日志驱动
 当启动容器时，我们可以为容器配置和docker daemon不一样的日志驱动。如果驱动程序有可配置的选项，则可以使用一个或多个`--log-opt<NAME>=<VALUE>`来进行设置。即使容器使用默认的日志驱动，也可以使用不同的配置选项。
 

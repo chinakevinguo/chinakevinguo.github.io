@@ -6,6 +6,7 @@ description: docker network常用命令
 keywords: docker
 ---
 本文提供了几个Docker network和container进行交互的命令的示例。这些命令可通过CLI提供，这些命令是：
+<!--more-->
 * `docker network create`
 * `docker network connect`
 * `docker network ls`
@@ -13,7 +14,7 @@ keywords: docker
 * `docker network disconnect`
 * `docker network inspect`
 
-<!--more-->
+
 虽然不是必须，但是在尝试这些示例之前，你最好先看看[Understanding Docker network](https://docs.docker.com/engine/userguide/networking/).这些例子都是依靠`bridge`网络，因此这些例子都可以马上执行。当然，如果你想要尝试`overlay`网络示例，你最好先看看[Getting started with multi-host networks](https://docs.docker.com/engine/userguide/networking/get-started-overlay/)
 
 # Create networks

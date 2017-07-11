@@ -7,9 +7,9 @@ keywords: docker
 ---
 
 Compose 是一个定义和运行多个docker容器的应用程序的工具。你可以使用compose file来配置你的应用服务。然后，使用单个命令，docker就会根据你的compose配置文件来创建和启动所有的服务。想要了解更多关于compose的特性，可以参考后面的[the list of features](https://docs.docker.com/compose/overview/#features)
-
-compose 非常适用于开发，测试和临时环境以及CI工作流。我们可以在下面的[Common Use Cases](https://docs.docker.com/compose/overview/#common-use-cases)中了解更多。
 <!--more-->
+compose 非常适用于开发，测试和临时环境以及CI工作流。我们可以在下面的[Common Use Cases](https://docs.docker.com/compose/overview/#common-use-cases)中了解更多。
+
 使用compose一般有三步：
 
 1.在`Dockerfile`中定义好你的应用的运行环境

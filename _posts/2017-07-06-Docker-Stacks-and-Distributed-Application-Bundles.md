@@ -10,6 +10,7 @@ keywords: docker
 
 > 这些内容来自[docker/docker repo](https://github.com/docker/docker)的[Docker Stacks and Distributed Application Bundles](https://github.com/docker/docker/blob/v1.12.0-rc4/experimental/docker-stacks-and-bundles.md)
 
+<!--more-->
 # 概述
 docker stacks 和分布式应用程序bundles是在docker 1.12和docker compose 1.8中引入的一个新特性，目前还在实验阶段，同Engine API中的swarm、nodes和service同时进行
 
@@ -24,7 +25,7 @@ Docker Compose --> 分布式应用程序包 --> Docker Stack
 
 从Docker 1.12和compose 1.8开始，这些功能是实验性的。Docker Engine和Docker Registry 都不支持捆绑包的分发。
 
-<!--more-->
+
 # 生成一个捆绑包
 生成捆绑包最简单的方法就是使用docker-compose从docker-compose.yml中生成。当然，这仅仅是一种可能的方式，用同样的方式， docker build不是唯一能生成docker image的方式。
 

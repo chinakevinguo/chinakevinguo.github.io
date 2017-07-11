@@ -7,7 +7,7 @@ keywords: docker
 ---
 
 > 现在看到的是旧版本的独立版的swarm。如果你使用的是docker 1.12或更高的版本，[swarm mode](https://docs.docker.com/engine/swarm/)已经继承到了docker engine中。大多数用户都使用集成的swarm mode。可参考[Getting started with swarm mode](https://docs.docker.com/engine/swarm/swarm-tutorial/)和[Swarm mode CLI commands](https://docs.docker.com/engine/swarm/#swarm-mode-cli-commands)，独立的swarm没有集成到docker engine API和CLI commands中。
-
+<!--more-->
 docker compose和docker swarm旨在实现完全集成，这意味着你可以将一个compose应用程序指向一个swarm集群，并使其全部工作，就像使用单个主机一样。
 
 实际的集成程度取决于你使用的[compose file](https://docs.docker.com/compose/compose-file/#versioning)版本:
@@ -21,7 +21,7 @@ docker compose和docker swarm旨在实现完全集成，这意味着你可以将
 $ eval "$(docker-machine env --swarm <name of swarm master machine>)"
 $ docker-compose up
 ```
-<!--more-->
+
 # 限制
 
 ## 构建images

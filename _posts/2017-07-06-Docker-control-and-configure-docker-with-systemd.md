@@ -8,6 +8,8 @@ keywords: docker
 
 很多linux发行版使用systemd来启动docker daemon。这篇文档主要介绍了几个例子来展示如何自定义docker 的设置。
 
+<!--more-->
+
 # 启动docker daemon
 安装完docker后，你需要启动docker daemon
 ```bash
@@ -21,7 +23,7 @@ $ sudo systemctl enable docker
 # 老版本
 $ sudo chkconfig docker on
 ```
-<!--more-->
+
 # 自定义docker daemon 选项
 有很多种方法为你的docker daemon配置daemon标志和环境变量。
 推荐的方法是使用systemd的插件文件[如[systemd.unit](https://www.freedesktop.org/software/systemd/man/systemd.unit.html)所描述的]。这些插件文件是一些在本地`/etc/systemd/system/docker.service.d`目录下的名为`<something>.conf`文件。

@@ -10,9 +10,11 @@ keywords: docker
 
 从docker1.2开始，[重启策略](https://docs.docker.com/engine/reference/run/#restart-policies-restart)内置在docker中，用于在容器退出时重启容器。如果设置了重启策略，它将在docker daemon启动的时候启用，通常发生在系统启动之后。重启策略将确保链接容器按正确的顺序启动。
 
+<!--more-->
+
 如果重启策略不适合你的环境，你可以使用像[upstart](http://upstart.ubuntu.com/),[systemd](http://freedesktop.org/wiki/Software/systemd/) or [supervisor](http://supervisord.org/)代替
 
-<!--more-->
+
 # 使用进程管理器
 
 docker 默认不会设定任何重启策略，因为它们与大多数进程管理器冲突，所以如果你正在使用进程管理器，请不要设置新的重启策略。

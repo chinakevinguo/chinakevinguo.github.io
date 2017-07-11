@@ -6,6 +6,11 @@ description: docker常用命令
 keywords: docker
 ---
 ### Docker Command
+
+介绍一些docker常用的命令
+
+<!--more-->
+
 #### Docker container management
 ```bash
 #运行容器
@@ -28,7 +33,7 @@ $ docker run -d -p 80:5000 trainning/webapp python app.py
 $ docker run ubuntu /bin/echo "Hello world"
 $ docker run -ti ubuntu /bin/bash
 ```
-<!--more-->
+
 ```bash
 #启动容器，可同时启动多个容器
 docker start [OPTIONS] CONTAINER [CONTAINER...]
