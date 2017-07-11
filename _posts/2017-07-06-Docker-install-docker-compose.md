@@ -7,8 +7,10 @@ keywords: docker
 ---
 
 你可以在macOS，windows 和64位的linux系统上运行compose。在安装它之前，你需要先安装docker。
-步骤如下：
+
 <!--more-->
+
+步骤如下：
 1.安装docker engine
 2.docker toolbox安装包括了docker engine和compose，因此Mac和windows已经安装好了。其他系统需要进入下一步
 3.进入[compose repository release page on Github](https://github.com/docker/compose/releases)
