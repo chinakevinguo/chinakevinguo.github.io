@@ -18,7 +18,7 @@ after_success:
 - git add --all .
 - git commit -m "Travis CI Auto Builder"
 - git push --force https://${JEKYLL_GITHUB_TOKEN}@github.com/chinakevinguo/kevinguo.me.git master
-- ssh root@kevinguo.me "docker restart chinakevinguo_jekyll_me"
+- ssh root@kevinguo.me "docker restart chinakevinguo_jekyll_kevinguo_me"
 branches:
   only:
   - master
