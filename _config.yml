@@ -2,7 +2,7 @@
 #   Main Configs   #
 # ---------------- #
 baseurl:
-url: http://oo3p.com
+url: https://kevinguo.me
 date_format: "ordinal"
 title: KevinGuo
 subtitle: "Just do it now !"
@@ -89,7 +89,7 @@ comments_provider: disqus
 # !!!Important!!! Please modify infos below to yours
 # https://disqus.com
 disqus:
-    username: oo3p
+    username: kevinguo
 # https://gentie.163.com
 #netease_gentie:
 #    productKey: 560ed243b708465d82d5a0a5f3b83da1
