@@ -2,7 +2,7 @@
 #   Main Configs   #
 # ---------------- #
 baseurl:
-url: https://oo3p.com
+url: http://oo3p.com
 date_format: "ordinal"
 title: KevinGuo
 subtitle: "Just do it now !"
