@@ -14,7 +14,7 @@ keywords: jekyll,travis
 
 我们都知道通过jekyll搭建博客最终都是将通过`jekyll build`生成的`_site`下的静态文件发布出去，那么我们是不是可以直接采用 `nginx` + `静态文件`的方式来发布呢，当然是可以的
 
-准备两个站点仓库
+#### 准备两个站点仓库
 
 - 主站点Github (保存静态文件)
 - 镜像站点Github (触发 travis ，生成静态文件)
@@ -30,7 +30,7 @@ keywords: jekyll,travis
 
 [Travis](https://travis-ci.org/) 是啥？ 就是个类似jenkins的东西. [Jenkins](https://jenkins.io/) 是啥？ 就是个类似Travis的东西.
 
-#### 1.构建所需docker镜像
+#### 构建所需docker镜像
 
 既然博客是通过 docker 化部署，采用`nginx` + `静态文件` 的方式发布，那么我们第一步就是要构建我们博客所需的镜像，`Dockerfile` 内容如下
 
@@ -78,7 +78,7 @@ docker run -d --name chinakevinguo_jekyll_kevinguo_me --restart=always -p 80:80 
 ```
 下一步就是 `静态文件` 了
 
-#### 2.静态文件的自动更新
+#### 静态文件的自动更新
 
 通过上面 `Dockerfile` 文件中的内容，你会发现，我是将 `kevinguo.me.git`下的内容clone到 `/usr/share/nginx/html`，也就是说，我实际上是发布的 `kevinguo.me.git` 下的静态文件，那么 `kevinguo.me.git` 下面的内容又是怎么来的呢
 
@@ -96,7 +96,7 @@ docker run -d --name chinakevinguo_jekyll_kevinguo_me --restart=always -p 80:80 
 
 3.Travis CI push静态文件到Github 通过 Github的token实现授权配置，准备 Github上的token
 
-**注意：** 这里的`token`，复制之后，最好自己保存好哟，因为只显示一次，如果丢失只能再次生成了
+**注意： 这里的`token`，复制之后，最好自己保存好哟，因为只显示一次，如果丢失只能再次生成了**
 
 ![github-token.png](/images/posts/github-token.png)
 

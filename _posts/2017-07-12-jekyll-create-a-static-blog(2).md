@@ -26,7 +26,7 @@ disqus 是一家第三方社会化评论系统，主要为网站主提供评论�
 
 4.修改你的`_config.yml`文件中的 `comments_provider` 和 `username`
 
-**重要：** 这里的`username`，实际上是 disqus 中的shortname
+**重要： 这里的`username`，实际上是 disqus 中的shortname**
 
 ```bash
 comments_provider: disqus
@@ -54,7 +54,7 @@ cloudflare 主要是为客户提供网站安全管理，性能优化等，比如
 
 4.扫描完成后，会看到 DNS 记录，自行添加(其中彩色的云朵表示开启SSL，否则就只是DNS)
 
-**注意** 如果你的A记录启用的SSL，那么所有关于这个A记录的请求都会转发给 Cloudflare，然后通过 Cloudflare再转发到你的服务器，所以这个时候，你通过 `nslookup kevinguo.me` 的时候解析出来的地址，并不是你的服务器地址，而是 Cloudflare的地址;如果你有其他服务(诸如VPS,FTP等)使用的是这个地址的话，最好是再添加一条不走SSL的A记录
+**注意 如果你的A记录启用的SSL，那么所有关于这个A记录的请求都会转发给 Cloudflare，然后通过 Cloudflare再转发到你的服务器，所以这个时候，你通过 `nslookup kevinguo.me` 的时候解析出来的地址，并不是你的服务器地址，而是 Cloudflare的地址;如果你有其他服务(诸如VPS,FTP等)使用的是这个地址的话，最好是再添加一条不走SSL的A记录**
 
 ![cloudflare-dns](/images/posts/cloudflare-dns.png)
 
