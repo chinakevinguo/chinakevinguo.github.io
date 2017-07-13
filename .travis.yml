@@ -1,4 +1,5 @@
 language: ruby
+sudo: false
 rvm:
 - 2.3.3
 before_install:
@@ -8,8 +9,10 @@ install:
   - gem install jekyll
   - gem install html-proofer
 script:
+- bundle exec rspec
 - bundle install
 - bundle exec jekyll build
+dist: precise
 after_success:
 - git clone https://github.com/chinakevinguo/kevinguo.me.git
 - cd kevinguo.me && rm -rf * && cp -r ../_site/* .
