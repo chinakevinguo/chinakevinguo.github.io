@@ -11,7 +11,7 @@ keywords: jekyll,travis
 <!--more-->
 ### 前提
 
-首先记得将 cloudflare 上有关你的站点的https配置删掉，如果没有做过，则忽略
+首先记得将 cloudflare 上有关你的站点的https配置删掉，如果没有做过，则忽略，同时记得去你的 DNS 控制器上将你的域名解析改为默认
 
 ### 搭建过程
 
