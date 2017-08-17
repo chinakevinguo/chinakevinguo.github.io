@@ -124,6 +124,9 @@ travis login --auto
 
 # 在.travis.yml同级目录下执行，此处的--add参数表示自动添加脚本到.travis.yml文件中
 travis encrypt-file ~/.ssh/id_rsa --add
+
+# 在服务器上执行ssh-copy-id操作，实现ssh连接的时候免密钥登陆
+ssh-copy-id root@kevinguo.me
 ```
 
 执行完成后会发现`travis`网站项目里的环境变量多了两个参数
