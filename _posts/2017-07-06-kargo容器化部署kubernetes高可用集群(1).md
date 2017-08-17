@@ -1,15 +1,18 @@
 ---
 layout: post
-title: kargo容器化部署kubernetes高可用集群(1)
+title: kubespray容器化部署kubernetes高可用集群(1)
 categories: [kubernetes, docker]
-description: kargo容器化部署kubernetes高可用集群
-keywords: kargo,kubernetes,docker
+description: kubespray容器化部署kubernetes高可用集群
+keywords: kubespray,kubernetes,docker
 ---
 
-> 捣鼓kubernetes有一段时间了，先后用过`yum`,`kubeadm`,`custom`等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到[漠然](https://mritd.me/)大神的[快速部署kubernetes高可用集群](https://mritd.me/2017/03/03/set-up-kubernetes-ha-cluster-by-kargo/)，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。
+> 捣鼓kubernetes有一段时间了，先后用过`yum`,`kubeadm`,`custom`等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到[漠然](https://mritd.me/)大神的[快速部署kubernetes高可用集群](https://mritd.me/2017/03/03/set-up-kubernetes-ha-cluster-by-kubespray/)，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。
 
 <!--more-->
 # 一、基础环境
+
+* docker版本1.12.6
+* CentOS 7
 
 ## 1.准备好要部署的机器
 
@@ -21,7 +24,7 @@ keywords: kargo,kubernetes,docker
 | 172.30.33.92 | k8s-master03-etcd03 |
 | 172.30.33.93 | k8s-node01-ingress01 |
 | 172.30.33.94 | k8s-node02-ingress02 |
-| 192.168.1.1 | ansible-client |
+| 172.30.33.31 | ansible-client |
 
 
 ## 2.准备部署机器 [ansible-client](https://kevinguo.me/2017/07/06/ansible-client/)
@@ -30,48 +33,52 @@ keywords: kargo,kubernetes,docker
 
 | IMAGE | VERSION |
 | :--- | :--- |
-| quay.io/coreos/hyperkube| v1.6.1_coreos.0 |
-| quay.io/coreos/etcd | v3.1.5 |
-| calico/ctl | v1.1.0-rc8 |
-| calico/node | v1.1.0-rc8 |
-| calico/cni | v1.5.6 |
-| gcr.io/google_containers/kubernetes-dashboard-amd64 | v1.6.0 |
-| gcr.io/google_containers/nginx-ingress-controller | 0.9.0-beta.3 |
-| gcr.io/google_containers/defaultbackend | 1.0 |
+| quay.io/coreos/hyperkube| v1.6.7_coreos.0 |
+| quay.io/coreos/etcd | v3.1.10 |
+| calico/ctl | v1.1.3 |
+| calico/node | v2.4.1 |
+| calico/cni | v1.10.0 |
+| calico/kube-policy-controller | v0.7.0 |
+| quay.io/calico/routereflector | v0.3.0 |
+| gcr.io/google_containers/kubernetes-dashboard-amd64 | v1.6.3 |
+| gcr.io/google_containers/nginx-ingress-controller | 0.9.0-beta.11 |
+| gcr.io/google_containers/defaultbackend | 1.3 |
 | gcr.io/google_containers/cluster-proportional-autoscaler-amd64 | 1.1.1 |
 | gcr.io/google_containers/fluentd-elasticsearch | 1.22 |
 | gcr.io/google_containers/kibana | v4.6.1 |
 | gcr.io/google_containers/elasticsearch | v2.4.1 |
-| gcr.io/google_containers/kubedns-amd64 | 1.9 |
-| gcr.io/google_containers/kube-dnsmasq-amd64 | 1.3 |
-| gcr.io/google_containers/exechealthz-amd64 | 1.1 |
+| gcr.io/google_containers/k8s-dns-sidecar-amd64 | 1.14.4 |
+| gcr.io/google_containers/k8s-dns-kube-dns-amd64 | 1.14.4 |
+| gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64 | 1.14.4 |
 | andyshinn/dnsmasq | 2.72 |
 | nginx | 1.11.4-alpine |
-| gcr.io/google_containers/heapster-grafana-amd64 | v4.0.2 |
-| gcr.io/google_containers/heapster-amd64 | v1.3.0-beta.1 |
+| gcr.io/google_containers/heapster-grafana-amd64 | v4.4.1 |
+| gcr.io/google_containers/heapster-amd64 | v1.4.0 |
 | gcr.io/google_containers/heapster-influxdb-amd64 | v1.1.1 |
 | gcr.io/google_containers/pause-amd64 | 3.0 |
+| lachlanevenson/k8s-helm | v2.2.2 |
+| gcr.io/kubernetes-helm/tiller | v2.2.2 |
 
 ## 4.load所有下载的镜像
 ```bash
 # 在ansible-client上操作
-$ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
-$ for i in ${ip[*]}; do scp -r kargo_images_v1.6.1 $i:~/; done
+$ IP=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
+$ for i in ${IP[*]}; do scp -r kubespray_images_v1.6.7 $i:~/; done
 # 对所有要部署的节点操作
-$ images=$(ls -l ~/kargo_images_v1.6.1|awk -F' ' '{ print $9 }')
-$ for x in ${images[*]}; do docker load -i $x; done
+$ IMAGES=$(ls -l ~/kubespray_images_v1.6.7|awk -F' ' '{ print $9 }')
+$ for x in ${images[*]}; do docker load -i kubespray_images_v1.6.7/$x; done
 ```
 # 二、搭建集群
 
-## 1.获取kargo源码
+## 1.获取kubespray源码
 ```bash
-$ git clone https://github.com/kubernetes-incubator/kargo.git
+$ git clone https://github.com/kubernetes-incubator/kubespray.git
 ```
 
 ## 2.编辑配置文件
 
 ``` sh
-$ vim ~/kargo/inventory/group_vars/k8s-cluster.yml
+$ vim ~/kubespray/inventory/group_vars/k8s-cluster.yml
 
 ---
 # 启动集群的基础系统,支持ubuntu, coreos, centos, none
@@ -108,7 +115,7 @@ kube_users_dir: "{ { kube_config_dir } }/users"
 kube_api_anonymous_auth: false
 
 ## kubernetes使用版本
-kube_version: v1.6.1
+kube_version: v1.6.7
 
 # 安装过程中缓存文件下载位置(最少1G)
 local_release_dir: "/tmp/releases"
@@ -218,8 +225,8 @@ helm_enabled: false
 ```bash
 # 定义集群IP
 $ IP=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
-# 利用kargo自带的python脚本生成配置
-$ CONFIG_FILE=~/kargo/inventory/inventory.cfg python3 ~/kargo/contrib/inventory_builder/inventory.py ${ IP[*] }
+# 利用kubespray自带的python脚本生成配置
+$ CONFIG_FILE=~/kubespray/inventory/inventory.cfg python3 ~/kubespray/contrib/inventory_builder/inventory.py ${ IP[*] }
 
 ```
 
@@ -261,7 +268,7 @@ kube-master
 
 修改docker配置,将下面关于docker安装的部分全部注释掉
 ```bash
-vim ~/kargo/roles/docker/tasks/main.yml
+vim ~/kubespray/roles/docker/tasks/main.yml
 
 # - name: ensure docker repository public key is installed
 #  action: "{ { docker_repo_key_info.pkg_key } }"
@@ -304,11 +311,14 @@ vim ~/kargo/roles/docker/tasks/main.yml
 #  notify: restart docker
 #  when: not (ansible_os_family in ["CoreOS", "Container Linux by CoreOS"] or is_atomic) and (docker_package_info.pkgs|length > 0)
 
+# 如果你是自己安装的docker,记得将这段注释掉,除非你觉得template中的docker.service你能用
+#- name: Set docker systemd config
+#  include: systemd.yml
 ```
 
 修改efk配置，注释掉`KIBANA_BASE_URL`这段，否则后面你搭建efk之后，无法访问kibana
 ```bash
-vim ~/kargo/roles/kubernetes-apps/efk/kibana/templates/kibana-deployment.yml.j2
+vim ~/kubespray/roles/kubernetes-apps/efk/kibana/templates/kibana-deployment.yml.j2
 
 #          - name: "KIBANA_BASE_URL"
 #            value: "{ { kibana_base_url } }"
@@ -317,15 +327,29 @@ vim ~/kargo/roles/kubernetes-apps/efk/kibana/templates/kibana-deployment.yml.j2
 
 修改download配置，更改etcd和kubedns版本
 
+**1.6.7版本中,为了使用更高版本的calico node,我自己多添加了一个变量`calico_node_version`**
+
 ```bash
-vim ~/kargo/roles/download/defaults/main.yml
-etcd_version: v3.1.5
-kubedns_version: 1.9
+vim ~/kubespray/roles/download/defaults/main.yml
+etcd_version: v3.1.10
+calico_node_version: "v2.4.1"
+kubedns_version: 1.14.4
+calico_policy_version: "v0.7.0"
 ```
 
-## 6.在ansible-client上一键部署
+**注意: 如果你修改了kubedns_version版本，那么也需要修改/root/kubespray/roles/kubernetes-apps/ansible/defaults/main.yml文件中的kubedns_version版本**
+
+## (可选)6.修改docker.service
+
 ```bash
-$ ansible-playbook -i ~/kargo/inventory/inventory.cfg cluster.yml -b -v --private-key=~/.ssh/id_rsa
+# 如果你的docker.service中没有MountFlags则不需要这一步
+# 注释掉/usr/lib/systemd/system/docker.service 中的MountFlags=slave
+```
+
+## 7.在ansible-client上一键部署
+
+```bash
+$ ansible-playbook -i ~/kubespray/inventory/inventory.cfg cluster.yml -b -v --private-key=~/.ssh/id_rsa
 ```
 
 部署成功后如下

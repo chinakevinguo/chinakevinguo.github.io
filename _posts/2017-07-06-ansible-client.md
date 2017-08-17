@@ -16,9 +16,9 @@ $ ssh-keygen -t rsa -P ''
 ```
 2.将ansible-client上的id_rsa.pub复制到其他所有节点
 ```bash
-$ ip=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
+$ IP=(172.30.33.89 172.30.33.90 172.30.33.91 172.30.33.92 172.30.33.93 172.30.33.94)
 
-$ for x in ${ip[*]}; do ssh-copy-id -i ~/.ssh/id_rsa.pub $x; done
+$ for x in ${IP[*]}; do ssh-copy-id -i ~/.ssh/id_rsa.pub $x; done
 ```
 
 2.ansible-client 上安装pip,python,setuptools,最好能先`yum update`一下
@@ -35,6 +35,6 @@ $ python setup.py install
 
 3.ansible安装
 ```bash
-$ yum install pycrypto python2-cryptography -y
+$ yum install pycrypto python2-cryptography python-netaddr epel-release python-pip python34 python34-pip -y
 $ pip install ansible
 ```
