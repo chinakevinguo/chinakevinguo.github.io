@@ -73,6 +73,12 @@ IMPORTANT NOTES:
    Donating to EFF:                    https://eff.org/donate-le
 ```
 
+然后生成`dhparam`证书，可能会花费一段时间
+
+```bash
+openssl dhparam -out /etc/letsencrypt/live/kevinguo.me/dhparam.pem 2048
+```
+
 5.配置你的 nginx
 
 nginx 的配置尽量模块化，这里通过 nginx 作为代理，访问后端的 docker 容器
