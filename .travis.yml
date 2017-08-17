@@ -20,7 +20,7 @@ after_success:
 - git commit -m "Travis CI Auto Builder"
 - git push --force https://${JEKYLL_GITHUB_TOKEN}@github.com/chinakevinguo/kevinguo.me.git
   master
-- ssh root@163.44.165.142 "docker restart chinakevinguo_jekyll_kevinguo_me"
+- ssh root@kevinguo.me "docker restart chinakevinguo_jekyll_kevinguo_me"
 branches:
   only:
   - master
@@ -28,4 +28,4 @@ env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 addons:
-  ssh_known_hosts: 163.44.165.142
+  ssh_known_hosts: kevinguo.me
