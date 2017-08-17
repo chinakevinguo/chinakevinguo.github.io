@@ -3,8 +3,7 @@ rvm:
 - 2.3.3
 sudo: false
 before_install:
-- openssl aes-256-cbc -K $encrypted_12c88460d9e3_key -iv $encrypted_12c88460d9e3_iv
-  -in id_rsa.enc -out ~/.ssh/id_rsa -d
+- openssl aes-256-cbc -K $encrypted_12c88460d9e3_key -iv $encrypted_12c88460d9e3_iv -in id_rsa.enc -out ~/.ssh/id_rsa -d
 - chmod 600 ~/.ssh/id_rsa
 script:
 - bundle install
