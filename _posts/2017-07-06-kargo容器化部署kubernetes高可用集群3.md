@@ -172,7 +172,7 @@ Ingress Controller 实质上可以理解为一个监视器，Ingress Controller 
 下面的图说明一切问题
 ![](/images/posts/Ingress.png)
 
-**注意** 如果你进入 Ingress Controller里面看过它的 nginx 配置，你会发现实际上，Ingress是直接将请求转发到了服务的 endpoint IP，并没有转发给 Service Cluster IP，据说是为了提高性能，那么这个 Service Cluster IP 存在的意义在哪呢，如果你也在问这个问题，那么你得重新学习下 Service Cluster IP在 kubernetes 集群中的作用了
+**注意：** 如果你进入 Ingress Controller里面看过它的 nginx 配置，你会发现实际上，Ingress是直接将请求转发到了服务的 endpoint IP，并没有转发给 Service Cluster IP，据说是为了提高性能，那么这个 Service Cluster IP 存在的意义在哪呢，如果你也在问这个问题，那么你得重新学习下 Service Cluster IP在 kubernetes 集群中的作用了
 
 这里简单说一下，Cluster IP是kubernetes 集群中的一个虚拟IP，仅仅是为了方便集群内部通信和服务发现的
 
@@ -193,7 +193,7 @@ kubectl label node k8s-node02 role=frontal
 
 3.进入ingress的`examples/daemonset/nginx`目录，修改yml文件
 
-**注意：官方给出的 daemonset 版本的yml文件中，没有绑定宿主机的80端口，也就是说前端 Nginx 没有监听宿主机的80端口（尚且不知为何），所以需要自己加一下`hostNetwork`；同时因为我是将ingress部署到我指定的前端，所以还需要加上`nodeSelector`,截图如下**
+**注意：官方给出的 daemonset 版本的yml文件中，没有绑定宿主机的80端口，也就是说前端 Nginx 没有监听宿主机的80端口（尚且不知为何），所以需要自己加一下`hostNetwork`；同时因为我是将ingress部署到我指定的前端，所以还需要在文件末尾加上`nodeSelector`,截图如下**
 
 ![](/images/posts/ingress-daemonset.png)
 
@@ -261,7 +261,7 @@ spec:
 
 elasticsearch-ingress.yml
 
-```yml
+```yaml
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -277,6 +277,17 @@ spec:
           servicePort: 9200
         path: /
 ```
+
+执行创建
+
+```bash
+kubectl create -f elasticsearch-ingress.yml
+kubectl create -f dashboard-ingress.yml
+kubectl create -f kibana-ingress.yml
+```
+
+创建完成后，我们来看看据诶过如何呢
+
 Dashboard and heapster
 ![](/images/posts/dashboard-heapster.png)
 
