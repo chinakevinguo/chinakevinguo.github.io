@@ -1,6 +1,6 @@
 ---
 layout: post
-title: kargo容器化部署kubernetes高可用集群(2)
+title: kubespray容器化部署kubernetes高可用集群(2)
 categories: [kubernetes, docker]
 description: kargo容器化部署kubernetes高可用集群
 keywords: kargo,kubernetes,docker
