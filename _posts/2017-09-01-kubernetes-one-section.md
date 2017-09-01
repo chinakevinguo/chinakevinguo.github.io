@@ -651,3 +651,120 @@ spec:
 
 consul：这个具体还没实施过，大致意思就是，容器启动时注册自己的ip+port到consul，然后consul自己做健康检查，最终将其发往fabio，fabio是个大路由，前端统一反代到fabio。
 etcd：大体实现方式，就是写脚本通过etcd的api注册服务，然后再写一个service discover的脚本循环查询注册进去的service，对比template中的内容，然后生成新的配置文件进行更新。
+
+#### kubernetes service 暴露
+
+目前kubernetes service 暴露的方式有如下几种
+
+* ClusterIP 只提供kubernetes集群内部的服务发现
+* NodePort 在每个节点上提供端口暴露服务
+* LoadBlancer 只能在云平台上使用，使用云平台提供的LB来暴露服务
+* ExternalName 与另一个域名绑定，通过该service访问另一个服务
+* ingress/traefik 使用第三方插件将pod暴露出来
+
+而无论是ClusterIP 还是 NodePort 都是通过kube-proxy来对service进行实现的，而kube-proxy又有两种方式来实现负载，userspace和iptables，下面我来说一下kubernetes默认的iptables方式的kube-proxy
+
+首先，我们来新建一个NodePort类型的服务
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myweb-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    nodePort: 30001
+  selector:
+    app: myweb         
+```
+
+myweb-service 代理了后端的一个pod，ip为10.233.88.53，看看iptables
+
+下面来逐条分析
+
+如果是通过node的30001来访问，则会进入如下的链
+
+```bash
+# 看看和NodePort  30001有关的iptables
+
+$ iptables -S -t nat |grep 30001
+-A KUBE-NODEPORTS -p tcp -m comment --comment "default/myweb-service:" -m tcp --dport 30001 -j KUBE-MARK-MASQ
+-A KUBE-NODEPORTS -p tcp -m comment --comment "default/myweb-service:" -m tcp --dport 30001 -j KUBE-SVC-KINM4OXG42E5QTAT
+```
+
+然后进一步跳转到`KUBE-SVC-KINM4OXG42E5QTAT`的链
+
+```bash
+-A KUBE-SVC-KINM4OXG42E5QTAT -m comment --comment "default/myweb-service:" -j KUBE-SEP-I4OJ7A6SXM5YG2QP
+```
+
+然后会跳转到`KUBE-SEP-I4OJ7A6SXM5YG2QP`链，最终将请求转发到10.233.88.53的pod上
+
+```bash
+-A KUBE-SEP-I4OJ7A6SXM5YG2QP -p tcp -m comment --comment "default/myweb-service:" -m tcp -j DNAT --to-destination 10.233.88.53:8080
+```
+
+> **注意：如果service代理了多个pod的话，会利用iptables的--probability特性，按一定的比例转发，如下**
+
+假若我们的myweb-service代理了3个pod
+
+如果是通过node的30001来访问，则会进入如下的链
+
+```bash
+# 看看和NodePort  30001有关的iptables
+
+$ iptables -S -t nat |grep 30001
+-A KUBE-NODEPORTS -p tcp -m comment --comment "default/myweb-service:" -m tcp --dport 30001 -j KUBE-MARK-MASQ
+-A KUBE-NODEPORTS -p tcp -m comment --comment "default/myweb-service:" -m tcp --dport 30001 -j KUBE-SVC-KINM4OXG42E5QTAT
+```
+
+然后进一步跳转到`KUBE-SEP-5I5KUCBAI2CKFMN2`、`KUBE-SEP-I4OJ7A6SXM5YG2QP`、`KUBE-SEP-FDQHGZ7N6PHRDJRL`的链
+
+```bash
+# 有分为30%，50%，20%的几率
+-A KUBE-SVC-KINM4OXG42E5QTAT -m comment --comment "default/myweb-service:" -m statistic --mode random --probability 0.33332999982 -j KUBE-SEP-5I5KUCBAI2CKFMN2
+
+-A KUBE-SVC-KINM4OXG42E5QTAT -m comment --comment "default/myweb-service:" -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-I4OJ7A6SXM5YG2QP
+
+-A KUBE-SVC-KINM4OXG42E5QTAT -m comment --comment "default/myweb-service:" -j KUBE-SEP-FDQHGZ7N6PHRDJRL
+```
+
+然后会分别跳到上面每个链下对应的链，最终转发到对应的pod上
+
+```bash
+# KUBE-SEP-5I5KUCBAI2CKFMN2
+-A KUBE-SEP-5I5KUCBAI2CKFMN2 -p tcp -m comment --comment "default/myweb-service:" -m tcp -j DNAT --to-destination 10.233.87.108:8080
+
+# KUBE-SEP-I4OJ7A6SXM5YG2QP
+-A KUBE-SEP-I4OJ7A6SXM5YG2QP -p tcp -m comment --comment "default/myweb-service:" -m tcp -j DNAT --to-destination 10.233.88.53:8080
+
+# KUBE-SEP-FDQHGZ7N6PHRDJRL
+-A KUBE-SEP-FDQHGZ7N6PHRDJRL -p tcp -m comment --comment "default/myweb-service:" -m tcp -j DNAT --to-destination 10.233.96.254:8080
+```
+
+好了，说完了NodePort，然后我们再说ClusterIP
+
+继续从上面看到尾就行了。
+
+ingress和traefik留到后面单独留个篇幅来说吧，这里就不说了。
+
+### Volume
+
+kubernetes 的volume要说的内容就很多了。
+
+首先volume是一个在pod中能被多个容器访问的共享目录，它是定义在pod上，然后挂载到容器下，而且它的生命周期只和pod有关。常见的存储类型有如下几种
+
+* emptyDir
+* hostPath
+* Persistent Volume(GCE Persistent Disks、NFS、RBD、ISCSCI、AWS ElasticBlockStore、GlusterFS)，这就设计到分布式存储和外部存储的一些操作了，后续再讲吧 (这些内容前面好像提到过？？？)
+
+#### emptyDir
+#### hostPath
+#### persistent volume
+
+
+### Namespace
+
+### Annotation
