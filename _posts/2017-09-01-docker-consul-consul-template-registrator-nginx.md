@@ -128,4 +128,4 @@ Hello World from node3----
 
 ### Conclusion
 
-文章写的比较简单，其实就是通过一个简单的实验，了解了下consul的服务注册，服务发现，以及如何使用consul-template来动态的生成对应的配置文件，如果你对这个有兴趣的，可以去[consul官网](https://www.consul.io/)了解更多
+文章写的比较简单，其实就是通过一个简单的实验，了解了下consul的服务注册，服务发现，以及如何使用consul-template来动态的生成对应的配置文件，而关于服务注册，我们使用的是registrator，也许你的项目需要调用consul的HTTP API来注册也说不定，具体你可以去[consul官网](https://www.consul.io/)了解更多。
