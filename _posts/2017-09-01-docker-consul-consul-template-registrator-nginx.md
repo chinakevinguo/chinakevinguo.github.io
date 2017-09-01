@@ -60,7 +60,7 @@ docker build -t docker-consul .
 启动nginx
 
 ```bash
-docker run -p 8080:80 -d --name nginx -e CONSUL_URL=163.44.165.142:8500 --volume ~/docker-consul/service.ctmpl:/templates/service.ctmpl  nginx-consul
+docker run -p 8080:80 -d --name nginx -e CONSUL_URL=$HOST_IP:8500 --volume ~/docker-consul/service.ctmpl:/templates/service.ctmpl  nginx-consul
 ```
 
 ### 启动一些服务实例
@@ -108,7 +108,7 @@ server {
 我们发现我们的python-micro-service 服务目前有4个，而且当我们通过如下命令访问的时候，也是4个轮询着被访问
 
 ```bash
-$ while true; do curl 163.44.165.142:8080; echo ----; sleep 1; done;
+$ while true; do curl $HOST_IP:8080; echo ----; sleep 1; done;
 Hello World from node4----
 Hello World from node1----
 Hello World from node2----
@@ -120,7 +120,7 @@ Hello World from node3----
 ![](/images/posts/consul-ui-service.png)
 
 ```bash
-$ while true; do curl 163.44.165.142:8080; echo ----; sleep 1; done;
+$ while true; do curl $HOST_IP:8080; echo ----; sleep 1; done;
 Hello World from node1----
 Hello World from node2----
 Hello World from node3----
