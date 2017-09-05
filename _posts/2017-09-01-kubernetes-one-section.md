@@ -758,13 +758,502 @@ kubernetes 的volume要说的内容就很多了。
 
 * emptyDir
 * hostPath
-* Persistent Volume(GCE Persistent Disks、NFS、RBD、ISCSCI、AWS ElasticBlockStore、GlusterFS)，这就设计到分布式存储和外部存储的一些操作了，后续再讲吧 (这些内容前面好像提到过？？？)
+* GCE Persistent Disks
+* NFS
+* RBD
+* ISCSCI
+* AWS ElasticBlockStore
+* GlusterFS
+* secret
+* PersistentVolume
+* downwardAPI
+* projected
+* configmap
+* local
+
+**注意：gitRepo实际上也是挂载一个空目录，从GIT仓库中clone内容下来供pod使用，所以它的数据也无法永久保存**
 
 #### emptyDir
+
+正如它的名字一样，这是一个空的目录，它是在Pod被分配到node节点上的时候被创建的，无需在宿主机node上指定对应的目录文件。而且当pod从节点上被删除之后，emptyDir中的数据也会被删除，emptyDir 一般用在如下几个地方
+
+* 暂存空间，例如用于基于磁盘的归并排序或长计算的检查点的暂存空间
+* 临时目录，临时储存那些无需持久化的数据
+
+默认情况下，`emptyDir` 数据存储在SSD或者网络存储上。但是，你也可以设置`emptyDir.medium`为`Memory`来启用`tmpfs`,tmpfs会将数据写入到内存中，因此，当机器重启之后，数据也会永久删除，并且，因为是存放在内存中，这些数据会占用你容器内存的limit指标。
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx
+    name: test-container
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir:
+      medium: Memory
+```
+
+#### secret
+
+secret volume 使用来传递敏感信息，比如说密码之类的。我们可以将在kubernetes中定义的secret直接挂载为文件让pod访问。secret volume实际是通过tmpfs(内存文件系统)来实现的，所以这些信息不会持久保存。
+
+#### downwardAPI
+
+如果你想将pod或container里面的字段暴露给其他正在运行的容器，那么downwardAPI正是你所需要的，它会将pod或container里面的字段以文件的形式存储下来，然后挂载到对应的容器中。
+
+目前能暴露的字段
+* node's name
+* pod's name
+* pod's namespace
+* pod's ip
+* pod's serviceAccount name
+* pod's UID
+* pod's labels
+* pod's annotations
+* 容器 CPU limit
+* 容器 CPU request
+* 容器 memory limit
+* 容器 memory request
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kubernetes-downwardapi-volume-example
+  labels:
+    zone: us-est-coast
+    cluster: test-cluster1
+    rack: rack-22
+  annotations:
+    build: two
+    builder: john-doe
+spec:
+  containers:
+    - name: client-container
+      image: gcr.io/google_containers/busybox
+      command: ["sh", "-c"]
+      args:
+      - while true; do
+          if [[ -e /etc/labels ]]; then
+            echo -en '\n\n'; cat /etc/labels; fi;
+          if [[ -e /etc/annotations ]]; then
+            echo -en '\n\n'; cat /etc/annotations; fi;
+          sleep 5;
+        done;
+      volumeMounts:
+        - name: podinfo
+          mountPath: /etc
+          readOnly: false
+  volumes:
+    - name: podinfo
+      downwardAPI:
+        items:
+          - path: "labels"
+            fieldRef:
+              fieldPath: metadata.labels
+          - path: "annotations"
+            fieldRef:
+              fieldPath: metadata.annotations
+```
+
+#### projected
+
+projected volume 可以将几个volume内容隐射到同样的目录中，当前只支持secret、configmap、downwardAPI
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-test
+spec:
+  containers:
+  - name: container-test
+    image: busybox
+    volumeMounts:
+    - name: all-in-one
+      mountPath: "/projected-volume"
+      readOnly: true
+  volumes:
+  - name: all-in-one
+    projected:
+      sources:
+      - secret:
+          name: mysecret
+          items:
+            - key: username
+              path: my-group/my-username
+      - downwardAPI:
+          items:
+            - path: "labels"
+              fieldRef:
+                fieldPath: metadata.labels
+            - path: "cpu_limit"
+              resourceFieldRef:
+                containerName: container-test
+                resource: limits.cpu
+      - configMap:
+          name: myconfigmap
+          items:
+            - key: config
+              path: my-group/my-config
+```
+
+#### local
+
+local volume在1.7中目前还是alpha版本，主要是用来将本地的disk，分区或者目录进行挂载。local volume只能以静态创建的PV使用。相对于HostPath，localhost可以直接以持久化的方式使用（它总是通过NodeAffinity调度在某个指定的节点上），而hostpath是无法直接以pv来使用的。
+
 #### hostPath
+
+hostPath 就是将宿主机上的目录或文件挂在到pod里。比如我们常用到`hostPath`的几个例子
+
+* 容器应用程序的日志，需要永久保存时，可以使用hostPath隐射宿主机上的高速文件存储
+* 运行的容器需要访问Docker内部结构：使用hostPath映射/var/lib/docker
+* 在容器中运行cAdvisor，使用hostPath映射/dev/cgroups
+
+而当我们在使用hostPath的时候需要注意以下几点
+
+* 在不同Node上具有相同配置的pod(通过podTemplate创建的)，可能会因为宿主机上的目录和文件不同而导致volume上目录和文件的访问结果不一致
+* 如果使用资源配额，无法将hostPath在宿主机上使用的资源纳入管理
+* 如果宿主机上的目录是root权限，那么你也必须以root身份来运行你的进程，或者，修改你的目录权限以便于能让hostPath卷有写权限
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx
+    name: test-container
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-volume
+  volumes:
+  - name: test-volume
+    hostPath:
+      path: /data
+```
+
+
+
+其实hostPath也能算是持久存储的一种，只不过局限性太大了。这里我们详细的讲讲外部存储和分布式存储在kubernetes中的使用(aws和gce的就不讲了，没环境)。
+
+[详细的例子](https://github.com/kubernetes/kubernetes/tree/master/examples/volumes)大家可以参考官方的例子
+
+#### NFS
+
+NFS是Network File System的缩写，即网络文件系统。kubernetes中通过简单的配置就可以挂载NFS到Pod中，而NFS中的数据是可以永久保存的，同时NFS支持同时写操作。
+
+首先，你得有个已经搭建好的NFS服务
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx
+    name: test-container
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-volume
+  volumes:
+  - name: test-volume
+    nfs:
+      server: 163.xx.xx.xx
+      path: "/"
+```
+
 #### persistent volume
 
+事实上，我们可以单独在Pod中指定外部存储，也可以将这些外部存使用PersistentVolume资源化。
+
+之前我们提到的volume都是定义在pod上的，和 pod 是一种静态绑定关系，属于"计算资源"的一部分，而实际上，“网络存储”是独立于“计算资源”之外而存在的一种实体资源。比如我们在使用虚机的情况下，我们通常会定义一个网络存储，然后从中划出一定的空间连接到虚拟机。而persistent volume和与之关联的persistent volume claim就起到了类似的作用。
+
+PersistentVolume(PV)是集群中的一块网络存储，用来提供网络存储资源 。跟Node一样，也是集群的资源。PV 跟volume类似，不过会有独立于Pod的生命周期。
+PersistentVolumeClaim(PVC)是对PV的请求。PVC有点类似于Pod，pod消耗node的资源，而PVC消耗PV的资源。Pod请求CPU和内存，而PVC请求特定大小和访问模式的数据卷。
+
+PV的访问模式有三种：
+
+* ReadWriteOnce(RWO):最基本的访问方式，可读可写，但只支持被耽搁pod挂载
+* ReadOnlyMany(ROX):可以以只读的方式被多个pod挂载
+* ReadWriteMany(RWX):以读写的方式被多个POD挂载。
+
+并不是所有存储都支持这三种方式，像共享方式，目前支持的还比较少，比较常用的是NFS。在PVC绑定PV时通常根据两个条件来绑定，一个实存储大小，一个是访问方式。
+**需要注意的是，虽然PV支持三种访问模式，但它同时只支持一种方式来访问PV**
+
+
+##### 创建PV的方式有两种
+
+有两种创建PV的方式：静态和动态
+
+###### 静态
+
+所谓静态，就是管理员手动创建一堆PV，组成一个PV池，供PVC来绑定。
+
+###### 动态
+经过API抽象，用户可以通过PVC使用存储资源，通常用户还会关心PV的很多属性，例如对不同的应用场景需要不同的性能，仅仅提供存储大小和访问模式不能满足要求。集群管理员一方面要提供不同PV的多种属性，一方面要隐藏底层的细节，还有一点是不再需要管理员手动去创建PV,这就引入了`StorageClass`资源。管理员用存储级别StorageClass描述存储的分类，不同的分类可以对应不同的质量服务Qos等级、备份策略和其他自定义的策略。kubernetes本身不参与存储级别的划分，StorageClass概念在有的存储系统里被称为”profiles”
+
+所谓动态，就是当所有的静态PV都不匹配用户的PVC时，集群通过storageClass的对象由存储系统根据PVC的要求自动创建。这种基于`StorageClass`的PV，管理员必须事先创建和配置这样的storage class。请求等级配置为`" "`的PVC，有效地禁用了它自身的动态供给功能。
+
+###### class
+
+我们可以根据不同的需求创建不同类型的PV(这种PV是基于`StorageClass`，是自动创建的)，然后我们可以通过为PVC指定`storageClassName`来请求PV，如果集群中有这个class，那么当用户请求的时候，kubernetes会自动的创建PV，如果集群中有默认的storageclass，那么你只需要创建PVC即可，无需指定`storageClassName`,剩下的都有默认的动态配置来搞定。
+
+举个例子：比如我现在需要两种类型的存储，一种是SSD，一种是普通的硬盘，那么这时候，我就可以创建两种class的`StorageClass`,然后在创建PVC时，指定不同的`storageClassName`即可，如下：
+
+每个`StorageClass`都包含`provisioner`和`parameters`这个两个字段，具体怎么配置这些storageclass，有哪些存储支持storageclass,请参考[官网](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+
+
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: slow
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard
+```
+
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+```
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-fast
+  storageClassName: fast
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 2Gi
+```
+当用户请求资源的时候，如果是通过pvc-fast请求，这时候就会绑定到一个SSD，而不会绑定到普通硬盘。
+
+###### 绑定
+
+在动态配置的情况下，当用户创建或者之前就已经创建了具有特定数量或具有某些访问模式的PVC的时候。master中的loop control会监视新的PVC，找到匹配的PV，然后将它们绑定到一起。如果这个PV是通过动态提供给PVC，那么loop control会始终绑定这个PV给这个PVC。否则，用户可能会一直请求PV，但是实际上又没有那么多PV资源。还需要注意的事，一旦绑定了PVC，就不能再绑定其他。
+
+###### 使用
+
+Pod使用PVC和使用Volume一样。集群检查PVC然后找到绑定的pv，然后隐射给pod使用。
+一旦用户拥有了一个PVC，并且PVC被绑定，那么只要用户还需要，PV就一直属于这个用户。
+
+###### 回收
+
+当用户不在需要PV时，我们可以删除PVC来回收PV，`PersistentVolume`中的回收策略会告诉kubernetes当PVC被释放后该怎么做，目前，支持的策略如下
+
+* Retained(保留)
+
+当PVC被删除后，PV仍然被保留下来，并且会变成`released`。但是它还不能被其他PVC使用，因为现在PV上仍然有上一个PVC所请求的数据。
+
+* Recycled(再利用)
+
+当PVC被删除后，kubernetes会将PV里的数据删除，然后把PV变成Available，然后又可以被新的PVC绑定
+
+这个原理实际上是：在删除PVC之后，会运行一个POD来执行一个(`rm -rf /thevolume/*`)的操作，删除pv下的所有数据
+
+**默认回收运行的POD用的image是gcr上的busybox，而且image策略是always，因为这个原因，你可能始终无法回收PV，这时候，就需要去重新配置回收POD的模板了，模板内容如下**
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: recycler-for-nfs
+  namespace: default
+spec:
+  restartPolicy: Never
+  volumes:
+  - name: vol
+    nfs:
+      path: /
+      server: 163.xx.xx.xx
+  containers:
+  - name: pv-recycler
+    image: "gcr.io/google_containers/busybox"
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh", "-c", "test -e /scrub && rm -rf /scrub/..?* /scrub/.[!.]* /scrub/*  && test -z \"$(ls -A /scrub)\" || exit 1"]
+    volumeMounts:
+    - name: vol
+      mountPath: /scrub
+```
+
+写好模板了，还需要在`kube-controller-manager`中去配置模板，[更多详细信息](https://kubernetes.io/docs/admin/kube-controller-manager/)可参考官网
+
+```yaml
+# 指定nfs回收模板的位置
+- --pv-recycler-pod-template-filepath-nfs=/etc/kubernetes/recycler-for-nfs.yaml
+
+# 在容器下挂载模板文件
+volumeMounts:
+- mountPath: "/etc/kubernetes/recycler-for-nfs.yaml"
+  name: recycler-nfs
+
+# 将宿主机上的模板文件挂载到pod
+volumes:
+- name: recycler-nfs
+  hostPath:
+    path: "/etc/kubernetes/recycler-for-nfs.yaml"
+```
+
+下面我们来新建PV和PVC来测试一下
+
+nfs-pv.yaml
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    path: "/"
+    server: 163.44.165.142
+```
+
+nfs-pvc.yaml
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+```
+
+nfs-nginx.yaml
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx
+    name: test-container
+    volumeMounts:
+    - mountPath: /test-pd
+      name: test-volume
+  volumes:
+  - name: test-volume
+    persistentVolumeClaim:
+      claimName: nfs
+
+```
+
+
+命令如下：
+
+```bash
+# 创建PV,PVC以及关联的POD
+kubectl create -f nfs-pv.yaml
+kubectl create -f nfs-pvc.yaml
+kubectl create -f nfs-nginx.yaml
+
+# 查看创建的PV
+$ kubectl get pv
+NAME      CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS    CLAIM         STORAGECLASS   REASON    AGE
+nfs       5Gi        RWO           Recycle         Bound     default/nfs                            1h
+
+# 查看创建的PVC
+$ kubectl get pvc
+NAME      STATUS    VOLUME    CAPACITY   ACCESSMODES   STORAGECLASS   AGE
+nfs       Bound     nfs       5Gi        RWO                          8m
+
+# 然后我们进入pod中新建一个文件recycle-file
+$ kubectl exec -ti test-pd /bin/bash
+$ touch recycle-file
+```
+
+我们发现nfs的回收策略是`Recycle`，当前状态是`Bound`，那么假如我现在将PVC删除掉呢，下面我们来操作试试看
+
+```bash
+kubectl delete -f nfs-nginx.yaml
+kubectl delete -f nfs-pvc.yaml
+
+# 查看现在的pv
+$ kubectl get pv
+NAME      CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS     CLAIM         STORAGECLASS   REASON    AGE
+nfs       5Gi        RWO           Recycle         Released   default/nfs                            1h
+
+# 过了一会儿，再看pv
+$ kubectl get pv
+NAME      CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS      CLAIM     STORAGECLASS   REASON    AGE
+nfs       5Gi        RWO           Recycle         Available                                      1h
+
+# 再重新使用PVC关联POD
+kubectl create -f nfs-pvc.yaml
+kubectl create -f nfs-nginx.yaml
+
+# 进入pod中看看数据是否还存在
+$ kubectl exec -ti test-pd ls /test-pd
+```
+
+我们发现当我们的回收策略是`Recycle`时，删除PVC之后，PV的状态先是`Released`，然后过一会儿之后，会变成`Available`状态，而且PV上的数据也已经被删除了，这时候就可以再次被其他的PVC使用了。
+
+**注意：当前只有NFS和HostPath支持回收利用操作**
+
+* Delete(删除)
+
+当PVC被删除后，kubernetes会删除PV及里面的数据。
+
+**注意：当前只有AWS EBS,GCE PD,AZURE DISK,OPENSTACK CINDER卷支持删除操作**
+
+**注意：动态PV，总会在PVC被删除后被删除**
+
+###### PV阶段状态
+
+一个volume会处于下面的几个状态之一
+
+* Avaliable 尚未绑定到PVC上的可用资源
+* Bound 已经被绑定到PVC
+* Released PVC已被删除，但是资源尚未回收
+* Failed 自动回收失败
+
+###### Capacity
+
+通常，我们在创建PV的时候，会从存储上给它划定一定大小的容量，这就使用capacity来指定即可。
+
+###### resource
+
+pvc，就像pod一样，可以指定request资源的大小
+
+###### selector
+
+PVC也可以指定标签选择器进行深度过滤PV，只有匹配了selector的PV才能绑定给PVC
+
+* matchLabels 单个匹配
+* matchExpressions 表达式匹配
 
 ### Namespace
 
+Namespace一般用于实现多租户的资源隔离。namespace 通过将集群内部的资源分配到不同的Namespace中，形成逻辑上不同项目、小组或环境的隔离，同时利用resource quota实现资源的管控限制，而随着kubernetes访问控制的深入，namespace开始与kubernetes的认证和授权机制结合。
+
 ### Annotation
+
+annotation 和label类似，也是使用 key/value的形式进行定义。不同的是label具有严格的命名规则，它定义的是kubernetes对象的元数据，并且用于label selector，而annotation测试用户任意定义的"附加"信息，以便于外部工具进行查找，很多时候，kubernetes的模块会通过annotation的方式标记资源的特殊信息。
