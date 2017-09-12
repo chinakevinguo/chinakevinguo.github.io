@@ -24,7 +24,7 @@ Ceph是一个符合POSIX、开源的分布式存储系统，不论你是想提�
 
 下图展示了Ceph的基础架构图
 
-![](/images/posts/Ceph-soft-topu.png)
+![ceph-topu](/images/posts/ceph-soft-topu.png)
 
 #### 1.基础存储系统RADOS
 
