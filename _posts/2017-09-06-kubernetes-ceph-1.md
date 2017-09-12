@@ -24,7 +24,7 @@ Ceph是一个符合POSIX、开源的分布式存储系统，不论你是想提�
 
 下图展示了Ceph的基础架构图
 
-![](/images/posts/ceph-soft-topu.png)
+![](/images/posts/Ceph-soft-topu.png)
 
 #### 1.基础存储系统RADOS
 
@@ -283,8 +283,9 @@ $ rados put test-object testfile --pool=test-pool
 # 检查存储池，确认ceph存储了此对象
 $ rados -p test-pool ls
 
-# 定位对象位置
+# 定位对象，会输出对象位置
 $ ceph osd map test-pool test-object
+osdmap e42 pool 'test-pool' (3) object 'test-file' -> pg 3.b79653d4 (3.4) -> up ([1,5,2,3,4], p1) acting ([1,5,2,3,4], p1)
 
 # 删除对象
 $ rados -p data rm test-object
@@ -292,3 +293,236 @@ $ rados -p data rm test-object
 # 删除存储池
 $ rados rmpool test-pool test-pool --yes-i-really-really-mean-it
 ```
+随着集群的运行，对象的位置可能会动态改变。Ceph有动态均衡机制，无需手动干预即可完成。
+
+#### 2.3 块存储测试
+
+**官方建议RBD和OSD最好不要在同一台物理机上(除非它们都是VM)**
+
+1.确认你使用了合适的内核版本，详情[参见](http://docs.ceph.com/docs/master/start/os-recommendations/)
+
+```bash
+lab_release -a
+uname -a
+```
+
+2.在管理节点上用 `ceph-deploy`安装ceph
+
+```bash
+ceph-deploy install {rbd-client}
+```
+
+3.在管理节点上部署ceph cli工具和密钥
+
+```bash
+ceph-deploy admin {rbd-client}
+```
+
+4.在rbd节点上创建块设备image
+
+```bash
+rbd create test-block --size 4096
+```
+
+5.映射image到块设备
+
+```bash
+rbd map test-block --name client.admin
+```
+
+**在上面的map映射操作时，会出现如下报错**
+
+```bash
+$ rbd map test-block --name client.admin
+rbd: sysfs write failed
+RBD image feature set mismatch. You can disable features unsupported by the kernel with "rbd feature disable".
+In some cases useful info is found in syslog - try "dmesg | tail" or so.
+rbd: map failed: (6) No such device or address
+```
+
+**大致意思是说features不匹配，可以通过disable features关掉一些特性来让内核支持。这是因为在Ceph高本本进行 map image时，默认ceph在创建image(上文test-block)时，会增加很多features，这些features需要内核支持，centos7上的支持有限，所以，我们需要关掉一些**
+
+我们可以用 `rbd info data` 看看创建的image目前有哪些features
+
+```bash
+$ rbd info test-block
+rbd image 'test-block':
+	size 4096 MB in 1024 objects
+	order 22 (4096 kB objects)
+	block_name_prefix: rbd_data.10bb238e1f29
+	format: 2
+	features: layering, exclusive-lock, object-map, fast-diff, deep-flatten
+	flags:
+```
+
+在features中，我们可以看到默认开启了很多：
+
+* layering 支持分层
+* exclusive-lock 支持独占锁
+* object-map 支持对象映射(依赖exclusive-lock)
+* fast-diff 快速计算差异(依赖object-map)
+* deep-flatten 支持快照扁平化操作
+
+**而实际上在CentOS7的3.10内核中只支持layering，所以我们需要手动关闭一些features，然后重新map；如果想要一劳永逸，可以在 ceph.conf 中加入 rbd_default_features = 1 来设置默认 features(数值仅是 layering 对应的 bit 码所对应的整数值)**
+
+6.关闭不支持的特性之后重新map
+
+```bash
+# 关闭不支持的features
+$ rbd feature disable test-block exclusive-lock, object-map, fast-diff, deep-flatten
+
+# 重新map
+$ rbd map test-block --name client.admin
+/dev/rbd0
+```
+
+7.格式化之后挂载到系统目录
+
+```bash
+# 格式化
+$ mkfs.xfs /dev/rbd0
+meta-data=/dev/rbd0              isize=512    agcount=9, agsize=130048 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=0, sparse=0
+data     =                       bsize=4096   blocks=1048576, imaxpct=25
+         =                       sunit=1024   swidth=1024 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=8 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+# 挂载
+$ mkdir test-block
+$ mount /dev/rbd0 test-block
+
+# 写入测试
+$ dd if=/dev/zero of=test-block/test-file bs=1G count=1
+1+0 records in
+1+0 records out
+1073741824 bytes (1.1 GB) copied, 2.96071 s, 363 MB/s
+
+$ ls test-block/
+test-file
+```
+
+#### 2.4 CephFS 测试
+
+1.创建MDS
+
+```bash
+$ ceph-deploy mds create k8s-node01 k8s-node02 k8s-registry
+```
+
+2.创建pool和fs，创建pool需要指定PG数量
+
+```bash
+ceph osd pool create cephfs_data 32
+ceph osd pool create cephfs_metadata 32
+ceph fs new test-fs cephfs_metadata cephfs_data
+```
+
+**PG 概念：**
+
+> 当Ceph集群接受到存储请求时，ceph会将一个文件会切分为多个Object，每个Object会被映射到一个PG，每个PG 会根据CRUSH算法映射到一组OSD(根据副本数)；一般来说增加PG的数量能降低OSD负载，一般每个OSD大约分配50～100PG，关于PG数量指定，一般遵循以下公式
+> * 集群PG总数 = (OSD总数 * 100)/数据最大副本数
+> * 单个存储池PG数 = (OSD总数 * 100)/数据最大副本数/存储池数
+
+**注意：PG的最终结果应当以最接近以上计算公式的2的N次幂(向上取值)；如我的虚拟机环境的每个存储池 PG数 = 6(OSD) * 100 / 5(副本数) / 4（4个存储池）= 30，向上取2的N次幂为32(即，2的5次方=32，最接近30)**
+
+3.挂载CephFS有两种方式，一种是使用内核驱动挂载，一种是使用 `ceph-fuse`用户空间挂载
+
+内核挂载需要提取ceph管理key，方式如下：
+
+在密钥文件中找到与某用户对于的密钥
+
+```bash
+$ cat /etc/ceph/ceph.client.admin.keyring
+[client.admin]
+	key = AQBferZZEKXFLxAAhlzElpm2MhhbBGB4TnNVkA==
+```
+
+复制密钥到文件中保存，并确保其权限
+
+```bash
+echo "AQBferZZEKXFLxAAhlzElpm2MhhbBGB4TnNVkA==" > ceph-key
+```
+
+创建目录挂载
+
+```bash
+mkdir test-fs
+mount -t ceph 172.30.33.90:6789:/ /root/test-fs -o name=admin,secretfile=ceph-key
+
+#写入数据测试
+$ dd if=/dev/zero of=test-fs/test-fs bs=1G count=1
+1+0 records in
+1+0 records out
+1073741824 bytes (1.1 GB) copied, 2.77355 s, 387 MB/s
+```
+
+`ceph-fuse`用户空间挂载的方式也比较简单，需要先安装ceph-fuse，同时也需要key
+
+```bash
+# 按照前面的步骤添加ceph源
+$ vi /etc/yum.repos.d/ceph.repo
+[ceph]
+name=ceph
+baseurl=http://mirrors.163.com/ceph/rpm-jewel/el7/x86_64/
+gpgcheck=0
+[ceph-noarch]
+name=cephnoarch
+baseurl=http://mirrors.163.com/ceph/rpm-jewel/el7/noarch/
+gpgcheck=0
+
+# 安装ceph-fuse
+yum install ceph-fuse -y
+
+# 复制配置和ceph key到client端
+sudo mkdir -p /etc/ceph
+sudo scp root@172.30.33.91:/etc/ceph/ceph.conf /etc/ceph/ceph.conf
+sudo scp root@172.30.33.91:/etc/ceph/ceph.client.admin.keyring /etc/ceph/ceph.client.admin.keyring
+
+# 创建目录挂载
+mkdir test-fs-fuse
+$ sudo ceph-fuse -m 172.30.33.91:6789 test-fs-fuse
+ceph-fuse[60551]: starting ceph client
+2017-09-12 14:47:24.137929 7f63d9719ec0 -1 init, newargv = 0x7f63e51d4840 newargc=11
+ceph-fuse[60551]: starting fuse
+
+# 写入数据测试
+$ sudo dd if=/dev/zero of=test-fs-fuse/test-fs-fuse bs=1G count=1
+1+0 records in
+1+0 records out
+1073741824 bytes (1.1 GB) copied, 10.5426 s, 102 MB/s
+
+# 查看确认，发现我们上面通过内核挂载的文件也还在
+$ ls -lh
+total 2.0G
+-rw-r--r-- 1 root root 1.0G Sep 12 13:59 test-fs
+-rw-r--r-- 1 root root 1.0G Sep 12 14:49 test-fs-fuse
+```
+
+#### 2.5 Ceph对象网关
+
+1.对象网关创建
+
+```bash
+# 创建RGW
+$ ceph-deploy rgw create k8s-node02
+```
+
+2.直接访问`http://ceph-node-ip:7480`返回结果如下
+
+```xml
+<ListAllMyBucketsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<Owner>
+<ID>anonymous</ID>
+<DisplayName/>
+</Owner>
+<Buckets/>
+</ListAllMyBucketsResult>
+```
+
+这就说明网关OK了，但是因为没有读写环境，所以暂时测不了。
+
+本文参考了[ceph官方文档](http://docs.ceph.com/docs/master/start/)及漠然的[ceph笔记(一)](https://mritd.me/2017/05/27/ceph-note-1/)部分
