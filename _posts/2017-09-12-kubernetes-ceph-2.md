@@ -56,4 +56,159 @@ CRUSH查找时候，ceph client先通过MON 获取cluster map，然后获取到�
 
 在Ceph集群中，如果OSD挂了，且老师处于`degraded`状态，Ceph 都会将其标记为 down 和 out 状态；然后默认情况下 Ceph 会等待 300秒之后进行数据恢复和再平衡，这个值可以通过在配置文件中的 mon osd down out interval 参数来调整
 
+
+#### 总结
+
+基于上述的定义，便可以对寻址流程进行解释了。具体而言，Ceph中的寻址至少要经历三次映射：
+
+1.File -> Object
+
+将用户操作的File，映射为RADOS能处理的object，每个object都会有一个唯一的oid。本质上就是按照object的最大size对file进行切分，切分成大小一致的object(最后的大小可以不一样)
+
+2.Object -> PG
+
+当File被映射为一个或多个object后，就需要将object映射到PG中,得到PG ID。这有一个计算公式
+
+hash(oid) & mask --> pgid
+
+由此可见，其计算由两步组成。首先是使用Ceph指定的静态hash算法计算出oid的hash值。然后将这个随机值和mask(mask的值=PG数-1)按位相与，最终得到PG ID。
+
+3.PG -> OSD
+
+最后根据前面得到的PG ID，通过CRUSH算法最终找到OSD的位置。
+
 ### Ceph组件调整及操作
+
+1.pool 操作
+
+```bash
+# 列出池
+ceph osd lspools
+
+# 在配置文件中调整默认PG 数量以及副本数
+osd pool default size = 5
+osd pool default pg num = 100
+osd pool default pgp num = 100
+
+# 创建池
+ceph osd pool create k8s-pool 30
+
+# 获取存储池选项值
+ceph osd pool get k8s-pool pg_num/pgp_num
+
+# 调整副本数
+ceph osd pool set k8s-pool size 10
+
+# 获取对象副本数
+ceph osd dump | grep 'replicated size'
+
+# 删除池
+ceph osd pool delete k8s-pool k8s-pool --yes-i-really-really-mean-it
+```
+
+2.object操作
+
+```bash
+# 将对象放入到池内
+rados put test-object testfile.txt -p cephfs_data
+
+# 列出池中对象
+rados ls -p cephfs_data
+
+# 检查池中对象位置
+ceph osd map cephfs_data test-object
+
+# 删除对象
+rados rm test-object -p cephfs_data
+```
+
+3.PG和PGP操作
+
+预设Ceph集群中的PG数至关重要，公式如下:
+
+```bash
+PG 总数 = (OSD 数 * 100) / 最大副本数
+```
+
+集群中单个池的PG数计算公式如下：
+
+```bash
+PG 总数 = (OSD 数 * 100) / 最大副本数 / 池数
+```
+
+PGP是为了实现定位而设计的PG，PGP的值应该和PG数量保持一致；pgp_num 数值才是 CRUSH 算法采用的真实值。虽然 pg_num 的增加引起了PG的分割，但是只有当 pgp_num增加以后，数据才会被迁移到新PG中，这样才会重新开始平衡。
+
+获取PG和PGP的方式如下：
+
+```bash
+ceph osd pool get cephfs_data pg_num
+ceph osd pool get cephfs_data pgp_num
+```
+
+调整方式如下：
+
+```bash
+ceph osd pool set cephfs_data pgp_num 32
+ceph osd pool set cephfs_data pgp_num 32
+```
+
+3.Cluster map 操作
+
+```bash
+# 查看现有集群布局
+# 基本上一台机器上一个osd
+$  ceph osd tree
+ID WEIGHT  TYPE NAME             UP/DOWN REWEIGHT PRIMARY-AFFINITY
+-1 0.28134 root default                                            
+-2 0.04689     host k8s-master01                                   
+ 0 0.04689         osd.0              up  1.00000          1.00000
+-3 0.04689     host k8s-master02                                   
+ 1 0.04689         osd.1              up  1.00000          1.00000
+-4 0.04689     host k8s-master03                                   
+ 2 0.04689         osd.2              up  1.00000          1.00000
+-5 0.04689     host k8s-node01                                     
+ 3 0.04689         osd.3              up  1.00000          1.00000
+-6 0.04689     host k8s-node02                                     
+ 4 0.04689         osd.4              up  1.00000          1.00000
+-7 0.04689     host k8s-registry                                   
+ 5 0.04689         osd.5              up  1.00000          1.00000
+
+
+# 添加逻辑上的机架
+ceph osd crush add-bucket rack01 rack
+ceph osd crush add-bucket rack02 rack
+ceph osd crush add-bucket rack03 rack
+
+# 将机器移动到不同的机架上
+ceph osd crush move k8s-master01 rack=rack01
+ceph osd crush move k8s-master02 rack=rack02
+ceph osd crush move k8s-master03 rack=rack03
+
+# 移动每个机架到默认的根下
+ceph osd crush move rack01 root=default
+ceph osd crush move rack02 root=default
+ceph osd crush move rack03 root=default
+```
+
+最终集群整体布局如下，我们可以看到每个机器都被分配到了对应的机架下面，从逻辑上进行了分隔
+```bash
+$ ceph osd tree
+ID  WEIGHT  TYPE NAME                 UP/DOWN REWEIGHT PRIMARY-AFFINITY
+ -1 0.28134 root default                                                
+ -5 0.04689     host k8s-node01                                         
+  3 0.04689         osd.3                  up  1.00000          1.00000
+ -6 0.04689     host k8s-node02                                         
+  4 0.04689         osd.4                  up  1.00000          1.00000
+ -7 0.04689     host k8s-registry                                       
+  5 0.04689         osd.5                  up  1.00000          1.00000
+ -8 0.04689     rack rack01                                             
+ -2 0.04689         host k8s-master01                                   
+  0 0.04689             osd.0              up  1.00000          1.00000
+ -9 0.04689     rack rack02                                             
+ -3 0.04689         host k8s-master02                                   
+  1 0.04689             osd.1              up  1.00000          1.00000
+-10 0.04689     rack rack03                                             
+ -4 0.04689         host k8s-master03                                   
+  2 0.04689             osd.2              up  1.00000          1.00000
+
+```
