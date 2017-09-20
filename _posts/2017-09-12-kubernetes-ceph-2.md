@@ -210,5 +210,18 @@ ID  WEIGHT  TYPE NAME                 UP/DOWN REWEIGHT PRIMARY-AFFINITY
 -10 0.04689     rack rack03                                             
  -4 0.04689         host k8s-master03                                   
   2 0.04689             osd.2              up  1.00000          1.00000
-
 ```
+
+### Ceph硬件配置
+
+#### MON需求
+
+Ceph monitor通过维护整个集群的map从而完成集群的健康处理；但是monitor并不参与实际的数据存储，所以实际上monitor节点CPU占用、内存占用都比较少；一般单核CPU加几个G的内存即可满足需求；虽然monitor节点不参与实际存储工作，但是monitor的网卡至少应该是冗余的，否则一旦网络出现故障则集群健康会难以保证。
+
+#### OSD需求
+
+OSD作为Ceph的主要存储设备，其会占用一定的CPU和内存资源，一般推荐做法是每个节点的每块硬盘作为一个OSD；同时OSD还需写入日志，所以应当为OSD集成日志留充足的空间；在出现故障时，OSD需求的资源可能会更多，所以OSD节点根据实际情况(每个OSD会有一个线程)应该分配更多的CPU和内存；固态硬盘也会增加OSD存取速度和恢复速度
+
+#### MDS需求
+
+MDS服务专门为CephFS存储元数据，所以相对于monitor和OSD节点，这个MDS节点的CPU需求会大得多，同时内存占用也是海量的，所以MDS一般会使用一个强劲的物理机单独搭建。

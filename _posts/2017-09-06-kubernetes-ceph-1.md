@@ -66,8 +66,11 @@ CRUSH： CRUSH是ceph使用的数据分布算法，类似一致性哈希，让�
 | :---: | :---: | :---: | :---: |
 | 172.30.33.31 | deploy-node | centos7.3.1611 | deploy node |
 | 172.30.33.90 | k8s-master01 | centos7.3.1611 | monitor osd node1 |
-| 172.30.33.91 | k8s-master02 | centos7.3.1611 | osd node2 |
-| 172.30.33.92 | k8s-master03 | centos7.3.1611 | osd node3 |
+| 172.30.33.91 | k8s-master02 | centos7.3.1611 | monitor osd node2 |
+| 172.30.33.92 | k8s-master03 | centos7.3.1611 | monitor osd node3 |
+| 172.30.33.89 | k8s-registry | centos7.3.1611 |  osd mds |
+| 172.30.33.93 | k8s-node01 | centos7.3.1611 | osd mds |
+| 172.30.33.94 | k8s-node02 | centos7.3.1611 | osd mds |
 
 ##### 在管理节点上操作
 
@@ -297,7 +300,7 @@ $ rados rmpool test-pool test-pool --yes-i-really-really-mean-it
 
 #### 2.3 块存储测试
 
-**官方建议RBD和OSD最好不要在同一台物理机上(除非它们都是VM)**
+**官方建议使用RBD的客户端最好不要和OSD在同一台物理机上(除非它们都是VM)**
 
 1.确认你使用了合适的内核版本，详情[参见](http://docs.ceph.com/docs/master/start/os-recommendations/)
 
