@@ -148,6 +148,37 @@ label即标签，是Kubernetes系统中另一个核心概念。一个label是一
 **注意：我们在指定`label selector`时，需要和`.spec.template.metadata.labels`下的值相同，如果不指定`label selector`则默认保持和`.spec.template.metadata.labels`的值相同**
 
 
+#### init容器
+
+init容器在1.6版本已经推出了beta版本，但是以前的语法仍然被保留，未来可能会被抛弃掉，所以建议使用最新的语法。
+
+init容器主要作用是为了执行一些在pod就绪前的一些初始化步骤，比如：
+
+* 把一些安全级别的程序放在init container中执行，避免放在images中暴露
+* 它们必须在应用程序启动之前完成，并且只有在init容器成功完成后，应用容器才能启动，这就提供了一种简单的阻塞或延迟应用容器启动的方法
+
+1.6之后的写法如下：
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  # init 容器
+  initContainers:
+    - name: init-myservice
+      image: busybox
+      command: ['sh','-c','until nslookup myservice;do echo waiting for myservice; sleep 2;done;']
+  # 业务容器
+  containers:
+  - name: myapp-container
+    image: busybox
+    command: ['sh','-c','echo The app is running! && sleep 3600']
+```
+
 ### ReplicationController(RC)
 我们将上面那个例子的yaml文件直接拿来解析
 ```yaml
