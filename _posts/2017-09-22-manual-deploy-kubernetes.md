@@ -255,7 +255,7 @@ etcd.csr  etcd-csr.json  etcd-key.pem  etcd.pem
     "127.0.0.1",
     "172.29.151.1",
     "172.29.151.2",
-    "172.20.151.3",
+    "172.29.151.3",
     "10.254.0.1",
     "localhost",
     "kubernetes",
@@ -307,7 +307,7 @@ kube-apiserver.csr  kube-apiserver-csr.json  kube-apiserver-key.pem  kube-apiser
   "hosts": [
     "172.29.151.1",
     "172.29.151.2",
-    "172.20.151.3"
+    "172.29.151.3"
   ],
   "key": {
     "algo": "rsa",
@@ -485,10 +485,10 @@ kube-proxy.csr  kube-proxy-csr.json  kube-proxy-key.pem  kube-proxy.pem
 cd /opt/ssl
 
 head -c 16 /dev/urandom | od -An -t x | tr -d ' '
-8da2682a8ca9915729e0104356f57424
+04d9b6c6fd3ed8a3488b3b0913e87d64
 
 vim token.csv
-8da2682a8ca9915729e0104356f57424,kubelet-bootstrap,10001,"system:kubelet-bootstrap"
+04d9b6c6fd3ed8a3488b3b0913e87d64,kubelet-bootstrap,10001,"system:kubelet-bootstrap"
 ```
 
 ##### 2.11 证书分发
@@ -782,7 +782,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --tls-cert-file=/etc/kubernetes/ssl/kube-apiserver.pem \
   --tls-private-key-file=/etc/kubernetes/ssl/kube-apiserver-key.pem \
   --client-ca-file=/etc/kubernetes/ssl/ca.pem \
-  --service-account-key-file=/etc/kubernetes/ssl/ca-key.pem \
+  --service-account-key-file=/etc/kubernetes/ssl/kube-apiserver-key.pem \
   --token-auth-file=/etc/kubernetes/known_token/token.csv \
   --experimental-bootstrap-token-auth=true \
   --kubelet-https=true \
@@ -895,7 +895,7 @@ systemctl status kube-scheduler
 
 **kube-controller-manager、kube-scheduler通过etcd选举，而且与master直接通过127.0.0.1:8080通信，而其他node，则需要在每个node上启动一个nginx，每个nginx反代所有apiserver，node上的kubelet、kube-proxy、kubectl连接本地nginx代理端口，当nginx发现无法连接后端时会自动踢掉出问题的apiserver，从而实现api server的HA**
 
-##### 在每个node节点上创建nginx代理
+##### 在每个node节点和k8s-console上创建nginx代理
 
 > 在每个节点上新建配置目录
 
@@ -951,12 +951,12 @@ After=docker.service
 [Service]
 User=root
 PermissionsStartOnly=true
-ExecStart=/usr/bin/docker run -p 127.0.0.1:6443:6443 \\
-                              -v /etc/nginx:/etc/nginx \\
-                              --name nginx-proxy \\
-                              --net=host \\
-                              --restart=on-failure:5 \\
-                              --memory=512M \\
+ExecStart=/usr/bin/docker run -p 127.0.0.1:6443:6443 \
+                              -v /etc/nginx:/etc/nginx \
+                              --name nginx-proxy \
+                              --net=host \
+                              --restart=on-failure:5 \
+                              --memory=512M \
                               nginx:1.13.3-alpine
 ExecStartPre=-/usr/bin/docker rm -f nginx-proxy
 ExecStop=/usr/bin/docker stop nginx-proxy
@@ -966,4 +966,1092 @@ TimeoutStartSec=30s
 
 [Install]
 WantedBy=multi-user.target
+```
+
+
+##### 配置开机启动
+
+```bash
+systemctl daemon-reload
+systemctl start nginx-proxy
+systemctl enable nginx-proxy
+```
+
+**最后我们在k8s-console上执行kubectl试试**
+
+```bash
+$ kubectl --server=https://127.0.0.1:6443 --certificate-authority=/etc/kubernetes/ssl/ca.pem --client-certificate=/etc/kubernetes/ssl/kube-admin.pem --client-key=/etc/kubernetes/ssl/kube-admin-key.pem get cs
+NAME                 STATUS    MESSAGE              ERROR
+controller-manager   Healthy   ok                   
+scheduler            Healthy   ok                   
+etcd-1               Healthy   {"health": "true"}   
+etcd-0               Healthy   {"health": "true"}   
+etcd-2               Healthy   {"health": "true"}   
+```
+
+### 九. 配置kubectl访问apiserver
+
+> 前面我们使用kubect打印除了kubernetes核心组件的状态，但是每次使用的时候都需要指定apiserver的地址以及证书之类的，实在是有点繁琐，接下来，我们在k8s-console上创建kubeconfig文件。
+
+```bash
+cd /etc/kubernetes
+export KUBE_APISERVER="https://127.0.0.1:6443"
+
+# 设置集群参数
+kubectl config set-cluster kubernetes \
+ --certificate-authority=/opt/ssl/ca.pem \
+ --embed-certs=true \
+ --server=${KUBE_APISERVER} \
+ --kubeconfig=admin.conf
+
+# 设置客户端认证参数
+kubectl config set-credentials kubernetes-admin \
+  --client-certificate=/opt/ssl/kube-admin.pem \
+  --embed-certs=true \
+  --client-key=/opt/ssl/kube-admin-key.pem \
+  --kubeconfig=admin.conf
+
+# 设置上下文参数
+kubectl config set-context kubernetes-admin@kubernetes \
+  --cluster=kubernetes \
+  --user=kubernetes-admin \
+  --kubeconfig=admin.conf
+
+# 设置默认上下文
+kubectl config use-context kubernetes-admin@kubernetes --kubeconfig=admin.conf
+
+# cp成~/.kube/config
+cp /etc/kubernetes/ssl/admin.conf ~/.kube/config
+```
+
+##### 试试看是否生效
+
+```bash
+$ kubectl get cs
+NAME                 STATUS    MESSAGE              ERROR
+scheduler            Healthy   ok                   
+controller-manager   Healthy   ok                   
+etcd-2               Healthy   {"health": "true"}   
+etcd-1               Healthy   {"health": "true"}   
+etcd-0               Healthy   {"health": "true"}   
+```
+
+### 十.kubelet配置
+
+> kubelet启动时向kube-apiserver发送 TLS bootstrapping请求，需要先将 bootstrap token 文件中的 kubelet-bootstrap用户赋予system:node-bootstrapper角色，然后kubelet才有权限创建认证请求。
+
+
+##### kubelet角色授权
+
+```bash
+# 在k8s-console上执行绑定操作
+kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
+```
+
+
+##### 在k8s-console上生成kubelet kubeconfig文件
+
+> 配置集群
+
+```bash
+kubectl config set-cluster kubernetes \
+  --certificate-authority=/opt/ssl/ca.pem \
+  --embed-certs=true \
+  --server=https://127.0.0.1:6443 \
+  --kubeconfig=bootstrap.kubeconfig
+```
+
+> 配置客户端认证参数
+
+```bash
+kubectl config set-credentials kubelet-bootstrap \
+  --token=04d9b6c6fd3ed8a3488b3b0913e87d64 \
+  --kubeconfig=bootstrap.kubeconfig
+```
+
+> 配置上下文关联
+
+```bash
+kubectl config set-context default \
+  --cluster=kubernetes \
+  --user=kubelet-bootstrap \
+  --kubeconfig=bootstrap.kubeconfig
+```
+
+> 配置默认上下文
+
+```bash
+kubectl config use-context default --kubeconfig=bootstrap.kubeconfig
+```
+
+> 分发bootstrap.kubeconfig文件到每个node节点
+
+```bash
+cd /etc/kubernetes
+for IP in `seq 5 7`;do
+  scp bootstrap.kubeconfig root@172.29.151.$IP:/etc/kubernetes/
+done
+```
+
+##### 添加kubelet为系统服务
+
+> 创建kubelet工作目录
+
+```bash
+mkdir /var/lib/kubelet
+```
+
+> 添加/usr/lib/systemd/system/kubelet.service,注意修改你成你自己节点的ip
+
+```bash
+[Unit]
+Description=Kubernetes Kubelet
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+ExecStart=/usr/local/bin/kubelet \
+  --cgroup-driver=systemd \
+  --address=172.29.151.5 \
+  --hostname-override=172.29.151.5 \
+  --pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 \
+  --experimental-bootstrap-kubeconfig=/etc/kubernetes/bootstrap.kubeconfig \
+  --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+  --require-kubeconfig \
+  --cert-dir=/etc/kubernetes/ssl \
+  --cluster_dns=10.254.0.2 \
+  --cluster_domain=cluster.local. \
+  --hairpin-mode promiscuous-bridge \
+  --allow-privileged=true \
+  --serialize-image-pulls=false \
+  --logtostderr=true \
+  --max-pods=512 \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+##### 启动kubelet
+
+```bash
+systemctl daemon-reload
+systemctl enable kubelet
+systemctl start kubelet
+systemctl status kubelet
+```
+
+##### 签发证书，验证nodes
+
+> 查看csr，我们发现状态为Pending
+
+```bash
+$ kubectl get csr
+NAME                                                   AGE       REQUESTOR           CONDITION
+node-csr-MIqovZHmrYMe1Y6AspcfU6_keLdSWfbUqg4pcK-Hb9w   2m        kubelet-bootstrap   Pending
+node-csr-el6foG3yw6_9xCu1vC_upuT-xLR9Z9ASBNj5isBFcsY   2m        kubelet-bootstrap   Pending
+node-csr-oPWmprgtrRixLZXUvEFKnHI2qZEGorzHKZ1ktLMdGS8   5m        kubelet-bootstrap   Pending
+```
+
+> 签发证书
+
+```bash
+$ kubectl certificate approve node-csr-oPWmprgtrRixLZXUvEFKnHI2qZEGorzHKZ1ktLMdGS8 node-csr-el6foG3yw6_9xCu1vC_upuT-xLR9Z9ASBNj5isBFcsY node-csr-MIqovZHmrYMe1Y6AspcfU6_keLdSWfbUqg4pcK-Hb9w
+certificatesigningrequest "node-csr-oPWmprgtrRixLZXUvEFKnHI2qZEGorzHKZ1ktLMdGS8" approved
+certificatesigningrequest "node-csr-el6foG3yw6_9xCu1vC_upuT-xLR9Z9ASBNj5isBFcsY" approved
+certificatesigningrequest "node-csr-MIqovZHmrYMe1Y6AspcfU6_keLdSWfbUqg4pcK-Hb9w" approved
+```
+
+> 查看node
+
+```bash
+$ kubectl get nodes
+NAME           STATUS    AGE       VERSION
+172.29.151.5   Ready     3m        v1.7.6
+172.29.151.6   Ready     45s       v1.7.6
+172.29.151.7   Ready     12s       v1.7.6
+```
+
+> 成功后会自动生成配置文件和密钥
+
+```bash
+$ ll /etc/kubernetes/ssl
+-rw-r--r-- 1 root root 1042 Oct  9 17:46 kubelet-client.crt
+-rw------- 1 root root  227 Oct  9 17:18 kubelet-client.key
+-rw-r--r-- 1 root root 1111 Oct  9 17:46 kubelet.crt
+-rw------- 1 root root 1675 Oct  9 17:46 kubelet.key
+
+
+$ ll /etc/kubernetes/kubelet.kubeconfig
+-rw------- 1 root root 2260 Oct  9 17:46 /etc/kubernetes/kubelet.kubeconfig
+```
+
+
+### 十一.kube-proxy 配置
+
+##### 在k8s-console上生成kube-proxy kubeconfig文件
+
+> 配置集群
+
+```bash
+kubectl config set-cluster kubernetes \
+  --certificate-authority=/opt/ssl/ca.pem \
+  --embed-certs=true \
+  --server=https://127.0.0.1:6443 \
+  --kubeconfig=kube-proxy.kubeconfig
+```
+
+> 配置客户端认证
+
+```bash
+kubectl config set-credentials kube-proxy \
+  --client-certificate=/opt/ssl/kube-proxy.pem \
+  --client-key=/opt/ssl/kube-proxy-key.pem \
+  --embed-certs=true \
+  --kubeconfig=kube-proxy.kubeconfig
+```
+
+> 配置上下文
+
+```bash
+kubectl config set-context default \
+  --cluster=kubernetes \
+  --user=kube-proxy \
+  --kubeconfig=kube-proxy.kubeconfig
+```
+
+> 配置默认上下文
+
+```bash
+kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+```
+
+> 分发到各个节点的/etc/kubernetes 目录
+
+```bash
+for IP in `seq 5 7`;do
+  scp kube-proxy.kubeconfig root@172.29.151.$IP:/etc/kubernetes/
+done
+```
+
+##### 添加kube-proxy为系统服务
+
+> 创建 kube-proxy目录
+
+```bash
+mkdir -p /var/lib/kube-proxy
+```
+
+> 添加/usr/lib/systemd/system/kube-proxy.service，注意修改为自己的节点ip
+
+```bash
+[Unit]
+Description=Kubernetes Kube-Proxy Server
+After=network.target
+
+[Service]
+WorkingDirectory=/var/lib/kube-proxy
+ExecStart=/usr/local/bin/kube-proxy \
+  --bind-address=172.29.151.5 \
+  --hostname-override=172.29.151.5 \
+  --cluster-cidr=10.254.0.0/16 \
+  --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig \
+  --logtostderr=true \
+  --v=2
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+```
+
+##### 启动kube-proxy
+
+```bash
+systemctl daemon-reload
+systemctl enable kube-proxy
+systemctl start kube-proxy
+systemctl status kube-proxy
+```
+
+### 十二.calico配置
+
+> 网络组件采用calico，calico部署比较简单，只需要create 一下yml文件即可，具体参考[calico官方文档](https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/) ，在使用calico网络的时候，官方的要求如下
+
+* kubelet 必须配置使用CNI插件`--network-plugin=cni`
+* kube-proxy 必须以`iptables`的模式启动
+* kube-proxy 不能使用`--masquerade-all`启动(会与calico policy冲突)
+* kubernetes networkpolicy api 至少需要kubernetes 1.3 版本以上
+* 如果开启了RBAC，那么需要注意需要创建clusterrole和clusterrolebinding
+
+##### 在每个节点上修改kubelet.service
+
+> 修改kubelet配置，增加`--network-plugin=cni`
+
+```bash
+vi /usr/lib/systemd/system/kubelet.service
+
+--network-plugin=cni
+```
+
+> 重启kubelet
+
+```bash
+systemctl daemon-reload
+systemctl restart kubelet.service
+systemctl status kubelet.service
+```
+
+##### 准备依赖包和文件
+
+> 下载calico.yaml 和rbac.yaml
+
+```bash
+wget https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/calico.yaml
+wget https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/rbac.yaml
+```
+
+> 下载镜像
+
+```bash
+quay.io/calico/node:v2.6.1
+quay.io/calico/cni:v1.11.0
+quay.io/calico/kube-controllers:v1.0.0
+```
+
+##### 修改配置文件
+
+> 修改etcd_endpoints
+
+```bash
+etcd_endpoints: "https://172.29.151.1:2379,https://172.29.151.2:2379,https://172.29.151.3:2379"
+```
+
+> 修改calico所需的etcd密钥信息
+
+```bash
+etcd_ca: "/calico-secrets/etcd-ca"
+etcd_cert: "/calico-secrets/etcd-cert"
+etcd_key: "/calico-secrets/etcd-key"
+```
+
+> 写入etcd-key、etcd-cert、etcd-ca的base64信息，将括号里面命令执行的结果填入即可
+
+```bash
+data:
+  etcd-key: (cat /opt/ssl/etcd-key.pem | base64 | tr -d '\n')
+  etcd-cert: (cat /opt/ssl/etcd.pem | base64 | tr -d '\n')
+  etcd-ca: (cat /opt/ssl/ca.pem | base64 | tr -d '\n')
+```
+
+> 修改calico的网络段
+
+```bash
+- name: CALICO_IPV4POOL_CIDR
+      value: "10.233.0.0/16"
+```
+
+> 注释掉calico-node 部分，这部分用systemctl来进行管理，因为用官方文档可能会出现无法获取到IP的情况
+
+```bash
+# Calico Version v2.6.1
+# https://docs.projectcalico.org/v2.6/releases#v2.6.1
+# This manifest includes the following component versions:
+#   calico/node:v2.6.1
+#   calico/cni:v1.11.0
+#   calico/kube-controllers:v1.0.0
+
+# This ConfigMap is used to configure a self-hosted Calico installation.
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: calico-config
+  namespace: kube-system
+data:
+  # Configure this with the location of your etcd cluster.
+  etcd_endpoints: "https://172.29.151.1:2379,https://172.29.151.2:2379,https://172.29.151.3:2379"
+
+  # Configure the Calico backend to use.
+  calico_backend: "bird"
+
+  # The CNI network configuration to install on each node.
+  cni_network_config: |-
+    {
+        "name": "k8s-pod-network",
+        "cniVersion": "0.1.0",
+        "type": "calico",
+        "etcd_endpoints": "__ETCD_ENDPOINTS__",
+        "etcd_key_file": "__ETCD_KEY_FILE__",
+        "etcd_cert_file": "__ETCD_CERT_FILE__",
+        "etcd_ca_cert_file": "__ETCD_CA_CERT_FILE__",
+        "log_level": "info",
+        "mtu": 1500,
+        "ipam": {
+            "type": "calico-ipam"
+        },
+        "policy": {
+            "type": "k8s",
+            "k8s_api_root": "https://__KUBERNETES_SERVICE_HOST__:__KUBERNETES_SERVICE_PORT__",
+            "k8s_auth_token": "__SERVICEACCOUNT_TOKEN__"
+        },
+        "kubernetes": {
+            "kubeconfig": "__KUBECONFIG_FILEPATH__"
+        }
+    }
+
+  # If you're using TLS enabled etcd uncomment the following.
+  # You must also populate the Secret below with these files.
+  etcd_ca: "/calico-secrets/etcd-ca"
+  etcd_cert: "/calico-secrets/etcd-cert"
+  etcd_key: "/calico-secrets/etcd-key"
+
+---
+
+# The following contains k8s Secrets for use with a TLS enabled etcd cluster.
+# For information on populating Secrets, see http://kubernetes.io/docs/user-guide/secrets/
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: calico-etcd-secrets
+  namespace: kube-system
+data:
+  # Populate the following files with etcd TLS configuration if desired, but leave blank if
+  # not using TLS for etcd.
+  # This self-hosted install expects three files with the following names.  The values
+  # should be base64 encoded strings of the entire contents of each file.
+  etcd-key: 这块自己对 etcd 相关证书做 base64
+  etcd-cert: 这块自己对 etcd 相关证书做 base64
+  etcd-ca: 这块自己对 etcd 相关证书做 base64
+
+---
+
+# This manifest installs the calico/node container, as well
+# as the Calico CNI plugins and network config on
+# each master and worker node in a Kubernetes cluster.
+kind: DaemonSet
+apiVersion: extensions/v1beta1
+metadata:
+  name: calico-node
+  namespace: kube-system
+  labels:
+    k8s-app: calico-node
+spec:
+  selector:
+    matchLabels:
+      k8s-app: calico-node
+  template:
+    metadata:
+      labels:
+        k8s-app: calico-node
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+        scheduler.alpha.kubernetes.io/tolerations: |
+          [{"key": "dedicated", "value": "master", "effect": "NoSchedule" },
+           {"key":"CriticalAddonsOnly", "operator":"Exists"}]
+    spec:
+      hostNetwork: true
+      serviceAccountName: calico-node
+      containers:
+        # Runs calico/node container on each Kubernetes node.  This
+        # container programs network policy and routes on each
+        # host.
+        # 从这里开始注释掉calico-node的部分
+        # - name: calico-node
+        #   image: quay.io/calico/node:v2.6.1
+        #   env:
+        #     # The location of the Calico etcd cluster.
+        #     - name: ETCD_ENDPOINTS
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: calico-config
+        #           key: etcd_endpoints
+        #     # Choose the backend to use.
+        #     - name: CALICO_NETWORKING_BACKEND
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: calico-config
+        #           key: calico_backend
+        #     # Cluster type to identify the deployment type
+        #     - name: CLUSTER_TYPE
+        #       value: "k8s,bgp"
+        #     # Disable file logging so `kubectl logs` works.
+        #     - name: CALICO_DISABLE_FILE_LOGGING
+        #       value: "true"
+        #     # Set Felix endpoint to host default action to ACCEPT.
+        #     - name: FELIX_DEFAULTENDPOINTTOHOSTACTION
+        #       value: "ACCEPT"
+        #     # Configure the IP Pool from which Pod IPs will be chosen.
+        #     - name: CALICO_IPV4POOL_CIDR
+        #       value: "10.233.0.0/16"
+        #     - name: CALICO_IPV4POOL_IPIP
+        #       value: "always"
+        #     # Disable IPv6 on Kubernetes.
+        #     - name: FELIX_IPV6SUPPORT
+        #       value: "false"
+        #     # Set Felix logging to "info"
+        #     - name: FELIX_LOGSEVERITYSCREEN
+        #       value: "info"
+        #     # Set MTU for tunnel device used if ipip is enabled
+        #     - name: FELIX_IPINIPMTU
+        #       value: "1440"
+        #     # Location of the CA certificate for etcd.
+        #     - name: ETCD_CA_CERT_FILE
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: calico-config
+        #           key: etcd_ca
+        #     # Location of the client key for etcd.
+        #     - name: ETCD_KEY_FILE
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: calico-config
+        #           key: etcd_key
+        #     # Location of the client certificate for etcd.
+        #     - name: ETCD_CERT_FILE
+        #       valueFrom:
+        #         configMapKeyRef:
+        #           name: calico-config
+        #           key: etcd_cert
+        #     # Auto-detect the BGP IP address.
+        #     - name: IP
+        #       value: ""
+        #     - name: FELIX_HEALTHENABLED
+        #       value: "true"
+        #   securityContext:
+        #     privileged: true
+        #   resources:
+        #     requests:
+        #       cpu: 250m
+        #   livenessProbe:
+        #     httpGet:
+        #       path: /liveness
+        #       port: 9099
+        #     periodSeconds: 10
+        #     initialDelaySeconds: 10
+        #     failureThreshold: 6
+        #   readinessProbe:
+        #     httpGet:
+        #       path: /readiness
+        #       port: 9099
+        #     periodSeconds: 10
+        #   volumeMounts:
+        #     - mountPath: /lib/modules
+        #       name: lib-modules
+        #       readOnly: true
+        #     - mountPath: /var/run/calico
+        #       name: var-run-calico
+        #       readOnly: false
+        #     - mountPath: /calico-secrets
+        #       name: etcd-certs
+        # This container installs the Calico CNI binaries
+        # and CNI network config file on each node.
+        - name: install-cni
+          image: quay.io/calico/cni:v1.11.0
+          command: ["/install-cni.sh"]
+          env:
+            # The location of the Calico etcd cluster.
+            - name: ETCD_ENDPOINTS
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_endpoints
+            # The CNI network config to install on each node.
+            - name: CNI_NETWORK_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: cni_network_config
+          volumeMounts:
+            - mountPath: /host/opt/cni/bin
+              name: cni-bin-dir
+            - mountPath: /host/etc/cni/net.d
+              name: cni-net-dir
+            - mountPath: /calico-secrets
+              name: etcd-certs
+      volumes:
+        # Used by calico/node.
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+        - name: var-run-calico
+          hostPath:
+            path: /var/run/calico
+        # Used to install CNI.
+        - name: cni-bin-dir
+          hostPath:
+            path: /opt/cni/bin
+        - name: cni-net-dir
+          hostPath:
+            path: /etc/cni/net.d
+        # Mount in the etcd TLS secrets.
+        - name: etcd-certs
+          secret:
+            secretName: calico-etcd-secrets
+
+---
+
+# This manifest deploys the Calico Kubernetes controllers.
+# See https://github.com/projectcalico/kube-controllers
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: calico-kube-controllers
+  namespace: kube-system
+  labels:
+    k8s-app: calico-kube-controllers
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ''
+    scheduler.alpha.kubernetes.io/tolerations: |
+      [{"key": "dedicated", "value": "master", "effect": "NoSchedule" },
+       {"key":"CriticalAddonsOnly", "operator":"Exists"}]
+spec:
+  # The controllers can only have a single active instance.
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: calico-kube-controllers
+      namespace: kube-system
+      labels:
+        k8s-app: calico-kube-controllers
+    spec:
+      # The controllers must run in the host network namespace so that
+      # it isn't governed by policy that would prevent it from working.
+      hostNetwork: true
+      serviceAccountName: calico-kube-controllers
+      containers:
+        - name: calico-kube-controllers
+          image: quay.io/calico/kube-controllers:v1.0.0
+          env:
+            # The location of the Calico etcd cluster.
+            - name: ETCD_ENDPOINTS
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_endpoints
+            # Location of the CA certificate for etcd.
+            - name: ETCD_CA_CERT_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_ca
+            # Location of the client key for etcd.
+            - name: ETCD_KEY_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_key
+            # Location of the client certificate for etcd.
+            - name: ETCD_CERT_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_cert
+          volumeMounts:
+            # Mount in the etcd TLS secrets.
+            - mountPath: /calico-secrets
+              name: etcd-certs
+      volumes:
+        # Mount in the etcd TLS secrets.
+        - name: etcd-certs
+          secret:
+            secretName: calico-etcd-secrets
+
+---
+
+# This deployment turns off the old "policy-controller". It should remain at 0 replicas, and then
+# be removed entirely once the new kube-controllers deployment has been deployed above.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: calico-policy-controller
+  namespace: kube-system
+  labels:
+    k8s-app: calico-policy
+spec:
+  # Turn this deployment off in favor of the kube-controllers deployment above.
+  replicas: 0
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: calico-policy-controller
+      namespace: kube-system
+      labels:
+        k8s-app: calico-policy
+    spec:
+      hostNetwork: true
+      serviceAccountName: calico-kube-controllers
+      containers:
+        - name: calico-policy-controller
+          image: quay.io/calico/kube-controllers:v1.0.0
+          env:
+            # The location of the Calico etcd cluster.
+            - name: ETCD_ENDPOINTS
+              valueFrom:
+                configMapKeyRef:
+                  name: calico-config
+                  key: etcd_endpoints
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: calico-kube-controllers
+  namespace: kube-system
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: calico-node
+  namespace: kube-system
+```
+
+##### 安装calico
+
+> 在每个node节点上创建calico所需的目录，并分发证书
+
+```bash
+cd /opt/ssl
+for IP in `seq 5 7`;do
+  ssh root@172.29.151.$IP mkdir -p /etc/calico/certs
+  scp ca.pem etcd*.pem root@172.29.151.$IP:/etc/calico/certs/
+done
+```
+
+> 在每个node节点上添加/etc/calico/calico.env文件,注意修改你自己的ip和hostname
+
+```bash
+ETCD_ENDPOINTS="https://172.29.151.1:2379,https://172.29.151.2:2379,https://172.29.151.3:2379"
+ETCD_CA_CERT_FILE="/etc/calico/certs/ca.pem"
+ETCD_CERT_FILE="/etc/calico/certs/etcd.pem"
+ETCD_KEY_FILE="/etc/calico/certs/etcd-key.pem"
+CALICO_IP="172.29.151.5"
+CALICO_IP6=""
+CALICO_LIBNETWORK_ENABLED="true"
+CALICO_IPV4POOL_CIDR="10.233.0.0/16"
+CALICO_IPV4POOL_IPIP="always"
+CALICO_HOSTNAME="k8s-mds-node01"
+```
+
+> 在每个node节点上添加calico.service为系统服务
+
+```bash
+[Unit]
+Description=calico-node
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/etc/calico/calico.env
+ExecStartPre=-/usr/bin/docker rm -f calico-node
+ExecStart=/usr/bin/docker run --net=host --privileged \
+ --name=calico-node \
+ -e ETCD_ENDPOINTS=${ETCD_ENDPOINTS} \
+ -e ETCD_CA_CERT_FILE=${ETCD_CA_CERT_FILE} \
+ -e ETCD_CERT_FILE=${ETCD_CERT_FILE} \
+ -e ETCD_KEY_FILE=${ETCD_KEY_FILE} \
+ -e HOSTNAME=${CALICO_HOSTNAME} \
+ -e IP=${CALICO_IP} \
+ -e IP6=${CALICO_IP6} \
+ -e CALICO_NETWORKING_BACKEND=${CALICO_NETWORKING_BACKEND} \
+ -e CALICO_LIBNETWORK_ENABLED=${CALICO_LIBNETWORK_ENABLED} \
+ -e CALICO_IPV4POOL_CIDR=${CALICO_IPV4POOL_CIDR} \
+ -e CALICO_IPV4POOL_IPIP=${CALICO_IPV4POOL_IPIP} \
+ -e CALICO_DISABLE_FILE_LOGGING=${CALICO_DISABLE_FILE_LOGGING} \
+ -e FELIX_DEFAULTENDPOINTTOHOSTACTION=RETURN \
+ -e FELIX_IPV6SUPPORT=false \
+ -e FELIX_LOGSEVERITYSCREEN=info \
+ -e AS=${CALICO_AS} \
+ -v /var/log/calico:/var/log/calico \
+ -v /run/docker/plugins:/run/docker/plugins \
+ -v /lib/modules:/lib/modules \
+ -v /var/run/calico:/var/run/calico \
+ -v /var/run/docker.sock:/var/run/docker.sock \
+ -v /etc/calico/certs:/etc/calico/certs:ro \
+ --memory=500M --cpu-shares=300 \
+ quay.io/calico/node:v2.6.1
+
+Restart=always
+RestartSec=10s
+
+ExecStop=-/usr/bin/docker stop calico-node
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> 启动calico-node
+
+```bash
+systemctl daemon-reload
+systemctl enable calico-node
+systemctl start calico-node
+systemctl status calico-node
+```
+> 在k8s-console上执行calico安装
+
+```bash
+$ kubectl apply -f calico.yaml
+configmap "calico-config" created
+secret "calico-etcd-secrets" created
+daemonset "calico-node" created
+deployment "calico-policy-controller" created
+serviceaccount "calico-policy-controller" created
+serviceaccount "calico-node" created
+
+
+$ kubectl apply -f rbac.yaml
+clusterrole "calico-policy-controller" created
+clusterrolebinding "calico-policy-controller" created
+clusterrole "calico-node" created
+clusterrolebinding "calico-node" created
+```
+
+##### 验证calico
+
+```bash
+$ kubectl get pods -n kube-system
+NAME                                       READY     STATUS    RESTARTS   AGE
+calico-kube-controllers-3994748863-0dpcp   1/1       Running   0          1h
+calico-node-74d64                          1/1       Running   0          14h
+calico-node-rbrw3                          1/1       Running   0          14h
+calico-node-vtcrs                          1/1       Running   0          14h
+```
+
+##### 安装calicoctl
+
+> 在k8s-console上下载calicoctl并分发到各个node节点
+
+```bash
+wget https://github.com/projectcalico/calicoctl/releases/download/v1.6.1/calicoctl
+chmod +x calicoctl
+
+for IP in `seq 5 7`;do
+  scp calicoctl root@172.29.151.$IP:/usr/local/bin/
+done
+```
+
+> 在节点上看看calico的状态
+
+```bash
+$ calicoctl node status
+Calico process is running.
+
+IPv4 BGP status
++--------------+-------------------+-------+----------+-------------+
+| PEER ADDRESS |     PEER TYPE     | STATE |  SINCE   |    INFO     |
++--------------+-------------------+-------+----------+-------------+
+| 172.29.151.6 | node-to-node mesh | up    | 12:40:50 | Established |
+| 172.29.151.7 | node-to-node mesh | up    | 12:40:50 | Established |
++--------------+-------------------+-------+----------+-------------+
+
+IPv6 BGP status
+No IPv6 peers found.
+
+```
+
+##### 测试跨主机通信
+
+> 创建一个nginxdeployment
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-dm
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    name: nginx
+```
+
+> 查看创建结果
+
+```bash
+$ kubectl get pods -o wide
+NAME                        READY     STATUS    RESTARTS   AGE       IP             NODE
+nginx-dm-2214564181-bplwr   1/1       Running   0          3m        10.233.136.3   172.29.151.7
+nginx-dm-2214564181-qsl5c   1/1       Running   0          3m        10.233.203.2   172.29.151.6
+
+$ kubectl get deployment
+NAME       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+nginx-dm   2         2         2            2           4m
+
+$ kubectl get svc
+NAME         CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+kubernetes   10.254.0.1       <none>        443/TCP   14h
+nginx-svc    10.254.149.124   <none>        80/TCP    4m
+```
+
+> 在pod里ping另一个pod
+
+```bash
+$ kubectl exec -ti nginx-dm-2214564181-bplwr /bin/sh
+/ # ping 10.233.203.2
+PING 10.233.203.2 (10.233.203.2): 56 data bytes
+64 bytes from 10.233.203.2: seq=0 ttl=62 time=0.592 ms
+64 bytes from 10.233.203.2: seq=1 ttl=62 time=0.894 ms
+64 bytes from 10.233.203.2: seq=2 ttl=62 time=0.559 ms
+```
+
+> 在node节点上curl测试一下
+
+```bash
+$ curl 10.254.149.124
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+
+
+### 十三.部署DNS
+
+##### 部署集群dns
+> 获取对应的yaml文件
+
+```bash
+wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns/kube-dns.yaml.sed
+mv kube-dns.yaml.sed kube-dns.yaml
+```
+
+> 修改如下配置
+
+```bash
+sed -i 's/$DNS_DOMAIN/cluster.local/gi' kube-dns.yaml
+sed -i 's/$DNS_SERVER_IP/10.254.0.2/gi' kube-dns.yaml
+```
+
+> 创建
+
+```bash
+kubectl create -f kube-dns.yaml
+```
+
+> 查看创建结果
+
+```bash
+$ kubectl get pods -n kube-system |grep kube-dns
+kube-dns-3468831164-2kl0h                  3/3       Running   0          14m
+```
+
+> 进入刚刚创建的nginx pod中访问nginx-svc测试
+
+```bash
+$ kubectl exec -ti nginx-dm-2214564181-bplwr /bin/sh
+/ # curl nginx-svc
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+```
+
+> 测试外网
+
+```bash
+$ kubectl exec -ti nginx-dm-2214564181-bplwr /bin/sh
+/ # curl https://baidu.com
+<html>
+<head><title>302 Found</title></head>
+<body bgcolor="white">
+<center><h1>302 Found</h1></center>
+<hr><center>bfe/1.0.8.18</center>
+</body>
+</html>
+```
+
+##### 部署dns自动扩容
+
+> 下载对应的yaml文件，不需要任何修改
+
+```bash
+wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/addons/dns-horizontal-autoscaler/dns-horizontal-autoscaler.yaml
+```
+
+> 创建
+
+```bash
+kubectl create -f dns-horizontal-autoscaler.yaml
+```
+
+> 查看创建结果
+
+```bash
+
 ```
