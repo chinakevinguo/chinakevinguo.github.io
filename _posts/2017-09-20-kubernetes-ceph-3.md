@@ -264,7 +264,7 @@ provisioner: kubernetes.io/rbd
 parameters:
   monitors: 172.30.33.90:6789,172.30.33.91:6789,172.30.33.92:6789
   adminId: admin
-  adminSecretName: cehp-storageclass-secret
+  adminSecretName: ceph-storageclass-secret
   adminSecretNamespace: kube-system
   pool: data
   userId: admin
