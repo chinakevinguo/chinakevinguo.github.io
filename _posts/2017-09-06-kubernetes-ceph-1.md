@@ -73,35 +73,27 @@ CRUSH： CRUSH是ceph使用的数据分布算法，类似一致性哈希，让�
 | 172.30.33.94 | k8s-node02 | centos7.3.1611 | osd mds |
 
 ##### 在管理节点上操作
-
-1.执行如下命令
-
-```bash
-$ sudo yum install -y yum-utils && sudo yum-config-manager --add-repo https://dl.fedoraproject.org/pub/epel/7/x86_64/ && sudo yum install --nogpgcheck -y epel-release && sudo rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 && sudo rm /etc/yum.repos.d/dl.fedoraproject.org*
-```
-
-2.将软件包源加入软件仓库
+1.添加ceph源
 
 ```bash
-$ vim /etc/yum.repos.d/ceph.repo
-
-[ceph]
-name=ceph
-baseurl=http://mirrors.163.com/ceph/rpm-jewel/el7/x86_64/
-gpgcheck=0
 [ceph-noarch]
-name=cephnoarch
-baseurl=http://mirrors.163.com/ceph/rpm-jewel/el7/noarch/
-gpgcheck=0
+name=Ceph noarch packages
+baseurl=https://download.ceph.com/rpm-jewel/el7/noarch
+enabled=1
+gpgcheck=1
+type=rpm-md
+gpgkey=https://download.ceph.com/keys/release.asc
+
+$ yum update -y && yum install ceph-deploy -y
 ```
 
-3.更新并安装`ceph-deploy`
+2.更新并安装`ceph-deploy`
 
 ```bash
 $ sudo yum update && sudo yum install ceph-deploy
 ```
 
-4.配置从部署机器到所有其他节点的免密钥登录，具体参考[这里](https://kevinguo.me/2017/07/06/ansible-client/)
+2.配置从部署机器到所有其他节点的免密钥登录，具体参考[这里](https://kevinguo.me/2017/07/06/ansible-client/)
 
 ##### 在节点上操作
 
@@ -154,15 +146,34 @@ $ ceph-deploy install k8s-master01 k8s-master02 k8s-master03
 ```
 **注意：在部署节点部署的时候，可能会因为网络原因导致无法安装ceph和ceph-radosgw，这时候，我们在各个节点上手动安装一下**
 ```bash
-# 添加ceph 163源
-[ceph]
-name=ceph
-baseurl=http://mirrors.163.com/ceph/rpm-jewel/el7/x86_64/
-gpgcheck=0
-[ceph-noarch]
-name=cephnoarch
-baseurl=http://mirrors.163.com/ceph/rpm-jewel/el7/noarch/
-gpgcheck=0
+# 添加ceph 源
+[Ceph]
+name=Ceph packages for $basearch
+baseurl=http://download.ceph.com/rpm-jewel/el7/$basearch
+enabled=1
+gpgcheck=1
+type=rpm-md
+gpgkey=https://download.ceph.com/keys/release.asc
+priority=1
+
+[Ceph-noarch]
+name=Ceph noarch packages
+baseurl=http://download.ceph.com/rpm-jewel/el7/noarch
+enabled=1
+gpgcheck=1
+type=rpm-md
+gpgkey=https://download.ceph.com/keys/release.asc
+priority=1
+
+[ceph-source]
+name=Ceph source packages
+baseurl=http://download.ceph.com/rpm-jewel/el7/SRPMS
+enabled=1
+gpgcheck=1
+type=rpm-md
+gpgkey=https://download.ceph.com/keys/release.asc
+priority=1
+
 
 $ yum install ceph ceph-radosgw -y
 ```
