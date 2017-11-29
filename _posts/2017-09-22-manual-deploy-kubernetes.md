@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 手动搭建kubernetes HA集群
+title: 手动搭建kubernetes HA集群(一)
 categories: [kubernetes, docker]
 description: 手动搭建kubernetes HA集群
 keywords: kubernetes,docker
@@ -2267,3 +2267,5 @@ monitoring-influxdb-3570645011-dp51l       1/1       Running   0          1h
 
 
 ##### ingress 配置
+
+见[第二章](https://kevinguo.me/)
