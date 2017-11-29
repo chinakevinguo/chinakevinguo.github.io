@@ -65,6 +65,8 @@ Consul 是一个支持多数据中心分布式高可用的服务发现和配置�
 
 首先我们需要部署一套`consul server cluster`，具体部署过程，这里就不再演示了，请参考[Consul 集群搭建](https://github.com/kaizamm/consul/blob/master/consul%2Bdocker%2Bregistrator.md)
 
+然后，我们所有的节点都需要包含在`calico-network`范围之内，calico网络部署请参考[第一章](https://kevinguo.me/2017/09/22/manual-deploy-kubernetes/),将所有fabio所在的节点配置为noscheduler
+
 1.consul client 部署
 
 > 我们在每个节点上跑一个consul-client，你可以以daemonset的方式部署，也可以直接以二进制的方式部署，用systemd管理起来，这里用二进制的方式
