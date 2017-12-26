@@ -61,7 +61,7 @@ vi /etc/selinux/config
 SELINUX=disable
 ```
 
-> 在所有节点上创建 `/etc/sysctl.d/k8s.conf`文件，添加如下内容
+> ~~如果你想使用flanel网络，还记得在所有节点上创建 `/etc/sysctl.d/k8s.conf`文件，添加如下内容，如果是calico网络，请忽略这步~~
 
 ```bash
 net.bridge.bridge-nf-call-ip6tables = 1
@@ -157,6 +157,10 @@ cfssl print-defaults csr > csr.json
   }
 }
 ```
+* ca-config.json：可以定义多个 profiles，分别指定不同的过期时间、使用场景等参数；后续在签名证书时使用某个 profile；
+* signing：表示该证书可用于签名其它证书；生成的 ca.pem 证书中 CA=TRUE；
+* server auth：表示client可以用该 CA 对server提供的证书进行验证；
+* client auth：表示server可以用该CA对client提供的证书进行验证；
 
 **csr.json**
 
@@ -178,6 +182,9 @@ cfssl print-defaults csr > csr.json
   ]
 }
 ```
+
+* CN：Common Name，kube-apiserver 从证书中提取该字段作为请求的用户名 (User Name)；浏览器使用该字段验证网站是否合法；
+* O：Organization，kube-apiserver 从证书中提取该字段作为请求用户所属的组 (Group)；
 
 > 生成CA 证书和私钥
 
@@ -280,6 +287,8 @@ etcd.csr  etcd-csr.json  etcd-key.pem  etcd.pem
 }
 ```
 
+* 如果 hosts 字段不为空则需要指定授权使用该证书的 IP 或域名列表，由于该证书被 etcd 集群和 kubernetes master 集群使用，所以上面分别指定了 etcd 集群、kubernetes master 集群的主机 IP 和 kubernetes 服务的服务 IP（一般是 kue-apiserver 指定的 service-cluster-ip-range 网段的第一个IP，如 10.254.0.1。
+
 > 生成kube-apiserver证书和私钥
 
 ```bash
@@ -324,6 +333,9 @@ kube-apiserver.csr  kube-apiserver-csr.json  kube-apiserver-key.pem  kube-apiser
   ]
 }
 ```
+
+* CN 指定该证书的 User 为 system:kube-controller-manager
+* kube-apiserver 预定义的 RoleBinding cluster-admin 将User system:kube-controller-manager 与 ClusterRole system:kube-controller-manager 绑定，该 ClusterRole 授予了调用 kube-apiserver kube-controller-manager 相关 API 的权限
 
 > 生成kube-controller-manager证书和私钥
 
@@ -372,6 +384,9 @@ kube-controller-manager.csr  kube-controller-manager-csr.json  kube-controller-m
 }
 ```
 
+* CN 指定该证书的 User 为 system:kube-scheduler
+* kube-apiserver 预定义的 RoleBinding cluster-admin 将User system:kube-scheduler 与 ClusterRole system:kube-scheduler 绑定，该 ClusterRole 授予了调用 kube-apiserver kube-scheduler 相关 API 的权限
+
 > 生成kube-scheduler证书和私钥
 
 ```bash
@@ -415,6 +430,10 @@ kube-scheduler.csr  kube-scheduler-csr.json  kube-scheduler-key.pem  kube-schedu
 }
 ```
 
+* 后续 kube-apiserver 使用 RBAC 对客户端(如 kubelet、kube-proxy、Pod)请求进行授权
+* kube-apiserver 预定义了一些 RBAC 使用的 RoleBindings，如 cluster-admin 将 Group system:masters 与 Role cluster-admin 绑定，该 Role 授予了调用kube-apiserver 的所有 API的权限
+* OU 指定该证书的 Group 为 system:masters，kubelet 使用该证书访问 kube-apiserver 时 ，由于证书被 CA 签名，所以认证通过，同时由于证书用户组为经过预授权的 system:masters，所以被授予访问所有 API 的权限
+
 > 生成kube-admin证书和私钥
 
 ```bash
@@ -457,6 +476,9 @@ kube-admin.csr  kube-admin-csr.json  kube-admin-key.pem  kube-admin.pem
   ]
 }
 ```
+
+* CN 指定该证书的 User 为 system:kube-proxy
+* kube-apiserver 预定义的 RoleBinding cluster-admin 将User system:kube-proxy 与 ClusterRole system:node-proxier 绑定，该 ClusterRole 授予了调用 kube-apiserver Proxy 相关 API 的权限
 
 > 生成kube-proxy证书和私钥
 
