@@ -51,4 +51,4 @@ kubernetes cloud的配置相对简单，我们只需要指定`Kubernetes URL`以
 
 ![](/images/posts/jenkins-kubernetes-result.png)
 
-![](/images/posts/jenkins-kubernetes-result2.png)
+![](/images/posts/jenkins-kubernetes-result-2.png)
