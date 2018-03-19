@@ -10,6 +10,9 @@ keywords: consul,docker,registrator
 
 > 以前了解过一段时间的consul，只知道consul是一个服务发现的工具，但是具体是怎么注册的，又是怎么服务发现的，一点也不清楚，这次趁着研究kubernetes的服务发现，顺带研究了下consul，在此记录下来。
 
+
+<!--more-->
+
 ### 概念
 
 简单来说，consul是一个提供服务注册、服务发现、键值存储、健康检查的工具，并且它支持多数据中心。

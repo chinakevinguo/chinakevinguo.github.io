@@ -20,6 +20,8 @@ keywords: kubernetes,docker
 
 5.超强的横向扩容能力
 
+<!--more-->
+
 ### master
 
 * kube-apiserver

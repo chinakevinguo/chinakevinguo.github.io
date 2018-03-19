@@ -8,6 +8,9 @@ keywords: harbor,docker,etcd
 
 > 由于原有的etcd一直是以单机的环境运行，不仅没有共享存储，也没有集群环境，而且生产上的私有image仓库也是使用的docker private registry，没有任何高可用，存在很大的隐患，所以，这里我搭建了一个套由ceph fs作为共享存储，为harbor和etcd集群提供存储服务的环境，特意在此记录下来，免得以后忘记了。整体架构图如下:
 
+
+<!--more-->
+
 ![](/images/posts/overall-structure.png)
 
 ### docker 安装

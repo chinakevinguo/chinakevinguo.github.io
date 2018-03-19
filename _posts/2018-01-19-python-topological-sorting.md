@@ -8,6 +8,9 @@ keywords: python,topological-sorting
 
 > 最近在学python，学到class 多重继承，降到了c3算法，这里记录一下
 
+
+<!--more-->
+
 ### 一、什么是拓扑排序
 
 在图论中，**拓扑排序(Topological Sorting)** 是一个 **有向无环图(DAG,Directed Acyclic Graph)** 的所有顶点的线性序列。且该序列必须满足下面两个条件：

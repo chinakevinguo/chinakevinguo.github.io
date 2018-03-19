@@ -10,6 +10,8 @@ keywords: kubernetes,docker
 
 > 该文档参考了诸多大神的文档,[漠然](https://mritd.me/2017/07/21/set-up-kubernetes-ha-cluster-by-binary/)、[青蛙小白](http://blog.frognew.com/2017/04/install-ha-kubernetes-1.6-cluster.html)，谨请原谅
 
+<!--more-->
+
 ### 一.环境准备
 
 ##### 1.1 系统环境

@@ -7,6 +7,9 @@ keywords: kubernetes,ceph
 ---
 > 前面花了两章的时间介绍了ceph存储集群，简单的讲了ceph的组件、架构、寻址过程以及关于rbd,cephfs,cephGW,rados,osd,mon,mds,pool,pg,object等的操作过程，这一章主要记录下kubernetes使用ceph的相关配置过程。
 
+
+<!--more-->
+
 通过[官网](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#ceph-rbd)，我们发现在kubernetes中使用的是ceph的RBD
 
 ### 部署集群

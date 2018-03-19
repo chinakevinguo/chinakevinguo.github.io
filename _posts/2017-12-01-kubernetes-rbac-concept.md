@@ -10,6 +10,9 @@ keywords: kubernetes,RBAC
 主要是为了避免以后想查看概念的时候找不到位置，望作者见谅
 以下所有内容是 [xingzhou](https://github.com/xingzhou) 对 kubernetes 官方文档的翻译，原文地址 https://k8smeetup.github.io/docs/admin/authorization/rbac/
 
+
+<!--more-->
+
 # RBAC——基于角色的访问控制
 
 基于角色的访问控制（Role-Based Access Control, 即”RBAC”）使用”rbac.authorization.k8s.io” API Group实现授权决策，允许管理员通过Kubernetes API动态配置策略。

@@ -8,6 +8,9 @@ keywords: kubernetes,docker,fabio,registrator,consul
 
 > 我们在第一章的时候，通过手动的方式搭建好了kubernetes集群，并且在上面跑了一些基础的服务，那么我们要如何将这些服务暴露出来呢，这一章重点介绍关于kubernetes的服务暴露
 
+
+<!--more-->
+
 ### 一、Kubernetes 服务暴露介绍
 
 关于服务暴露，常见的有如下几种方式:

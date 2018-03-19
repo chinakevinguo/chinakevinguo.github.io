@@ -9,6 +9,7 @@ keywords: jekyll,travis
 > 上一篇HTTPS是使用cloudflare进行加密的，所有的请求都交给cloudflare来进行转发，就会出现域名指向的IP不是主机的问题，虽然安全些，但是总感觉怪怪的，所以这一篇，直接通过 nginx+docker+let's encrypt 搭建HTTPS认证
 
 <!--more-->
+
 ### 前提
 
 首先记得将 cloudflare 上有关你的站点的https配置删掉，如果没有做过，则忽略，同时记得去你的 DNS 控制器上将你的域名解析改为默认

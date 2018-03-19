@@ -9,6 +9,7 @@ keywords: kargo,kubernetes,docker
 > 上一篇我们详细的剥析了通过kargo生成的各类服务的配置文件，学会了，如何生成证书，如何配置etcd,calico,kubelet，学会了如何配置一个kubernetes的高可用集群。既然集群已经配好了，那么这一章，我们就来学学如何配置一些常用的插件。
 
 <!--more-->
+
 目前尚不确定kubernetes各个插件版本之间的兼容性，我使用kubespray部署的各个IMAGE在[第一章]( https://kevinguo.me/2017/07/06/kargo%E5%AE%B9%E5%99%A8%E5%8C%96%E9%83%A8%E7%BD%B2kubernetes%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A41)中已经列出来了，中途在部署heapster和kibana的时候出了点问题，其他还未发现什么问题
 
 目前，我所用到的插件如下：

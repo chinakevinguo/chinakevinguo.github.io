@@ -10,6 +10,8 @@ keywords: rancher,docker
 
 > 由于公司目前有部分业务跑在docker上，但又还没有上诸如:swarm,kubernetes之类的容器编排工具，但是又想要能对docker主机及容器进行一个简单可视化的管理，筛选来，筛选去，发现无论是:DockerUI、Shipyard、portainer还是Daocloud都不能符合我们的心意，最终决定使用`rancher`来进行管理。
 
+<!--more-->
+
 ### Rancher是什么
 
 借用官方文档里面的话来说，Rancher是一个开源的容器管理平台。

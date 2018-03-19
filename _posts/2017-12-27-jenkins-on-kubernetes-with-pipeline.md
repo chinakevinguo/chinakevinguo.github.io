@@ -8,6 +8,9 @@ keywords: kubernetes,jenkins
 
 > jenkins CI/CD用了有很长一段时间了，包括现公司的docker container deployment也是通过写pipeline workflow来实现的，但是当我在将jenkins迁往kubernetes的过程中，还是踩了不少的坑，这里记录下来。
 
+
+<!--more-->
+
 该流程包含了 `checkout scm` --> `build artifacts` --> `build image` --> `deploy to k8s`
 
 流程相对简单，而且并没有涉及到代码分支，集中测试，蓝绿部署等等

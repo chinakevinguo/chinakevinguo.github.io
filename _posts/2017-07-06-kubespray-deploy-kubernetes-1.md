@@ -9,6 +9,7 @@ keywords: kubespray,kubernetes,docker
 > 捣鼓kubernetes有一段时间了，先后用过`yum`,`kubeadm`,`custom`等方式，但都不尽如人意，不是缺胳膊就是短腿，后来有幸翻到[漠然](https://mritd.me/)大神的[快速部署kubernetes高可用集群](https://mritd.me/2017/03/03/set-up-kubernetes-ha-cluster-by-kubespray/)，并且请教了无数次才最终搭建成功，在此，再次膜拜漠然大神，同时该篇blog也参考了漠神的的博客，主要是为了记录下来，方便以后查看。
 
 <!--more-->
+
 # 一、基础环境
 
 * docker版本1.12.6
