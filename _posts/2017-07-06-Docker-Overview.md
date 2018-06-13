@@ -39,7 +39,7 @@ Docker在Linux上使用如下的namespaces：
 * Control groups
 Cgroup技术将应用程序限制为特定的一进程集，Cgroup允许Docker Engine将可用的硬件资源共享到容器，并且可以对其进行限制和约束，例如，你可以限制容器的内存大小
 * Union file systems
-UFS，其实就是一个层级概念，将多个目录挂载到同一个目录下，然后进行修改，修改的内容会被重新保存到另外的层里面，而不会影响到原有挂载层数据
+UFS，其实就是一个层级概念，支持将文件系统中的修改进行提交和层层叠加，修改的内容会被重新保存到另外的层里面，因此不会影响到原有挂载层数据，同时也将多个目录挂载到同一个虚拟文件系统下，该技术是实现image的基础
 * Container format
 Docker将namespaces，cgroup和UnionFS组合在一起，形成了一个libcontainer
 
