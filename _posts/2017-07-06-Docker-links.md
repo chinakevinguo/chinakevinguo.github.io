@@ -106,7 +106,7 @@ Docker为`--link`后的每个目标容器设定了别名。例如，如果一个
 
 Docker还会为源容器公开的每个端口定义一组环境变量。每个变量在表单中都有一个唯一的前缀：
 
-<name>_PORT_<port>_<protocol>
+`<name>_PORT_<port>_<protocol>`
 
 前缀部分包含如下：
 
