@@ -105,14 +105,18 @@ docker以两种方式将子容器的连接信息暴露给父容器：
 Docker为`--link`后的每个目标容器设定了别名。例如，如果一个名叫web的新容器连接到一个名叫db的数据库容器(`--link db:webdb`)。那么docker会在`web`容器中创建一个`WEBDB_NAME=/web/webdb`的环境变量
 
 Docker还会为源容器公开的每个端口定义一组环境变量。每个变量在表单中都有一个唯一的前缀：
+
 <name>_PORT_<port>_<protocol>
+
 前缀部分包含如下：
+
 * 通过`--link`指定的别名
 * 公开的端口
 * tcp/udp协议
 
 Docker使用这种前缀格式指定了三个不同的环境变量：
-* `prefix_ADDR` IP，例：WEBDB_PORT_5432_TCP_ADDR=172.17.0.82.
+
+* `prefix_ADDR` IP，例：WEBDB_PORT_5432_TCP_ADDR=172.17.0.82
 * `prefix_PORT` 端口，例：WEBDB_PORT_5432_TCP_PORT=5432
 * `prefix_PROTO` 协议，例：WEBDB_PORT_5432_TCP_PROTO=tcp
 
@@ -120,9 +124,10 @@ Docker使用这种前缀格式指定了三个不同的环境变量：
 
 另外，docker会创建一个名叫`<alias>_PORT`的环境变量，这个环境变量是源容器的第一个公开端口。这个所谓的`第一`端口，被称之为最低编号的暴露端口。例如：`DB_PORT=tcp://172.17.0.82:5432`
 
-最后，docker还会将源容器里那些来自docker主机的环境变量暴露为目标容器的变量，这些变量会在目标容器中被创建成`<alias>_ENV_<name>`的样子，变量的值来自于源容器
+最后，docker还会将源容器里那些来自docker主机的环境变量暴露为目标容器的变量，这些变量会在目标容器中被创建成 `<alias>_ENV_<name>` 的样子，变量的值来自于源容器
 
 我们可以进入web容器，使用`env`命令看看这个目标容器里面的环境变量
+
 ```bash
 $ docker exec -ti web env
 
